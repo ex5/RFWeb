@@ -14,7 +14,7 @@ import re
 
 def show_brief(request):
     _c = sqlite3.Connection('%s/BFT2.db' % PROJECT_ROOT)
-    modules = _c.execute('SELECT * from module where t>="2012-02-29" order by t').fetchall()
+    modules = _c.execute('SELECT * from module where t>="2012-02-29" order by id').fetchall()
     _table = "<table border='5'><tr><td><strong>Serial number</strong></td><td><strong>Number of trials</strong></td><td><strong>Result</strong></td><td><strong>Timestamp</strong></td><td><strong>Download link</strong></td><td><strong>HwAddr 0</strong></td><td><strong>HwAddr 1</strong></td></tr>"
     for _row in modules:
         _hwaddrs = _c.execute('select hwaddr from hwaddr where id="%s"' % _row[0]).fetchall()
@@ -26,7 +26,7 @@ def show_brief(request):
     return HttpResponse(_table)
 
 def show_report(request):
-    return HttpResponse(open(PROJECT_ROOT + re.findall("/[\w]+(/.*)", request.path_info)[0]).read())
+    return HttpResponse(open(os.path.join(PROJECT_ROOT, "reports") + re.findall("/[\w]+(/.*)", request.path_info)[0]).read())
 
 def download_report(request):
     _archive = request.path_info
