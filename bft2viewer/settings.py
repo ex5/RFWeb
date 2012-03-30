@@ -1,13 +1,13 @@
 # Django settings for BFT2 project.
 import os
 DEBUG = True
+APPEND_SLASH = True
 TEMPLATE_DEBUG = DEBUG
 PROJECT_ROOT = os.path.abspath(os.path.dirname(__file__))
 PROJECT_NAME = os.path.abspath(os.path.dirname(__file__)).split('/')[-1]
 ADMINS = (
     # ('Your Name', 'your_email@example.com'),
 )
-
 MANAGERS = ADMINS
 
 DATABASES = {
@@ -107,7 +107,8 @@ TEMPLATE_DIRS = (
     # Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
-    os.path.join(PROJECT_ROOT, "reports"),
+    #os.path.join(PROJECT_ROOT, "reports"),
+    os.path.join(PROJECT_ROOT, "templates"),
     )
 
 INSTALLED_APPS = (
@@ -121,6 +122,7 @@ INSTALLED_APPS = (
     # 'django.contrib.admin',
     # Uncomment the next line to enable admin documentation:
     # 'django.contrib.admindocs',
+    '%s.viewer' % PROJECT_NAME,
 )
 
 # A sample logging configuration. The only tangible logging
