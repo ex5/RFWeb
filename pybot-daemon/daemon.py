@@ -98,7 +98,7 @@ class Daemon:
         """
         # Close log file
         try:
-    	    self.logger.info("stopping daemon")
+    	    self.logger.info("stopping")
             self.logger.flush()
             self.logger.close()
         except AttributeError:

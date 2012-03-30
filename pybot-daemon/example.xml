@@ -1,0 +1,9 @@
+<root>
+    <robot suit="/home/public/clone/BFT2/BFT2.html" output="/tmp/test_result_0">
+        <test name="CPUs cores count" />
+    </robot>
+    <robot suit="/home/public/clone/BFT2/BFT2.html" output="/tmp/test_result_1">
+    	<test name="CPUs frequency" />
+        <test name="CPUs cores count" />
+    </robot>
+</root>
