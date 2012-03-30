@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>Tasks</h2>
+
+<table class="tasks" id="tasks" valign=top>
+    {% for field in tasks.0.fields %}
+    <th>{{ field }}</th>        
+    {% endfor %}
+    {% for task in tasks %}
+    <tr>
+        {% for field, value in task.fields.items %}
+        <td>
+            {{ value }}
+        </td>
+        {% endfor %}
+    </tr>
+    {% endfor %}
+</table>
+{% endblock content %}
+
