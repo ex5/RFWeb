@@ -69,7 +69,7 @@ td.name, th.name {
 </tr>
 <tr>
 <td class="name">Library</td>
-<td>Dialogs_re</td>
+<td>cDialogs.py</td>
 <td></td>
 <td></td>
 <td></td>
@@ -854,7 +854,7 @@ td.name, th.name {
 </tr>
 <tr>
 <td class="name"></td>
-<td>${tty}=</td>
+<td>@{ttys}=</td>
 <td>Serial Exists</td>
 <td></td>
 <td></td>
@@ -862,9 +862,9 @@ td.name, th.name {
 <tr>
 <td class="name"></td>
 <td>Should Not Contain</td>
-<td>${tty}=</td>
+<td>'@{ttys}'</td>
 <td>ERROR</td>
-<td>${tty}=</td>
+<td>'@{ttys}'</td>
 </tr>
 <tr>
 <td class="name"></td>
@@ -876,15 +876,8 @@ td.name, th.name {
 <tr>
 <td class="name"></td>
 <td>Should Not Be Equal</td>
-<td>${tty}</td>
-<td>${None}</td>
-<td>Serial port not recognized</td>
-</tr>
-<tr>
-<td class="name"></td>
-<td>...</td>
-<td>False</td>
-<td></td>
+<td>'@{ttys}'</td>
+<td>'[]'</td>
 <td></td>
 </tr>
 <tr>
@@ -1265,6 +1258,13 @@ td.name, th.name {
 <td>...</td>
 <td>value0</td>
 <td>value1</td>
+<td>yet another value</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>...</td>
+<td>and there's more</td>
+<td></td>
 <td></td>
 </tr>
 <tr>

@@ -100,10 +100,7 @@ class BFT2Library:
         self._run_command("dmesg | grep tty")
         if self._error:
             return "ERROR: %s" % self._error
-        _tmp = re.search("(?P<tty>ttyS[01])", self._status).groups()
-        if not _tmp:
-            return None
-        return _tmp[0]
+        return ["/dev/%s" % x for x in set(re.findall("(tty[USB\d]{2,5})", self._status,  re.M))]
 
     def serial_test(self, device='/dev/ttyS0', _test_string="hello serial port"):
         import serial
