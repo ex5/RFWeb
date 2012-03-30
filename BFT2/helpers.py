@@ -14,7 +14,7 @@ class CmdRunner(object):
         return self._process and self._process.poll() is None
     is_running = property(_get_state) 
 
-    def run(self, command, shell=True, pipe=True, do_raise=False):
+    def runcmd(self, command, shell=True, pipe=True, do_raise=False):
         self._clear()
         self._process = Popen(command, shell=shell, stdout=pipe and PIPE or None, stderr=PIPE)
         self._output = pipe and self._process.stdout.read().strip() or ''
