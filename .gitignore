@@ -6,6 +6,7 @@
 **/*.exe
 **/*.o
 **/*.so
+**/*.pyc
 
 # Packages #
 ############
@@ -19,14 +20,14 @@
 **/*.rar
 **/*.tar
 **/*.zip
+**/*.rpm
 
 # Logs and databases #
 ######################
 **/*.log
-**/*.pyc
-**/*log.html
-**/*report.html
-**/*output.html
+**/log.html
+**/report.html
+**/output.html
 **/*.sql
 **/*.sqlite
 **/*.swp
