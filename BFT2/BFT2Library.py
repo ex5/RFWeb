@@ -2,13 +2,14 @@ import re
 from subprocess import Popen, PIPE
 import helpers
 
-HwAddr = lambda x: re.search(r".* ([0-9a-e:]*) .*", x)
-substr = lambda subs, x: re.findall("^.*%s.*$" % subs, x, re.MULTILINE)
-cores_count = lambda _tmp: max(map(int, re.findall("^core id.*: (\d*)$", _tmp, re.M))) + 1
-cpus_count = lambda _tmp: max(map(int, re.findall("^physical id.*: (\d*)$", _tmp, re.M))) + 1
+match_hwaddr = lambda x: re.search(r".* ([0-9a-e:]*) .*", x)
+substr = lambda subs, x: re.findall("^.*%s.*$" % subs, x, re.M)
+match_cores_count = lambda _tmp: max(map(int, re.findall("^core id.*: (\d*)$", _tmp, re.M))) + 1
+match_cpus_count = lambda _tmp: max(map(int, re.findall("^physical id.*: (\d*)$", _tmp, re.M))) + 1
 
 class BFT2Library(helpers.CmdRunner):
     def __init__(self):
+        super(BFT2Library, self).__init__()
         self._hwaddrs_file_path = 'hwaddrs.log'
         self._hwaddrs = set()
         try:
@@ -28,10 +29,8 @@ class BFT2Library(helpers.CmdRunner):
             return
         _file.write(hwaddr + '\n')
         _file.close()
-
     def get_hwaddrs(self):
         return self._hwaddrs
-
     hwaddrs = property(get_hwaddrs, add_hwaddr)
 
     def _is_hwaddr_taken(self, hwaddr):
@@ -40,8 +39,8 @@ class BFT2Library(helpers.CmdRunner):
         self.add_hwaddr(hwaddr)
         return False
 
-    def HwAddr(self):
-        self.run("tail /sys/class/net/eth0/address")
+    def hwaddr_unique(self):
+        self.run("cat /sys/class/net/eth0/address")
         if self._error:
             return "ERROR: %s" % self._error
         if self._is_hwaddr_taken(self._output):
@@ -114,21 +113,21 @@ class BFT2Library(helpers.CmdRunner):
         self.run("cat /proc/cpuinfo")
         if self._error:
             return "ERROR: %s" % self._error
-        return max(map(int, re.findall("^processor.*: (\d*)$", self._output, re.M))) + 1 != cpus_count(self._output) * cores_count(self._output)
+        return max(map(int, re.findall("^processor.*: (\d*)$", self._output, re.M))) + 1 != match_cpus_count(self._output) * match_cores_count(self._output)
 
     def CPU_cores(self):
         #cat /proc/cpuinfo | grep "core id"
         self.run("cat /proc/cpuinfo")
         if self._error:
             return "ERROR: %s" % self._error
-        return cores_count(self._output)
+        return match_cores_count(self._output)
 
     def CPUs(self):
         #cat /proc/cpuinfo | grep "physical id"
         self.run("cat /proc/cpuinfo")
         if self._error:
             return "ERROR: %s" % self._error
-        return cpus_count(self._output)
+        return match_cpus_count(self._output)
     
     def CPU_frequency(self, expect_freq=3093.061):
         #cat /proc/cpuinfo | grep "cpu MHz"
@@ -150,4 +149,3 @@ class BFT2Library(helpers.CmdRunner):
             return "ERROR: cannot stat memory"
         return _tmp[0]
     
-

@@ -1,9 +1,7 @@
 from subprocess import Popen, PIPE
-from HTMLParser import HTMLParser
-from re import sub
-from traceback import print_exc
+import sys
 
-class CmdRunner():
+class CmdRunner(object):
     def __init__(self):
         self._process = None
         self._clear()

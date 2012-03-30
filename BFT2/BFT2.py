@@ -21,6 +21,7 @@ class BFT2UI(helpers.CmdRunner):
     Simple UI for BFT2 collections of test cases. Uses on dialog/xdialog
     '''
     def __init__(self, logfile="BFT2UI.log", suit_path="quickstart"):
+        super(BFT2UI, self).__init__()
         self.logfile = open(logfile, 'w')
         sys.stderr = self.logfile
         self.suit_path = suit_path
@@ -157,7 +158,7 @@ class BFT2UI(helpers.CmdRunner):
             self.state = "exit"
             return
         if self.tags:
-            self.chosen_tags = self.dlg.checklist(text="Please, choose tests:", choices=[(str(x[1]), str(x[0]), 'off') for x in zip(range(len(self.tags) + 1), self.tags)])[1]
+            self.chosen_tags = self.dlg.checklist(text="Please, choose tests:", choices=[(x, str(len(self.tags[x])), 'off') for x in self.tags])[1]
         if not self.chosen_tags:
             self.chosen_tags = self.tags.keys()
         self.text_update("[OK] Tags to run: %s\n\nProceed?\n" % self.chosen_tags)
@@ -199,3 +200,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+
