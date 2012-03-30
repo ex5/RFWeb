@@ -2,7 +2,6 @@
 
 import sys
 import os
-import helpers
 import subprocess
 import time
 import dialog
@@ -29,110 +28,116 @@ class TestScheduler():
         self.dlg.setBackgroundTitle(self.backtitle)
         self.display()
 
+    def get_info_height(self):
+        return len(self.text.split('\n')) + 5
+    height = property(get_info_height)
+
+    def get_info_width(self):
+        return max(map(len, self.text.split('\n'))) + 5
+    width = property(get_info_width)
+
     def __str__(self):
         return str([(attr, getattr(self, attr)) for attr in self.__dict__])
 
     def flush_state(self):
         self.suit = None
-        self.info = ""
+        self.text = ""
         self.state = "restart"
         self.title = str(self.__class__).split('.')[1]
         self.backtitle = self.title
+        self.dlg.DIALOGRC = ''
 
     def log(self, *args):
         self.logfile.write(str(time.ctime()) + ': ' + str(args) + '\n')
 
     def quit(self):
-        self.info_update("----- Bye! -----", clear=True)
+        self.text_update(" Bye! ", clear=True)
+        self.dlg.infobox(self.text, self.height, self.width)
         self.log("quit", self)
         self.logfile.close()
         exit(0)
 
-    def info_update(self, info, widget="infobox", clear=False):
+    def text_update(self, info, widget="infobox", clear=False):
         if clear:
-            self.info = ""
+            self.text = ""
         for token in colorize:
             info = info.replace(token, colorize[token])
-        self.info += "\n" + info
-        self.draw(self.state, widget)
-
-    def draw(self, mode="", widget="infobox"):
-        size = "%s %s" % (len(self.info.split('\n')) + 5, max(map(len, self.info.split('\n'))))
-        subprocess.call("DIALOGRC=.dialogrc.%s dialog --keep-window --title \"%s\" --backtitle \"%s\" --colors --%s \"%s\" %s" % (mode, self.title, self.backtitle, widget, self.info, size), shell=True, stderr=self.logfile)
+        self.text += "\n" + info
+        if self.state != "restart":
+            self.dlg.DIALOGRC = os.path.abspath(".dialogrc.%s" % self.state)
 
     def draw_menu(self):
-        height = len(self.info[1]) + 7
-        width = max(max(max(map(lambda x: len(x[1]), self.info[1])), len(self.info[0])), len(self.title)) + 5
-        return self.dlg.menu(text=self.info[0], height=height, width=width, menu_height=7, choices=self.info[1])
+        height = len(self.text[1]) + 7
+        width = max(max(max(map(lambda x: len(x[1]), self.text[1])), len(self.text[0])), len(self.title)) + 5
+        return self.dlg.menu(text=self.text[0], height=height, width=width, menu_height=7, choices=self.text[1])
 
     def draw_checklist(self):
-        height = len(self.info[1]) + 7
-        width = max(max(max(map(lambda x: len(x[0]), self.info[1])), len(self.info[0])), len(self.title)) + 12
-        return self.dlg.checklist(text=self.info[0], height=height, width=width, list_height=7, choices=self.info[1])
+        height = len(self.text[1]) + 7
+        width = max(max(max(map(lambda x: len(x[0]), self.text[1])), len(self.text[0])), len(self.title)) + 12
+        return self.dlg.checklist(text=self.text[0], height=height, width=width, list_height=7, choices=self.text[1])
 
     def display(self):
         while self.state != "exit":
             if self.state == "restart":
                 self.do()
+        self.dlg.msgbox(self.text, self.height, self.width)
         self.quit()
 
-    def do(self):
+    def load_test_suit(self):
         if os.path.isdir(self.suit_path):
-            htmls = [name for name in os.listdir(self.suit_path) if '.html' in name]
-            self.info = ["Please, choose one of the test suits:", map(lambda x: (str(x[0]),str(x[1])), zip(range(1, len(htmls) + 1), htmls) )]
-            try:
-                chosen = int(self.draw_menu()[1]) - 1
-            except Exception:
-                self.state = "exit"
-                return
-            self.log("chosen item", chosen, self.log(htmls[chosen]))
-            self.suit_path = "%s/%s" % ( self.suit_path, htmls[chosen])
-        self.info_update("Welcome to test scheduler", clear=True)
-        # reading test suite file
-        self.suit = open(self.suit_path)
-        if not self.suit:
-            self.state = "alarm"
-            self.title = colorize["Error"]
-            self.info_update("[FAIL] Could not found any test suit")
-            self.flush_state()
+            return #TODO
+        if not os.path.isfile(self.suit_path):
+            self.text_update("[FAIL] Could not load test suit")
             return
-        self.info_update("[OK] Found test suit %s" % self.suit.name)
+        # reading test suite file
+        try:
+            self.suit = robot.parsing.TestData(source=self.suit_path)
+        except Exception:
+            self.title = colorize["Error"]
+            self.text_update("[FAIL] %s is not a valid test suit file" % self.suit_path, widget="msgbox")
+            return
+        self.text_update("[OK] Test suit %s" % self.suit)
+
+    def check_pybot(self):
         # checking pybot executable
         try:
-            self.pybot = helpers._path_to_executable("pybot")
-        except Exception:
-            self.state = "alarm"
-            self.title = colorize["Error"]
-            self.info_update("[FAIL] Could not found pybot executable")
-            self.flush_state()
-            return
-        self.info_update("[OK] Found pybot executable")
-        try:
-            test_data = robot.parsing.TestData(source=self.suit.name)
+            self.pybot = dialog._path_to_executable("pybot")
         except Exception:
             self.title = colorize["Error"]
-            self.info_update("[FAIL] %s is not a valid test suit file" % self.suit.name, widget="msgbox")
-            self.flush_state()
+            self.text_update("[FAIL] Could not found pybot executable")
             return
-        keywords = map(lambda x: (str(x.name), "", 1), test_data.keywords)
-        self.log(self.suit, self.suit.name, test_data, keywords)
+        self.text_update("[OK] pybot executable")
+
+    def do(self):
+        self.check_pybot()
+        self.load_test_suit()
+        if not self.suit or not self.pybot:
+            self.state = "exit"
+            return
+        keywords = map(lambda x: (str(x.name), "", 1), self.suit.keywords)
+        self.log(self.suit, keywords)
         if keywords:
-            self.info = ["Please, choose tests:", keywords]
+            self.text = ["Please, choose tests:", keywords]
             chosen = self.draw_checklist()
             self.log(chosen)
-
-        #self.log(self.info_update(info="\n\ZbRun available tests\Zn", widget="msgbox"))
-        testrun = subprocess.Popen([self.pybot, self.suit.name], stderr=subprocess.PIPE, stdout=subprocess.PIPE)
-        self.info_update("", clear=True)
-        while testrun.poll() is None: #Check if child process has terminated
+        exit = self.dlg.yesno(self.text + "\nProceed?\n", len(self.text.split('\n')) + 5, max(map(len, self.text.split('\n'))) + 5)
+        if exit:
+            self.state = "exit"
+            return
+        testrun = subprocess.Popen([self.pybot, self.suit_path], stderr=subprocess.PIPE, stdout=subprocess.PIPE)
+        self.text_update("", clear=True)
+        while testrun.poll() is None:
             line = testrun.stdout.readline()
-            self.log(line)
             if '|' in line or ',' in line:
                 if 'FAIL' in line:
                     self.state = "alarm"
-                self.info_update(line)
-        self.info_update("", widget="msgbox")
-        self.flush_state()
+                self.text_update(line)
+                self.dlg.infobox(self.text, self.height, self.width)
+        exit = self.dlg.yesno(self.text, self.height, self.width)
+        if exit:
+            self.state = "exit"
+        else:
+            self.flush_state()
 
 def main():
     if len(sys.argv) > 1:

@@ -1131,7 +1131,7 @@ class Dialog:
 
 	"""
 	return self._perform(
-            *(["--infobox", text, str(height), str(width)],),
+            *(["--colors", "--infobox", text, str(height), str(width)],),
             **kwargs)[0]
 
     def inputbox(self, text, height=10, width=30, init='', **kwargs):
@@ -1283,7 +1283,7 @@ class Dialog:
 
 	"""
 	return self._perform(
-            *(["--msgbox", text, str(height), str(width)],),
+            *(["--colors", "--msgbox", text, str(height), str(width)],),
             **kwargs)[0]
 
     def passwordbox(self, text, height=10, width=60, init='', **kwargs):
