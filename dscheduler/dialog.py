@@ -1567,5 +1567,5 @@ class Dialog:
 
 	"""
 	return self._perform(
-            *(["--yesno", text, str(height), str(width)],),
+            *([ "--colors","--yesno", text, str(height), str(width)],),
             **kwargs)[0]
