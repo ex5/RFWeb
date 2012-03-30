@@ -1259,7 +1259,7 @@ class Dialog:
         else:
             return (code, output)
 
-    def msgbox(self, text, height=10, width=30, **kwargs):
+    def msgbox(self, text, height=10, width=30, ok="OK", **kwargs):
         """Display a message dialog box.
 
         text   -- text to display in the box
@@ -1283,7 +1283,7 @@ class Dialog:
 
 	"""
 	return self._perform(
-            *(["--colors", "--msgbox", text, str(height), str(width)],),
+            *(["--ok-label", ok, "--colors", "--msgbox", text, str(height), str(width)],),
             **kwargs)[0]
 
     def passwordbox(self, text, height=10, width=60, init='', **kwargs):
@@ -1539,7 +1539,7 @@ class Dialog:
             time = None
         return (code, time)
 
-    def yesno(self, text, height=10, width=30, **kwargs):
+    def yesno(self, text, height=10, width=30, yes="Yes", no="No", **kwargs):
         """Display a yes/no dialog box.
 
         text   -- text to display in the box
@@ -1567,5 +1567,5 @@ class Dialog:
 
 	"""
 	return self._perform(
-            *([ "--colors","--yesno", text, str(height), str(width)],),
+            *(["--yes-label", yes, "--no-label", no, "--colors", "--yesno", text, str(height), str(width)],),
             **kwargs)[0]

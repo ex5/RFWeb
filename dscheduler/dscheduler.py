@@ -16,15 +16,29 @@ colorize= {
         'PASS': "\Z2\ZbPASS\Zn",
         }
 
+def _run_command(command):
+    process = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    return {'stdout': process.stdout.read().strip(),
+            'stderr': process.stderr.read().strip()
+           }
+
+def _find_usb_drive():
+    _out  = _run_command('ls /dev/disk/by-id| grep "usb.*part1"')
+    if _out['stderr']:
+        return "ERROR: %s" % _out['stderr']
+    return _out['stdout']
+
 class TestScheduler():
     '''
     Simple test scheduler with UI based on dialog/xdialog
     '''
     def __init__(self, logfile="dscheduler.log", suit_path="quickstart"):
         self.logfile = open(logfile, 'w')
+        sys.stderr = self.logfile
         self.suit_path = suit_path
         self.dlg = dialog.Dialog(dialog="dialog")
         self.flush_state()
+        self.chosen_tags = []
         self.dlg.setBackgroundTitle(self.backtitle)
         self.display()
 
@@ -39,6 +53,27 @@ class TestScheduler():
     def __str__(self):
         return str([(attr, getattr(self, attr)) for attr in self.__dict__])
 
+    def _reports_to_usb_drive(self, devID):
+        _mount_path = "/mnt/%s" % devID
+        _device = "/dev/disk/by-id/%s" % devID
+        if not os.path.exists(_mount_path) or not os.path.isdir(_mount_path):
+            os.mkdir(_mount_path)
+        if os.listdir(_mount_path):
+            _mount_path += str(time.time())
+            os.mkdir(_mount_path)
+        _out = _run_command("mount %s %s" % (_device, _mount_path))
+        self.text_update(str(_out))
+        self.dlg.infobox(self.text, self.height, self.width)
+        if _out['stderr']:
+            return "ERROR: %s" % _out['stderr']
+        _dest_path = _mount_path + "/bft2report_%s" % time.strftime("%Y_%m_%d-%H-%M-%s")
+        os.mkdir(_dest_path)
+        _out = _run_command("cp *.html %(path)s; cp *.xml %(path)s; cp *.log %(path)s" % {'path':_dest_path})
+        _out = _run_command("umount %s" % _mount_path)
+        os.rmdir(_mount_path)
+        if _out['stderr']:
+            return "ERROR: %s" % _out['stderr']
+
     def flush_state(self):
         self.suit = None
         self.text = ""
@@ -52,7 +87,6 @@ class TestScheduler():
 
     def quit(self):
         self.text_update(" Bye! ", clear=True)
-        self.dlg.infobox(self.text, self.height, self.width)
         self.log("quit", self)
         self.logfile.close()
         exit(0)
@@ -71,16 +105,11 @@ class TestScheduler():
         width = max(max(max(map(lambda x: len(x[1]), self.text[1])), len(self.text[0])), len(self.title)) + 5
         return self.dlg.menu(text=self.text[0], height=height, width=width, menu_height=7, choices=self.text[1])
 
-    def draw_checklist(self):
-        height = len(self.text[1]) + 7
-        width = max(max(max(map(lambda x: len(x[0]), self.text[1])), len(self.text[0])), len(self.title)) + 12
-        return self.dlg.checklist(text=self.text[0], height=height, width=width, list_height=7, choices=self.text[1])
-
     def display(self):
         while self.state != "exit":
             if self.state == "restart":
                 self.do()
-        self.dlg.msgbox(self.text, self.height, self.width)
+        self.dlg.msgbox(self.text, self.height, self.width, "Bye!")
         self.quit()
 
     def load_test_suit(self):
@@ -92,7 +121,15 @@ class TestScheduler():
         # reading test suite file
         try:
             self.suit = robot.parsing.TestData(source=self.suit_path)
-        except Exception:
+            self.tags = set([])
+            self.log(self.tags)
+            for testcase in self.suit.testcase_table:
+                if testcase.tags.value.__class__ == list:
+                    self.tags.update(map(str,testcase.tags.value))
+                else:
+                    self.tags.add(str(testcase.tags.value))
+        except Exception, e:
+            self.log(e)
             self.title = colorize["Error"]
             self.text_update("[FAIL] %s is not a valid test suit file" % self.suit_path, widget="msgbox")
             return
@@ -114,17 +151,19 @@ class TestScheduler():
         if not self.suit or not self.pybot:
             self.state = "exit"
             return
-        keywords = map(lambda x: (str(x.name), "", 1), self.suit.keywords)
-        self.log(self.suit, keywords)
-        if keywords:
-            self.text = ["Please, choose tests:", keywords]
-            chosen = self.draw_checklist()
-            self.log(chosen)
-        exit = self.dlg.yesno(self.text + "\nProceed?\n", len(self.text.split('\n')) + 5, max(map(len, self.text.split('\n'))) + 5)
+        #keywords = map(lambda x: (str(x.name), "", 1), self.suit.keywords)
+        #self.log(self.suit, keywords)
+        if self.tags:
+            self.chosen_tags = self.dlg.checklist(text="Please, choose tests:", choices=[(str(x[1]), str(x[0]), 'on') for x in zip(range(len(self.tags) + 1), self.tags)])[1]
+            self.log(self.chosen_tags)
+            self.text_update("[OK] Tags to run: %s" % self.chosen_tags)
+        exit = self.dlg.yesno(self.text + "\nProceed?\n", len(self.text.split('\n')) + 5, max(map(len, self.text.split('\n'))) + 5, "Run", "Exit")
         if exit:
             self.state = "exit"
             return
-        testrun = subprocess.Popen([self.pybot, self.suit_path], stderr=subprocess.PIPE, stdout=subprocess.PIPE)
+        self.log(' '.join(map(str, self.chosen_tags)))
+        _cmd = self.chosen_tags and [self.pybot, "--include", ' '.join(map(str, self.chosen_tags)), self.suit_path] or [self.pybot, self.suit_path]
+        testrun = subprocess.Popen(_cmd, stderr=subprocess.PIPE, stdout=subprocess.PIPE)
         self.text_update("", clear=True)
         while testrun.poll() is None:
             line = testrun.stdout.readline()
@@ -133,9 +172,24 @@ class TestScheduler():
                     self.state = "alarm"
                 self.text_update(line)
                 self.dlg.infobox(self.text, self.height, self.width)
-        exit = self.dlg.yesno(self.text, self.height, self.width)
+        exit = self.dlg.yesno(self.text, self.height + 20, self.width + 20, "Run again", "Write to USB and exit")
         if exit:
             self.state = "exit"
+            _usb = _find_usb_drive()
+            self.log(_usb)
+            _attemts = 3
+            while not _usb and _attemts:
+                self.log("Waiting")
+                time.sleep(5)
+                _attemts -= 1
+                self.dlg.msgbox("Please, insert USB-drive\nPress OK when finished")
+                _usb = _find_usb_drive()
+            self.log(_usb)
+            if not _usb:
+                self.dlg.msgbox("Cannot write reports")
+            else:
+                self.dlg.infobox("Writing reports to USB-drive..")
+                self._reports_to_usb_drive(_usb)
         else:
             self.flush_state()
 

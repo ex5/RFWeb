@@ -142,7 +142,7 @@ class BFT2Library:
         return cpus_count(self._status)
     
     def CPU_frequency(self, expect_freq=3093.061):
-        #cat /proc/cpuinfo |grep "cpu MHz"
+        #cat /proc/cpuinfo | grep "cpu MHz"
         self._run_command("cat /proc/cpuinfo")
         if self._error:
             return "ERROR: %s" % self._error
@@ -160,4 +160,5 @@ class BFT2Library:
         if not _tmp:
             return "ERROR: cannot stat memory"
         return _tmp[0]
+    
 
