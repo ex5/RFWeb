@@ -29,7 +29,6 @@
 **/report.html
 **/output.xml
 **/*.sql
-**/*.sqlite
 **/*.swp
 **/*.out
 
