@@ -94,6 +94,20 @@ td.name, th.name {
 <td></td>
 </tr>
 <tr>
+<td class="name">@{test_hosts}</td>
+<td>www.www.www</td>
+<td>127.0.0.2</td>
+<td>localhost</td>
+<td>orphu</td>
+</tr>
+<tr>
+<td class="name">...</td>
+<td># Hosts to get echo reply from</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
 <td class="name">${test_host}</td>
 <td>127.0.0.1</td>
 <td># Host address to ping and test packets loss and so on</td>
@@ -122,20 +136,6 @@ td.name, th.name {
 <td></td>
 </tr>
 <tr>
-<td class="name">@{test_hosts}</td>
-<td>www.www.www</td>
-<td>127.0.0.2</td>
-<td>localhost</td>
-<td>orphu</td>
-</tr>
-<tr>
-<td class="name">...</td>
-<td># Hosts to get echo reply from</td>
-<td></td>
-<td></td>
-<td></td>
-</tr>
-<tr>
 <td class="name">${CPU_frequency}</td>
 <td>3093.061</td>
 <td># Expected CPU frequency, MHz</td>
@@ -150,6 +150,13 @@ td.name, th.name {
 <td></td>
 </tr>
 <tr>
+<td class="name">${CPU_cores}</td>
+<td>4</td>
+<td># Number of CPU cores</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
 <td class="name">${hyper_threading}</td>
 <td>${False}</td>
 <td># Hyper-threading, YES/NO</td>
@@ -160,13 +167,6 @@ td.name, th.name {
 <td class="name">${memtotal}</td>
 <td>4030544</td>
 <td># Total amount of memory, kB</td>
-<td></td>
-<td></td>
-</tr>
-<tr>
-<td class="name">${CPU_cores}</td>
-<td>4</td>
-<td># Number of CPU cores </td>
 <td></td>
 <td></td>
 </tr>
@@ -205,20 +205,6 @@ td.name, th.name {
 </tr>
 <tr>
 <td class="name"></td>
-<td>Should Be Equal</td>
-<td>Hw Addr</td>
-<td>UNIQUE</td>
-<td>${serial_num} has duplicate HwAddr</td>
-</tr>
-<tr>
-<td class="name"></td>
-<td>...</td>
-<td>${False}</td>
-<td></td>
-<td></td>
-</tr>
-<tr>
-<td class="name"></td>
 <td>Should Not Contain</td>
 <td>${_status}</td>
 <td>ERROR</td>
@@ -228,6 +214,20 @@ td.name, th.name {
 <td class="name"></td>
 <td>...</td>
 <td>False</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Should Be Equal</td>
+<td>Hw Addr</td>
+<td>UNIQUE</td>
+<td>${serial_num} has duplicate HwAddr</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>...</td>
+<td>${False}</td>
 <td></td>
 <td></td>
 </tr>
@@ -711,13 +711,6 @@ td.name, th.name {
 </tr>
 <tr>
 <td class="name"></td>
-<td>Should Not Be Equal</td>
-<td>${_status}</td>
-<td>'FAIL'</td>
-<td>Packet loss's exceeded acceptable level</td>
-</tr>
-<tr>
-<td class="name"></td>
 <td>Should Not Contain</td>
 <td>${_status}</td>
 <td>ERROR</td>
@@ -729,6 +722,13 @@ td.name, th.name {
 <td>False</td>
 <td></td>
 <td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Should Not Be Equal</td>
+<td>${_status}</td>
+<td>'FAIL'</td>
+<td>Packet loss's exceeded acceptable level</td>
 </tr>
 <tr>
 <td class="name"></td>
@@ -779,13 +779,6 @@ td.name, th.name {
 </tr>
 <tr>
 <td class="name"></td>
-<td>Should Not Be Equal</td>
-<td>${_status}</td>
-<td>'FAIL'</td>
-<td>Packet loss's exceeded acceptable level</td>
-</tr>
-<tr>
-<td class="name"></td>
 <td>Should Not Contain</td>
 <td>${_status}</td>
 <td>ERROR</td>
@@ -797,6 +790,13 @@ td.name, th.name {
 <td>False</td>
 <td></td>
 <td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Should Not Be Equal</td>
+<td>${_status}</td>
+<td>'FAIL'</td>
+<td>Packet loss's exceeded acceptable level</td>
 </tr>
 <tr>
 <td class="name"></td>
@@ -826,10 +826,10 @@ td.name, th.name {
 </tr>
 <tr>
 <td class="name"></td>
-<td>Should Not Be Equal</td>
-<td>${tty}</td>
-<td>${None}</td>
-<td>Serial port not recognized</td>
+<td>Should Not Contain</td>
+<td>${tty}=</td>
+<td>ERROR</td>
+<td>${tty}=</td>
 </tr>
 <tr>
 <td class="name"></td>
@@ -840,10 +840,10 @@ td.name, th.name {
 </tr>
 <tr>
 <td class="name"></td>
-<td>Should Not Contain</td>
-<td>${tty}=</td>
-<td>ERROR</td>
-<td>${tty}=</td>
+<td>Should Not Be Equal</td>
+<td>${tty}</td>
+<td>${None}</td>
+<td>Serial port not recognized</td>
 </tr>
 <tr>
 <td class="name"></td>
@@ -873,10 +873,10 @@ td.name, th.name {
 </tr>
 <tr>
 <td class="name"></td>
-<td>Should Not Be Equal</td>
-<td>${tty}</td>
-<td>${None}</td>
-<td>Serial port not recognized</td>
+<td>Should Not Contain</td>
+<td>${tty}=</td>
+<td>ERROR</td>
+<td>${tty}=</td>
 </tr>
 <tr>
 <td class="name"></td>
@@ -887,10 +887,10 @@ td.name, th.name {
 </tr>
 <tr>
 <td class="name"></td>
-<td>Should Not Contain</td>
-<td>${tty}=</td>
-<td>ERROR</td>
-<td>${tty}=</td>
+<td>Should Not Be Equal</td>
+<td>${tty}</td>
+<td>${None}</td>
+<td>Serial port not recognized</td>
 </tr>
 <tr>
 <td class="name"></td>
@@ -927,9 +927,9 @@ td.name, th.name {
 </tr>
 <tr>
 <td class="name"></td>
-<td>Should Be Equal</td>
+<td>Should Not Contain</td>
 <td>${_status}</td>
-<td>PASS</td>
+<td>ERROR</td>
 <td>${_status}</td>
 </tr>
 <tr>
@@ -941,9 +941,9 @@ td.name, th.name {
 </tr>
 <tr>
 <td class="name"></td>
-<td>Should Not Contain</td>
+<td>Should Be Equal</td>
 <td>${_status}</td>
-<td>ERROR</td>
+<td>PASS</td>
 <td>${_status}</td>
 </tr>
 <tr>
@@ -1069,60 +1069,6 @@ td.name, th.name {
 <td></td>
 </tr>
 <tr>
-<td class="name"><a name="test_Total memory amount check">Total memory amount check</a></td>
-<td>[Documentation]</td>
-<td class="colspan3" colspan="3">Fails if total memory amount differs from expected one.\nAlso fails if cannot determine total amount of memory.</td>
-</tr>
-<tr>
-<td class="name"></td>
-<td>[Tags]</td>
-<td>memory</td>
-<td></td>
-<td></td>
-</tr>
-<tr>
-<td class="name"></td>
-<td>${_status}</td>
-<td>Total Memory</td>
-<td></td>
-<td></td>
-</tr>
-<tr>
-<td class="name"></td>
-<td>Should Not Contain</td>
-<td>'${_status}'</td>
-<td>ERROR</td>
-<td>${_status}</td>
-</tr>
-<tr>
-<td class="name"></td>
-<td>...</td>
-<td>False</td>
-<td></td>
-<td></td>
-</tr>
-<tr>
-<td class="name"></td>
-<td>Should Be Equal</td>
-<td>${_status}</td>
-<td>${memtotal}</td>
-<td>Unexpected total amount of memory: ${_status}</td>
-</tr>
-<tr>
-<td class="name"></td>
-<td>...</td>
-<td>False</td>
-<td></td>
-<td></td>
-</tr>
-<tr>
-<td class="name"></td>
-<td></td>
-<td></td>
-<td></td>
-<td></td>
-</tr>
-<tr>
 <td class="name"><a name="test_CPUs cores count check">CPUs cores count check</a></td>
 <td>[Documentation]</td>
 <td class="colspan3" colspan="3">Fails if resulting CPUs count differs from expected one.</td>
@@ -1161,6 +1107,60 @@ td.name, th.name {
 <td>${_status}</td>
 <td>${CPU_cores}</td>
 <td>Unexpected CPUs cores count: ${_status}, expected ${CPU_cores}</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>...</td>
+<td>False</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"><a name="test_Total memory amount check">Total memory amount check</a></td>
+<td>[Documentation]</td>
+<td class="colspan3" colspan="3">Fails if total memory amount differs from expected one.\nAlso fails if cannot determine total amount of memory.</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>[Tags]</td>
+<td>memory</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>${_status}</td>
+<td>Total Memory</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Should Not Contain</td>
+<td>'${_status}'</td>
+<td>ERROR</td>
+<td>${_status}</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>...</td>
+<td>False</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Should Be Equal</td>
+<td>${_status}</td>
+<td>${memtotal}</td>
+<td>Unexpected total amount of memory: ${_status}</td>
 </tr>
 <tr>
 <td class="name"></td>
