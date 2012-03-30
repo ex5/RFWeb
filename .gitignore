@@ -32,6 +32,7 @@
 *.sql
 *.swp
 *.out
+bft2viewer/reports
 
 # robotframework 
 robotframework/docs
