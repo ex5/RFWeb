@@ -20,7 +20,7 @@ class BFT2UI(helpers.CmdRunner):
     '''
     Simple UI for BFT2 collections of test cases. Uses on dialog/xdialog
     '''
-    def __init__(self, logfile="dscheduler.log", suit_path="quickstart"):
+    def __init__(self, logfile="BFT2UI.log", suit_path="quickstart"):
         self.logfile = open(logfile, 'w')
         sys.stderr = self.logfile
         self.suit_path = suit_path
@@ -39,6 +39,7 @@ class BFT2UI(helpers.CmdRunner):
             if not self._output:
                 _attempts -= 1
                 self.dlg.msgbox("Please insert the USB drive then press OK")
+                time.sleep(5)
         if not _attempts:
             return "ERROR: couldn't find any USB drives"
         return self._output
@@ -62,11 +63,11 @@ class BFT2UI(helpers.CmdRunner):
         try:
             os.mkdir(_mount_path)
             self.run("mount %s %s" % (_device, _mount_path), do_raise=True)
-            self.text_update(str(_out))
             self.dlg.infobox(self.text, self.height, self.width)
             _dest_path = _mount_path + "/bft2report_%s" % time.strftime("%Y_%m_%d-%H-%M-%s")
             os.mkdir(_dest_path)
             self.run("cp *.html %(path)s; cp *.xml %(path)s; cp *.log %(path)s" % {'path':_dest_path}, do_raise=True)
+            self.log("umount %s" % _mount_path)
             self.run("umount %s" % _mount_path, do_raise=True)
             os.rmdir(_mount_path)
         except Exception, e:
@@ -97,6 +98,8 @@ class BFT2UI(helpers.CmdRunner):
         self.text += "\n" + info
         if self.state != "restart":
             self.dlg.DIALOGRC = os.path.abspath(".dialogrc.%s" % self.state)
+        if 'FAIL' in info:
+            self.dlg.DIALOGRC = os.path.abspath(".dialogrc.alarm")
 
     def draw_menu(self):
         height = len(self.text[1]) + 7
@@ -130,9 +133,8 @@ class BFT2UI(helpers.CmdRunner):
                     if str(testcase.tags.value) not in self.tags:
                         self.tags[str(testcase.tags.value)] = []
                     self.tags[str(testcase.tags.value)].append(testcase.name)
-            self.log(self.tags)
         except Exception, e:
-            self.log(e)
+            self.log('Load test suit, exception: ', e)
             self.title = colorize["Error"]
             self.text_update("[FAIL] %s is not a valid test suit file" % self.suit_path, widget="msgbox")
             return
@@ -166,21 +168,18 @@ class BFT2UI(helpers.CmdRunner):
         self.log("Pybot command: ", _cmd)
         self.run(_cmd, pipe=False, do_raise=True)
         from xml.etree import ElementTree
-        _botout = ElementTree.parse('output.xml').getroot()
-        self.log("xml: ", _botout)
+        _test_output = ElementTree.parse('output.xml').getroot()
         self.text_update('', clear=True)
-        for test in _botout.findall('*/test'):
-            self.log(test)
+        for test in _test_output.findall('*/test'):
             _status = test.find('status').text
             self.text_update("[%s] \Zb%s\Zn " % (_status and 'FAIL' or 'PASS', test.attrib['name']))
             self.text_update(_status and "Status: %s \n" % _status.replace('\n\n','\n') or '')
-        del _botout
-        self.log('text: ', self.text)
-        exit = self.dlg.yesno(self.text, self.height, self.width, "Run again", "Write to USB and exit")
+        del _test_output
+        exit = self.dlg.yesno(self.text, self.height, self.width, "Run", "Save and exit")
         if exit:
             self.state = "exit"
             _usb = self._find_usb_drive()
-            self.log(_usb)
+            self.log("Wriring to: ", _usb)
             if not _usb or 'ERROR' in _usb:
                 self.dlg.msgbox(_usb and "%s" % _usb or "Cannot write reports")
             else:
@@ -195,6 +194,8 @@ def main():
     if len(sys.argv) > 1:
         print sys.argv
         scheduler = BFT2UI(suit_path=sys.argv[1])
+    else:
+        print "Please provide path to Robot test suit."
 
 if __name__ == "__main__":
     main()
