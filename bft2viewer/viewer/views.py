@@ -17,6 +17,7 @@ href = lambda link, text: {'link': link, 'text': text}
 states = {'FAIL': -1, 'PASS': 0, 'RETEST': 2, 'HIDE': 3, 'LAST': 1}
 _states = {states[y]: y for y in states}
 
+<<<<<<< HEAD
 def mark(request):
     if request.method == 'POST': # If the form has been submitted...
         _new_state = request.POST['state']
@@ -35,6 +36,43 @@ def show_table(request):
     _c = sqlite3.Connection('%s/BFT2.db' % PROJECT_ROOT)
     modules = _c.execute('SELECT * FROM module WHERE t>="2012-02-29" AND state != "%d" ORDER BY id' % states['HIDE']).fetchall()
     _header = "Serial number,Number of trials,Result,Timestamp,Download link,HwAddr 0,HwAddr 1".split(",")
+=======
+# ------------------------------------------- ## --------------------------------------- #
+def _append_new(request):
+    _tmp = ""
+    _c = sqlite3.Connection(DB_PATH)
+    _c_original = sqlite3.Connection(ORIGINAL_DB_PATH)
+    _sql_count = 'SELECT COUNT(*) FROM module'
+    _current_count = _c.execute(_sql_count).fetchall()
+    _current_count = _current_count and len(_current_count) > 0 and int(_current_count[0][0])
+    _new_count = _c_original.execute(_sql_count).fetchall()
+    _new_count = _new_count and len(_new_count) > 0 and int(_new_count[0][0])
+    if _new_count <= _current_count:
+        return HttpResponse('no new entries')
+    _sql = 'SELECT * FROM module'
+    for MM in _c_original.execute(_sql).fetchall():
+        _sql = 'SELECT * FROM module WHERE id="%s" AND trial=%d' % (MM[0], MM[1])
+        if not _c.execute(_sql).fetchall():
+            _tmp += _sql
+            _tmp += '<br>'
+            _sql = 'INSERT INTO module (id, trial, state, t, comment, show) VALUES("%s", %d, %d, "%s", "", 1)' % tuple(MM)
+            _tmp += _sql
+            _tmp += '<br><br>'
+            _c.execute(_sql)
+            _c.commit()
+    _c.close()
+    _c_original.close()
+    return HttpResponse(_tmp)
+
+def _fetch_data(fetch_all=False, export=False):
+    _c = sqlite3.Connection(DB_PATH)
+    _c_original = sqlite3.Connection(ORIGINAL_DB_PATH)
+    _sql = 'SELECT id, trial, state, t, comment FROM module WHERE t>="2012-02-29" AND show > 0 ORDER BY id'
+    if fetch_all:
+       _sql =  'SELECT id, trial, state, t, comment FROM module ORDER BY id'
+    mms = _c.execute(_sql).fetchall()
+    _header = "Serial number,Trial#,Result,New result,Timestamp,Logs,HwAddr 0,HwAddr 1,Comment, New comment".split(",")
+>>>>>>> forgot to append new db entries
     _table = []
 <<<<<<< HEAD
     for _row in modules:
@@ -64,8 +102,76 @@ def show_table(request):
                        _row[3],
                        href(_report_link and "tar/%s.tar.gz" % _report_link.split('/')[1] or '', "tar.gz"), 
                        _hwaddrs and len(_hwaddrs) > 0 and _hwaddrs[0][0] or '', 
+<<<<<<< HEAD
                        _hwaddrs and len(_hwaddrs) > 1 and _hwaddrs[1][0] or ''))
     return render_to_response("table_simple.html", {'header': _header, "table": _table})
+=======
+                       _hwaddrs and len(_hwaddrs) > 1 and _hwaddrs[1][0] or '',
+                       _row[4])
+                       )
+    _c.close()
+    _c_original.close()
+    return {'header': _header, "table": _table}
+
+# ------------------------------------------- ## --------------------------------------- #
+def csv(request):
+    #raise False, request
+    response = HttpResponse(mimetype='text/csv')
+    response['Content-Disposition'] = 'attachment; filename=BFT2_%s.csv' % time.time()
+    t = loader.get_template('simple.csv')
+    c = Context({'data': _fetch_data(export=True)["table"],})
+    response.write(t.render(c))
+    return response
+
+def csv_all(request):
+    #raise False, request
+    response = HttpResponse(mimetype='text/csv')
+    response['Content-Disposition'] = 'attachment; filename=BFT2_full_%s.csv' % time.time()
+    t = loader.get_template('simple.csv')
+    c = Context({'data': _fetch_data(fetch_all=True, export=True)["table"],})
+    response.write(t.render(c))
+    return response
+
+def mark(request):
+    if request.method == 'POST':
+        MMs = lambda: map(lambda x: x.split(','), filter(lambda x: x not in ('state', 'hide') and "new comment" not in x, request.POST.keys()))
+        _tmp = ''
+        if 'hide' in request.POST:
+            _c = sqlite3.Connection(DB_PATH)
+            for _mm_id, _trial in MMs():
+                _sql = 'UPDATE module SET show = 0 WHERE id="%s" AND trial=%d' % (_mm_id, int(_trial))
+                _tmp += _sql
+                _c.execute(_sql)
+            _c.commit()
+            _c.close()
+        if 'state' in request.POST:
+            _new_state = request.POST['state']
+            _c = sqlite3.Connection(DB_PATH)
+            for _mm_id, _trial in MMs():
+                _sql = 'UPDATE module SET state = %d, show = 1 WHERE id="%s" AND trial=%d' % (STATE[_new_state], _mm_id, int(_trial))
+                _tmp += _sql
+                _c.execute(_sql)
+            _c.commit()
+            _c.close()
+        _f = lambda x: "new comment" in x and len(request.POST[x]) > 0
+        if any(map(_f, request.POST.keys())):
+            _c = sqlite3.Connection(DB_PATH)
+            for _input_name in filter(_f, request.POST.keys()):
+                _mm_id, _trial = tuple(_input_name.split(',')[1:])
+                _sql = 'UPDATE module SET comment = "%s" WHERE id="%s" AND trial=%d' % (request.POST[_input_name], _mm_id, int(_trial))
+                _c.execute(_sql)
+            _c.commit()
+            _c.close()
+    return HttpResponseRedirect('/d/')
+
+def show_table(request):
+    _append_new(request)
+    return render_to_response("table_simple.html", _fetch_data())
+
+def show_all(request):
+    _append_new(request)
+    return render_to_response("table_simple.html", _fetch_data(fetch_all=True))
+>>>>>>> forgot to append new db entries
 
 def show_report(request):
     return HttpResponse(open(PROJECT_ROOT + request.path_info).read())
