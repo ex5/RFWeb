@@ -105,12 +105,20 @@ class BFT2Library:
             return None
         return _tmp[0]
 
-    def serial_test(self, port_num=0):
+    def serial_test(self, port_num=0, _test_string="hello serial port"):
         import serial
-        _p = serial.Serial(int(port_num))
-        _p.write("hello")
+        try:
+            _p = serial.Serial(int(port_num), timeout=5, writeTimeout=5, interCharTimeout=5, xonxoff=False, rtscts=False)
+            _p.flowControl(False)
+        except Exception:
+            return "ERROR: cannot open port %s" % port_num
+        if False in (_p.writable(), _p.readable()):
+            _p.close()
+            return "ERROR: cannot write to/read from port %s" % _p.port
+        _p.write(_test_string)
+        _tmp = _p.readall()
         _p.close()
-        return 'PASS'
+        return _tmp
 
     def hyper_threading_check(self):
         #cat /proc/cpuinfo | grep "processor"

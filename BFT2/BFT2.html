@@ -171,6 +171,13 @@ td.name, th.name {
 <td></td>
 </tr>
 <tr>
+<td class="name">${test_string}</td>
+<td>hellohello</td>
+<td># Test string for serial port test</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
 <td class="name"></td>
 <td></td>
 <td></td>
@@ -866,17 +873,17 @@ td.name, th.name {
 </tr>
 <tr>
 <td class="name"></td>
-<td>${tty}=</td>
+<td>${_status}</td>
 <td>Serial Test</td>
 <td>0</td>
-<td></td>
+<td>${test_string}</td>
 </tr>
 <tr>
 <td class="name"></td>
 <td>Should Not Contain</td>
-<td>${tty}=</td>
+<td>${_status}</td>
 <td>ERROR</td>
-<td>${tty}=</td>
+<td>${_status}</td>
 </tr>
 <tr>
 <td class="name"></td>
@@ -888,9 +895,9 @@ td.name, th.name {
 <tr>
 <td class="name"></td>
 <td>Should Not Be Equal</td>
-<td>${tty}</td>
-<td>${None}</td>
-<td>Serial port not recognized</td>
+<td>${_status}</td>
+<td>${test_string}</td>
+<td>Unexpected result read from serial port ${_status}</td>
 </tr>
 <tr>
 <td class="name"></td>
