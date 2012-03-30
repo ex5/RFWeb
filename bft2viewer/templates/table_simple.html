@@ -1,0 +1,66 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN">
+<html lang="en">
+    <head>
+        <title>BFT2 reports</title>
+    </head>
+    <body>
+        <a href="/d/all/">Show all reports (including hidden and outdated)</a><br>
+        <a href="/d/">Show reports</a><br>
+        <form name="export csv" method="post" action="csv/">
+            <input type="submit" value="Export to CSV"/>
+        </form>
+        <form name="report" method="post" action="mark/">
+            <div align="center">
+                <input type="submit" value="Mark selected"/>
+                <input type="radio" name="state" value="PASS"/>Passed
+                <input type="radio" name="state" value="FAIL"/>Failed
+                <input type="radio" name="state" value="RETEST"/>Retest<br />
+                <input type="checkbox" name="hide" value="HIDE"/>Hide from view<br />
+            </div>
+            <div align="center" style="padding : 4px; height : 600px; overflow : auto; ">
+                {% load smart_if %}
+                <table border=5 align="center">
+                    <tr>
+                        {% for headercell in header %}
+                        <th><strong>{{ headercell }}</strong></th>
+                        {% endfor %}
+                    </tr>
+                    {% for row in table %}
+                    <tr>
+                        {% for cell in row %}
+                        <td align="center">
+                            {% if 'RETEST' in cell %}
+                            <strong><font color="BLUE">{{ cell }}</font></strong>
+                            {% else %}
+                            {% if 'PASS' in cell %}
+                            <strong><font color="green">{{ cell }}</font></strong>
+                            {% else %}
+                            {% if 'FAIL' in cell %}
+                            <strong><font color="red">{{ cell }}</font></strong>
+                            {% else %}
+                            {% if 'link' in cell %}
+                            <input type="checkbox" name="{{ cell.text }}, {{ row.1 }}"/>
+                            {% if cell.link %}
+                            <a href="{{ cell.link }}">{{ cell.text }}</a>
+                            {% else %}
+                            {{ cell.text }}
+                            {% endif %}
+                            {% else %}
+                            {{ cell }}
+                            {% endif %}
+                            {% endif %}
+                            {% endif %}
+                            {% endif %}
+                        </td>
+                        {% endfor %}
+                        <td align="center">
+                            <input type="text" name="new comment,{{ row.0.text }},{{ row.1 }}"/></br>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </table>
+            </div>
+        </form>
+    </body>
+</html>
+
