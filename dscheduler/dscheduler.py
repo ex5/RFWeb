@@ -2,7 +2,6 @@
 
 import sys
 import os
-sys.path.append(os.path.abspath(os.path.curdir) + "/pythondialog-2.7")
 import helpers
 import subprocess
 import time
@@ -22,7 +21,7 @@ class TestScheduler():
     '''
     Simple test scheduler with UI based on dialog/xdialog
     '''
-    def __init__(self, logfile="scheduler.log", suit_path="quickstart"):
+    def __init__(self, logfile="dscheduler.log", suit_path="quickstart"):
         self.logfile = open(logfile, 'w')
         self.suit_path = suit_path
         self.dlg = dialog.Dialog(dialog="dialog")
@@ -78,17 +77,19 @@ class TestScheduler():
         self.quit()
 
     def do(self):
-        htmls = [name for name in os.listdir(self.suit_path) if '.html' in name]
-        self.info = ["Please, choose one of the test suits:", map(lambda x: (str(x[0]),str(x[1])), zip(range(1, len(htmls) + 1), htmls) )]
-        try:
-            chosen = int(self.draw_menu()[1]) - 1
-        except Exception:
-            self.state = "exit"
-            return
-        self.log("chosen item", chosen, self.log(htmls[chosen]))
+        if os.path.isdir(self.suit_path):
+            htmls = [name for name in os.listdir(self.suit_path) if '.html' in name]
+            self.info = ["Please, choose one of the test suits:", map(lambda x: (str(x[0]),str(x[1])), zip(range(1, len(htmls) + 1), htmls) )]
+            try:
+                chosen = int(self.draw_menu()[1]) - 1
+            except Exception:
+                self.state = "exit"
+                return
+            self.log("chosen item", chosen, self.log(htmls[chosen]))
+            self.suit_path = "%s/%s" % ( self.suit_path, htmls[chosen])
         self.info_update("Welcome to test scheduler", clear=True)
         # reading test suite file
-        self.suit = open("%s/%s" % ( self.suit_path, htmls[chosen]))
+        self.suit = open(self.suit_path)
         if not self.suit:
             self.state = "alarm"
             self.title = colorize["Error"]
@@ -114,9 +115,11 @@ class TestScheduler():
             self.flush_state()
             return
         keywords = map(lambda x: (str(x.name), "", 1), test_data.keywords)
-        self.info = ["Please, choose tests:", keywords]
-        chosen = self.draw_checklist()
-        self.log(chosen)
+        self.log(self.suit, self.suit.name, test_data, keywords)
+        if keywords:
+            self.info = ["Please, choose tests:", keywords]
+            chosen = self.draw_checklist()
+            self.log(chosen)
 
         #self.log(self.info_update(info="\n\ZbRun available tests\Zn", widget="msgbox"))
         testrun = subprocess.Popen([self.pybot, self.suit.name], stderr=subprocess.PIPE, stdout=subprocess.PIPE)
@@ -128,7 +131,6 @@ class TestScheduler():
                 if 'FAIL' in line:
                     self.state = "alarm"
                 self.info_update(line)
-                #time.sleep(.8)
         self.info_update("", widget="msgbox")
         self.flush_state()
 

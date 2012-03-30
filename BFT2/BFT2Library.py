@@ -1,14 +1,12 @@
 import re
 from subprocess import Popen, PIPE
-import sys
 
 HwAddr = lambda x: re.search(r".* ([0-9a-e:]*) .*", x)
 substr = lambda subs, x: re.findall("^.*%s.*$" % subs, x, re.MULTILINE)
+cores_count = lambda _tmp: max(map(int, re.findall("^core id.*: (\d*)$", _tmp, re.M))) + 1
+cpus_count = lambda _tmp: max(map(int, re.findall("^physical id.*: (\d*)$", _tmp, re.M))) + 1
 
 class BFT2Library:
-    ROBOT_SYSLOG_FILE = 'robot.log'
-    SUIT_STATUS = "test suite status set be script"
-    #ROBOT_LIBRARY_SCOPE = 'GLOBAL'
     def __init__(self):
         self._hwaddrs_file_path = 'hwaddrs.log'
         self._hwaddrs = set()
@@ -21,27 +19,8 @@ class BFT2Library:
             pass
         self._error = ''
         self._status = ''
-        self._pci = \
-'''
-8086:0100
-8086:0101
-8086:1c3a
-8086:1c2d
-8086:1c20
-8086:1c10
-8086:244e
-8086:1c18
-8086:1c26
-8086:1c5c
-8086:1c00
-8086:1c22
-8086:1c08
-1002:68e1
-1002:aa68
-1283:8893
-10ec:8168'''.split('\n')
 
-    def set_another_hwaddr(self, hwaddr):
+    def add_hwaddr(self, hwaddr):
         if hwaddr in self._hwaddrs:
             return
         self._hwaddrs.add(hwaddr)
@@ -51,29 +30,16 @@ class BFT2Library:
         _file.write(hwaddr + '\n')
         _file.close()
 
-    def get_another_hwaddr(self):
+    def get_hwaddrs(self):
         return self._hwaddrs
 
-    hwaddrs = property(get_another_hwaddr, set_another_hwaddr)
+    hwaddrs = property(get_hwaddrs, add_hwaddr)
 
     def _is_hwaddr_taken(self, hwaddr):
         if hwaddr in self.hwaddrs:
             return True
-        self.set_another_hwaddr(hwaddr)
+        self.add_hwaddr(hwaddr)
         return False
-
-    def status_should_be(self, expected_status):
-        if expected_status != self._status:
-            raise AssertionError("Expected status to be '%s' but was '%s'"
-                                  % (expected_status, self._status))
-
-    def status_should_not_be(self, expected_status):
-        if self._status == expected_status:
-            raise AssertionError("Status should not be '%s'" % self._status)
-    
-    def any_errors(self):
-        if self._error:
-            raise AssertionError("ERROR: %s" % self._error)
 
     def _run_command(self, command):
         self._status = ''
@@ -84,13 +50,17 @@ class BFT2Library:
 
     def HwAddr(self):
         self._run_command("tail /sys/class/net/eth0/address")
+        if self._error:
+            return "ERROR: %s" % self._error
         if self._is_hwaddr_taken(self._status):
-            self._status = 'NOT UNIQUE'
+            return 'NOT UNIQUE'
         else:
-            self._status = 'UNIQUE'
+            return 'UNIQUE'
 
     def network_device(self, name):
         self._run_command("ls /sys/class/net")
+        if self._error:
+            return "ERROR: %s" % self._error
         if not substr(name, self._status):
             return 'NOT FOUND'
         else:
@@ -98,17 +68,85 @@ class BFT2Library:
 
     def pci_device(self, devID):
         self._run_command("lspci -d %s -vvv" % devID)
+        if self._error:
+            return "ERROR: %s" % self._error
         return self._status
     
     def link_up(self, name):
         self._run_command("cat /sys/class/net/%s/operstate" % name)
+        if self._error:
+            return "ERROR: %s" % self._error
         return self._status
 
-    def ping(self, ip, count=100, flood=False):
-        print "ping %s -c %s %s" % (flood and "-i 0" or '', count, ip)
-        self._run_command("ping %s -c %s %s" % (flood and "-i 0" or '', count, ip))
-        print self._status
+    def ping(self, host, count=100, flood=False, acceptable_loss=10):
+        _cmd = "ping %s -c %s %s" % (flood and "-i 0" or '', count, host)
+        _stdout_path = _cmd.replace(' ', '_') + ".out"
+        _stdout = open(_stdout_path, 'w+')
+        process = Popen(_cmd, shell=True, stdout=_stdout, stderr=PIPE)
+        self._error = process.stderr.read().strip()
+        if self._error:
+            return "ERROR: %s" % self._error
+        self._run_command("tail %s -n 2" % _stdout_path)
+        _packet_loss = re.search('([\d]+)%', self._status).groups()[0]
+        _stdout.close()
+        return int(_packet_loss) <= int(acceptable_loss) and 'REPLIED' or 'FAILED'
 
-    def serial(self):
+    def UID(self):
+        if self._error:
+            return "ERROR: %s" % self._error
         return "1234567890"
+    
+    def serial_exists(self):
+        self._run_command("dmesg | grep tty")
+        if self._error:
+            return "ERROR: %s" % self._error
+        _tmp = re.search("(?P<tty>ttyS[01])", self._status).groups()
+        if not _tmp:
+            return None
+        return _tmp[0]
+
+    def serial_test(self, port_num=0):
+        import serial
+        _p = serial.Serial(int(port_num))
+        _p.write("hello")
+        _p.close()
+        return 'PASS'
+
+    def hyper_threading_check(self):
+        #cat /proc/cpuinfo | grep "processor"
+        self._run_command("cat /proc/cpuinfo")
+        if self._error:
+            return "ERROR: %s" % self._error
+        if max(map(int, re.findall("^processor.*: (\d*)$", self._status, re.M))) + 1 != cpus_count(self._status) * cores_count(self._status):
+            return 'YES'
+        return 'NO'
+
+    def CPU_cores(self, expect_cores=4):
+        #cat /proc/cpuinfo | grep "core id"
+        self._run_command("cat /proc/cpuinfo")
+        if self._error:
+            return "ERROR: %s" % self._error
+        if cores_count(self._status) != int(expect_cores):
+            return 'Unexpected number of CPU cores %s' % cores_count(self._status)
+        return 'PASS'
+
+    def CPUs(self, expect_cpus=4):
+        #cat /proc/cpuinfo | grep "physical id"
+        self._run_command("cat /proc/cpuinfo")
+        if self._error:
+            return "ERROR: %s" % self._error
+        if cpus_count(self._status) != int(expect_cpus):
+            return 'Unexpected number of CPUs %s' % cpus_count(self._status)
+        return 'PASS'
+    
+    def CPU_frequency(self, expect_freq=3093.061):
+        #cat /proc/cpuinfo |grep "cpu MHz"
+        self._run_command("cat /proc/cpuinfo")
+        if self._error:
+            return "ERROR: %s" % self._error
+        _tmp = re.findall("^cpu MHz.*: (\d*\.\d*)$", self._status, re.M)
+        if any(map(lambda x: x != expect_freq, _tmp)):
+            return 'Unexpected CPU MHz %s' % _tmp
+        return 'PASS'
+
 

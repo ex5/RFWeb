@@ -46,7 +46,13 @@ echo "clean"
 echo "post"
 
 %postun
+# TODO
 echo "postrun"
+pwd 
+cd pyserial-2.6
+python setup.py install
+cd ../robotframework
+python install.py install
 
 %files
 #%defattr(-,root,root,-)
