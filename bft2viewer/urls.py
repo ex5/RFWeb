@@ -12,8 +12,12 @@ urlpatterns = patterns('',
 =======
     (r'all/reports/(?P<x>.*.html)$', redirect_to, {'url': '/d/reports/%(x)s'}),
     (r'all/tar/(?P<x>.*.tar.gz)$', redirect_to, {'url': '/d/tar/%(x)s'}),
+<<<<<<< HEAD
     url('^$', '%s.viewer.views._append_new' % PROJECT_NAME, name='home'),
 >>>>>>> forgot to append new db entries
+=======
+    url('^$', '%s.viewer.views.show_table' % PROJECT_NAME, name='home'),
+>>>>>>> minor fix
     url(r'reports/*', '%s.viewer.views.show_report' % PROJECT_NAME, name='report'),
     url(r'mark/', '%s.viewer.views.mark' % PROJECT_NAME, name='mark'),
     url(r'.*tar.gz$', '%s.viewer.views.download_report' % PROJECT_NAME, name='download'),
