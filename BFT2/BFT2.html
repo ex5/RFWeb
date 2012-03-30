@@ -87,44 +87,107 @@ td.name, th.name {
 <th class="name" colspan="5">Variables</th>
 </tr>
 <tr>
-<td class="name">@{devIDs}</td>
-<td>1002:68e1</td>
-<td>1002:aa68</td>
+<td class="name">${workd}</td>
+<td>/opt/BFT2</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name">${confd}</td>
+<td>${workd}/.conf</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name">${goldend}</td>
+<td>${workd}/.golden</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name">@{PCI_devIDs}</td>
+<td>8086:35b0</td>
+<td>8086:35b1</td>
+<td>8086:35b5</td>
+<td>8086:35b6</td>
+</tr>
+<tr>
+<td class="name">...</td>
+<td>8086:35b7</td>
+<td>8086:2690</td>
+<td>8086:2692</td>
+<td>8086:2688</td>
+</tr>
+<tr>
+<td class="name">...</td>
+<td>8086:2689</td>
+<td>8086:268c</td>
+<td>8086:244e</td>
+<td>8086:2670</td>
+</tr>
+<tr>
+<td class="name">...</td>
+<td>8086:2680</td>
+<td>8086:269b</td>
+<td>8086:10e7</td>
+<td>8086:10e7</td>
+</tr>
+<tr>
+<td class="name">...</td>
+<td>10ee:0007</td>
+<td>1a03:2000</td>
 <td># List of PCI devices IDs to check</td>
 <td></td>
 </tr>
 <tr>
+<td class="name">@{USB_devIDs}</td>
+<td>aaaa:bbbb</td>
+<td>046b:ff10</td>
+<td>05e3:0608</td>
+<td>046b:ff01</td>
+</tr>
+<tr>
+<td class="name">...</td>
+<td>1d6b:0002</td>
+<td>1d6b:0001</td>
+<td>1d6b:0001</td>
+<td># List of USB devices IDs to check</td>
+</tr>
+<tr>
 <td class="name">@{network_devices}</td>
-<td>eth2</td>
 <td>eth1</td>
 <td>eth0</td>
 <td>lo</td>
-</tr>
-<tr>
-<td class="name">...</td>
 <td># List of network devices to check</td>
-<td></td>
+</tr>
+<tr>
+<td class="name">${test_eth12}</td>
+<td>192.168.0.253</td>
+<td># Host address for ETH1-2 test ping</td>
 <td></td>
 <td></td>
 </tr>
 <tr>
-<td class="name">@{test_hosts}</td>
-<td>www.www.www</td>
-<td>127.0.0.2</td>
-<td>localhost</td>
-<td>orphu</td>
-</tr>
-<tr>
-<td class="name">...</td>
-<td># Hosts to get echo reply from</td>
-<td></td>
+<td class="name">${test_eth34}</td>
+<td>192.168.8.253</td>
+<td># Host address for ETH3-4 test ping</td>
 <td></td>
 <td></td>
 </tr>
 <tr>
-<td class="name">${test_host}</td>
-<td>127.0.0.1</td>
-<td># Host address to ping and test packets loss and so on</td>
+<td class="name">${tty_device}</td>
+<td>/dev/ttyS0</td>
+<td># Serial port device</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name">${tty_marvell}</td>
+<td>/dev/ttyS1</td>
+<td></td>
 <td></td>
 <td></td>
 </tr>
@@ -137,21 +200,21 @@ td.name, th.name {
 </tr>
 <tr>
 <td class="name">${packets_count_flood}</td>
-<td>1000</td>
+<td>2000</td>
 <td># Amount of echo reply packets for flood test</td>
 <td></td>
 <td></td>
 </tr>
 <tr>
 <td class="name">${packets_count}</td>
-<td>1</td>
+<td>30</td>
 <td># Amount of echo reply packets for ping test</td>
 <td></td>
 <td></td>
 </tr>
 <tr>
 <td class="name">${CPU_frequency}</td>
-<td>3093.061</td>
+<td>1866</td>
 <td># Expected CPU frequency, MHz</td>
 <td></td>
 <td></td>
@@ -165,7 +228,7 @@ td.name, th.name {
 </tr>
 <tr>
 <td class="name">${CPU_cores}</td>
-<td>4</td>
+<td>2</td>
 <td># Number of CPU cores</td>
 <td></td>
 <td></td>
@@ -179,22 +242,8 @@ td.name, th.name {
 </tr>
 <tr>
 <td class="name">${memtotal}</td>
-<td>4030544</td>
+<td>514408</td>
 <td># Total amount of memory, kB</td>
-<td></td>
-<td></td>
-</tr>
-<tr>
-<td class="name">${test_string}</td>
-<td>hellohello</td>
-<td># Test string for serial port test</td>
-<td></td>
-<td></td>
-</tr>
-<tr>
-<td class="name">${tty_device}</td>
-<td>/dev/ttyUSB0</td>
-<td># Serial port device</td>
 <td></td>
 <td></td>
 </tr>
@@ -211,7 +260,12 @@ td.name, th.name {
 <th class="name" colspan="5">Test Cases</th>
 </tr>
 <tr>
-<td class="name"><a name="test_MAC should be unique">MAC should be unique</a></td>
+<td class="name"><a name="test_MAC is unique">MAC is unique</a></td>
+<td>[Documentation]</td>
+<td class="colspan3" colspan="3">Fails if MAC is not unique.</td>
+</tr>
+<tr>
+<td class="name"></td>
 <td>[Tags]</td>
 <td>device</td>
 <td></td>
@@ -220,63 +274,56 @@ td.name, th.name {
 <tr>
 <td class="name"></td>
 <td>[Timeout]</td>
-<td>5 minutes</td>
+<td>2 minutes</td>
 <td></td>
 <td></td>
 </tr>
 <tr>
 <td class="name"></td>
-<td>${serial_num}</td>
-<td>UID</td>
-<td></td>
+<td>${_current_sn}=</td>
+<td>Run</td>
+<td>sqlite3 ${workd}/BFT2.db "SELECT id FROM module WHERE state=1"</td>
 <td></td>
 </tr>
 <tr>
 <td class="name"></td>
-<td>Should Not Contain</td>
-<td>${serial_num}</td>
-<td>ERROR</td>
-<td>${serial_num}</td>
+<td>Check Interface HwAddr</td>
+<td>eth0</td>
+<td>${_current_sn}</td>
+<td></td>
 </tr>
 <tr>
 <td class="name"></td>
-<td>...</td>
-<td>False</td>
+<td>Check Interface HwAddr</td>
+<td>eth1</td>
+<td>${_current_sn}</td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>${_status}</td>
+<td>Run And Return Rc And Output</td>
+<td>rsync --timeout=2 ${workd}/BFT2.db ${test_eth12}:/${workd}/BFT2.db</td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Log</td>
+<td>${_status}</td>
 <td></td>
 <td></td>
 </tr>
 <tr>
 <td class="name"></td>
 <td>${_status}</td>
-<td>Hwaddr Unique</td>
-<td></td>
+<td>Run And Return Rc And Output</td>
+<td>rsync --timeout=2 ${workd}/BFT2.db ${test_eth34}:/${workd}/BFT2.db</td>
 <td></td>
 </tr>
 <tr>
 <td class="name"></td>
-<td>Should Not Contain</td>
+<td>Log</td>
 <td>${_status}</td>
-<td>ERROR</td>
-<td>${_status}</td>
-</tr>
-<tr>
-<td class="name"></td>
-<td>...</td>
-<td>False</td>
-<td></td>
-<td></td>
-</tr>
-<tr>
-<td class="name"></td>
-<td>Should Be Equal</td>
-<td>Hwaddr Unique</td>
-<td>UNIQUE</td>
-<td>${serial_num} has duplicate HwAddr</td>
-</tr>
-<tr>
-<td class="name"></td>
-<td>...</td>
-<td>${False}</td>
 <td></td>
 <td></td>
 </tr>
@@ -295,21 +342,82 @@ td.name, th.name {
 <td></td>
 </tr>
 <tr>
-<td class="name"><a name="test_PCI device should exist">PCI device should exist</a></td>
+<td class="name"><a name="test_Total memory amount">Total memory amount</a></td>
 <td>[Documentation]</td>
-<td class="colspan3" colspan="3">Fails if the specified PCI/PCIe device doesn't exists. \ndevID should be in same format as corresponding argument of the lspci utility (see man 8 lspci)</td>
+<td class="colspan3" colspan="3">Fails if total memory amount differs from expected one.\nAlso fails if cannot determine total amount of memory.</td>
 </tr>
 <tr>
 <td class="name"></td>
 <td>[Tags]</td>
 <td>device</td>
-<td>pci</td>
+<td></td>
 <td></td>
 </tr>
 <tr>
 <td class="name"></td>
 <td>[Timeout]</td>
-<td>10 minutes</td>
+<td>1 minute</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>${_status}</td>
+<td>Total Memory</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Should Not Contain</td>
+<td>'${_status}'</td>
+<td>ERROR</td>
+<td>${_status}</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>...</td>
+<td>False</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Should Be Equal</td>
+<td>${_status}</td>
+<td>${memtotal}</td>
+<td>Unexpected total amount of memory: ${_status}</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>...</td>
+<td>False</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"><a name="test_PCI device exists">PCI device exists</a></td>
+<td>[Documentation]</td>
+<td class="colspan3" colspan="3">Fails if PCI/PCIe device doesn't exists. \ndevID should be in same format as corresponding argument of lspci utility (see man 8 lspci)</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>[Tags]</td>
+<td>device</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>[Timeout]</td>
+<td>5 minutes</td>
 <td></td>
 <td></td>
 </tr>
@@ -318,7 +426,7 @@ td.name, th.name {
 <td>: FOR</td>
 <td>${devID}</td>
 <td>IN</td>
-<td>@{devIDs}</td>
+<td>@{PCI_devIDs}</td>
 </tr>
 <tr>
 <td class="name"></td>
@@ -384,15 +492,355 @@ td.name, th.name {
 <td></td>
 </tr>
 <tr>
-<td class="name"><a name="test_Network device should exist">Network device should exist</a></td>
+<td class="name"><a name="test_USB device exists">USB device exists</a></td>
 <td>[Documentation]</td>
-<td class="colspan3" colspan="3">Fails is the specified network devices doesn't exists \nname should be Linux OS network device name as eth0, eth1, ib0 , tun0 , etc.</td>
+<td class="colspan3" colspan="3">Fails if USB device doesn't exists. \ndevID should be in same format as corresponding argument of lsusb utility (see man 8 lsusb)</td>
 </tr>
 <tr>
 <td class="name"></td>
 <td>[Tags]</td>
-<td>network</td>
 <td>device</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>[Timeout]</td>
+<td>5 minutes</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>: FOR</td>
+<td>${devID}</td>
+<td>IN</td>
+<td>@{USB_devIDs}</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td></td>
+<td>${_status}=</td>
+<td>USB Device</td>
+<td>${devID}</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td></td>
+<td>Run Keyword And Continue On Failure</td>
+<td>Should Not Be Equal</td>
+<td>${_status}</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td></td>
+<td>...</td>
+<td>${EMPTY}</td>
+<td>Device ${devID} not found</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td></td>
+<td>...</td>
+<td>False</td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td></td>
+<td>Run Keyword And Continue On Failure</td>
+<td>Should Not Contain</td>
+<td>${_status}</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td></td>
+<td>...</td>
+<td>ERROR</td>
+<td>${_status}</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td></td>
+<td>...</td>
+<td>False</td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>[Teardown]</td>
+<td>Run Keyword If Test Failed</td>
+<td>log</td>
+<td>"Device not found"</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"><a name="test_CPUs frequency">CPUs frequency</a></td>
+<td>[Documentation]</td>
+<td class="colspan3" colspan="3">Fails if CPU frequency differs from expected one.</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>[Tags]</td>
+<td>device</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>[Timeout]</td>
+<td>1 minute</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>${_status}</td>
+<td>CPU Frequency</td>
+<td>${CPU_frequency}</td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Should Not Contain</td>
+<td>${_status}</td>
+<td>ERROR</td>
+<td>${_status}</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>...</td>
+<td>False</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Should Be Equal</td>
+<td>${_status}</td>
+<td>PASS</td>
+<td>${_status}</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>...</td>
+<td>False</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"><a name="test_CPUs count">CPUs count</a></td>
+<td>[Documentation]</td>
+<td class="colspan3" colspan="3">Fails if resulting CPUs count differs from expected one.</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>[Tags]</td>
+<td>device</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>[Timeout]</td>
+<td>1 minute</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>${_status}</td>
+<td>CPUs</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Should Not Contain</td>
+<td>'${_status}'</td>
+<td>ERROR</td>
+<td>${_status}</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>...</td>
+<td>False</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Should Be Equal As Numbers</td>
+<td>${_status}</td>
+<td>${CPUs}</td>
+<td>Unexpected CPUs count: ${_status}, expected ${CPUs}</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>...</td>
+<td>False</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"><a name="test_CPU hyper-threading">CPU hyper-threading</a></td>
+<td>[Documentation]</td>
+<td class="colspan3" colspan="3">Fails if there's no hyper-threading but expected otherwise, or the other way around (O_o)</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>[Tags]</td>
+<td>device</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>[Timeout]</td>
+<td>1 minute</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>${_status}</td>
+<td>Hyper Threading Check</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Should Not Contain</td>
+<td>'${_status}'</td>
+<td>ERROR</td>
+<td>${_status}</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>...</td>
+<td>False</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Should Be Equal</td>
+<td>${_status}</td>
+<td>${hyper_threading}</td>
+<td>Hyper-threading ${_status}, expected ${hyper_threading}</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>...</td>
+<td>False</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"><a name="test_CPUs cores count">CPUs cores count</a></td>
+<td>[Documentation]</td>
+<td class="colspan3" colspan="3">Fails if resulting CPUs count differs from expected one.</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>[Tags]</td>
+<td>device</td>
+<td>noncritical</td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>[Timeout]</td>
+<td>1 minute</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>${_status}</td>
+<td>CPU Cores</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Should Not Contain</td>
+<td>'${_status}'</td>
+<td>ERROR</td>
+<td>${_status}</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>...</td>
+<td>False</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Should Be Equal As Numbers</td>
+<td>${_status}</td>
+<td>${CPU_cores}</td>
+<td>Unexpected CPUs cores count: ${_status}, expected ${CPU_cores}</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>...</td>
+<td>False</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"><a name="test_Network device exists">Network device exists</a></td>
+<td>[Documentation]</td>
+<td class="colspan3" colspan="3">Fails if network devices doesn't exists \nname should be Linux OS network device name as eth0, eth1, ib0 , tun0 , etc.</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>[Tags]</td>
+<td>device</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>[Timeout]</td>
+<td>1 minute</td>
+<td></td>
 <td></td>
 </tr>
 <tr>
@@ -466,256 +914,50 @@ td.name, th.name {
 <td></td>
 </tr>
 <tr>
-<td class="name"><a name="test_Link should be Up">Link should be Up</a></td>
+<td class="name"><a name="test_Marvell echo">Marvell echo</a></td>
 <td>[Documentation]</td>
-<td class="colspan3" colspan="3">Fails if physical link of the specified network device is Down. \ndevID should be Linux OS network device name.</td>
+<td class="colspan3" colspan="3">Fails if cannot read from given tty.\nShould be executed with root privileges.</td>
 </tr>
 <tr>
 <td class="name"></td>
 <td>[Tags]</td>
-<td>network</td>
-<td></td>
-<td></td>
-</tr>
-<tr>
-<td class="name"></td>
-<td>: FOR</td>
-<td>${name}</td>
-<td>IN</td>
-<td>@{network_devices}</td>
-</tr>
-<tr>
-<td class="name"></td>
-<td></td>
-<td>${_status}=</td>
-<td>Link Up</td>
-<td>${name}</td>
-</tr>
-<tr>
-<td class="name"></td>
-<td></td>
-<td>Run Keyword And Continue On Failure</td>
-<td>Should Be Equal</td>
-<td>${_status}</td>
-</tr>
-<tr>
-<td class="name"></td>
-<td></td>
-<td>...</td>
-<td>up</td>
-<td>Link ${name} is DOWN or its state is unknown</td>
-</tr>
-<tr>
-<td class="name"></td>
-<td></td>
-<td>...</td>
-<td>False</td>
-<td></td>
-</tr>
-<tr>
-<td class="name"></td>
-<td></td>
-<td>Run Keyword And Continue On Failure</td>
-<td>Should Not Contain</td>
-<td>${_status}</td>
-</tr>
-<tr>
-<td class="name"></td>
-<td></td>
-<td>...</td>
-<td>ERROR</td>
-<td>${_status}</td>
-</tr>
-<tr>
-<td class="name"></td>
-<td></td>
-<td>...</td>
-<td>False</td>
-<td></td>
-</tr>
-<tr>
-<td class="name"></td>
-<td>[Teardown]</td>
-<td>Run Keyword If Test Failed</td>
-<td>log</td>
-<td>"Link is DOWN or its state is unknown"</td>
-</tr>
-<tr>
-<td class="name"></td>
-<td></td>
-<td></td>
-<td></td>
-<td></td>
-</tr>
-<tr>
-<td class="name"><a name="test_Link should not be up">Link should not be up</a></td>
-<td>[Documentation]</td>
-<td class="colspan3" colspan="3">Fails if physical link of the specified network device is Up. \ndevID should be Linux OS network device name.</td>
-</tr>
-<tr>
-<td class="name"></td>
-<td>[Tags]</td>
-<td>network</td>
-<td></td>
-<td></td>
-</tr>
-<tr>
-<td class="name"></td>
-<td>: FOR</td>
-<td>${name}</td>
-<td>IN</td>
-<td>@{network_devices}</td>
-</tr>
-<tr>
-<td class="name"></td>
-<td></td>
-<td>${_status}=</td>
-<td>Link Up</td>
-<td>${name}</td>
-</tr>
-<tr>
-<td class="name"></td>
-<td></td>
-<td>Run Keyword And Continue On Failure</td>
-<td>Should Not Be Equal</td>
-<td>${_status}</td>
-</tr>
-<tr>
-<td class="name"></td>
-<td></td>
-<td>...</td>
-<td>up</td>
-<td>Link ${name} is UP</td>
-</tr>
-<tr>
-<td class="name"></td>
-<td></td>
-<td>...</td>
-<td>False</td>
-<td></td>
-</tr>
-<tr>
-<td class="name"></td>
-<td></td>
-<td>Run Keyword And Continue On Failure</td>
-<td>Should Not Contain</td>
-<td>${_status}</td>
-</tr>
-<tr>
-<td class="name"></td>
-<td></td>
-<td>...</td>
-<td>ERROR</td>
-<td>${_status}</td>
-</tr>
-<tr>
-<td class="name"></td>
-<td></td>
-<td>...</td>
-<td>False</td>
-<td></td>
-</tr>
-<tr>
-<td class="name"></td>
-<td>[Teardown]</td>
-<td>Run Keyword If Test Failed</td>
-<td>log</td>
-<td>"Link is UP"</td>
-</tr>
-<tr>
-<td class="name"></td>
-<td></td>
-<td></td>
-<td></td>
-<td></td>
-</tr>
-<tr>
-<td class="name"><a name="test_Should receive echo replies from given hosts">Should receive echo replies from given hosts</a></td>
-<td>[Documentation]</td>
-<td class="colspan3" colspan="3">Fails if cannot receive echo reply from any of the given hosts</td>
-</tr>
-<tr>
-<td class="name"></td>
-<td>[Tags]</td>
-<td>network</td>
+<td>serial</td>
 <td></td>
 <td></td>
 </tr>
 <tr>
 <td class="name"></td>
 <td>[Timeout]</td>
-<td>1 minute</td>
+<td>15 minutes</td>
 <td></td>
 <td></td>
 </tr>
 <tr>
 <td class="name"></td>
-<td>: FOR</td>
-<td>${host}</td>
-<td>IN</td>
-<td>@{test_hosts}</td>
-</tr>
-<tr>
-<td class="name"></td>
-<td></td>
-<td>${_status}=</td>
-<td>Ping</td>
-<td>${host}</td>
-</tr>
-<tr>
-<td class="name"></td>
-<td></td>
-<td>...</td>
-<td>1</td>
-<td>${False}</td>
-</tr>
-<tr>
-<td class="name"></td>
-<td></td>
-<td>...</td>
-<td>0</td>
-<td></td>
-</tr>
-<tr>
-<td class="name"></td>
-<td></td>
-<td>Run Keyword And Continue On Failure</td>
-<td>Should Be Equal</td>
 <td>${_status}</td>
-</tr>
-<tr>
-<td class="name"></td>
-<td></td>
-<td>...</td>
-<td>REPLIED</td>
-<td>${host} is not replying</td>
-</tr>
-<tr>
-<td class="name"></td>
-<td></td>
-<td>...</td>
-<td>False</td>
+<td>Marvell Echo</td>
+<td>${tty_marvell}</td>
 <td></td>
 </tr>
 <tr>
 <td class="name"></td>
-<td></td>
-<td>Run Keyword And Continue On Failure</td>
 <td>Should Not Contain</td>
 <td>${_status}</td>
-</tr>
-<tr>
-<td class="name"></td>
-<td></td>
-<td>...</td>
 <td>ERROR</td>
 <td>${_status}</td>
 </tr>
 <tr>
 <td class="name"></td>
-<td></td>
 <td>...</td>
 <td>False</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Should Not Be Empty</td>
+<td>${_status}</td>
+<td>Unable to connect</td>
 <td></td>
 </tr>
 <tr>
@@ -726,36 +968,36 @@ td.name, th.name {
 <td></td>
 </tr>
 <tr>
-<td class="name"><a name="test_Packet loss should be acceptable">Packet loss should be acceptable</a></td>
+<td class="name"><a name="test_Marvell boot">Marvell boot</a></td>
 <td>[Documentation]</td>
-<td class="colspan3" colspan="3">Fails if packet loss percentage value exceeds acceptable level</td>
+<td class="colspan3" colspan="3">Fails if cannot boot uImage at given tty.\nShould be executed with root privileges.</td>
 </tr>
 <tr>
 <td class="name"></td>
 <td>[Tags]</td>
-<td>network</td>
+<td>serial</td>
 <td></td>
 <td></td>
 </tr>
 <tr>
 <td class="name"></td>
 <td>[Timeout]</td>
-<td>5 minutes</td>
+<td>15 minutes</td>
 <td></td>
 <td></td>
 </tr>
 <tr>
 <td class="name"></td>
 <td>${_status}</td>
-<td>Ping</td>
-<td>${test_host}</td>
-<td>${packets_count}</td>
+<td>Marvell Boot</td>
+<td>${tty_marvell}</td>
+<td></td>
 </tr>
 <tr>
 <td class="name"></td>
-<td>...</td>
-<td>${False}</td>
-<td>${packet_loss}</td>
+<td>Should Not Be Empty</td>
+<td>${_status}</td>
+<td></td>
 <td></td>
 </tr>
 <tr>
@@ -774,63 +1016,9 @@ td.name, th.name {
 </tr>
 <tr>
 <td class="name"></td>
-<td>Should Not Be Equal</td>
+<td>Should Contain</td>
 <td>${_status}</td>
-<td>'FAIL'</td>
-<td>Packet loss's exceeded acceptable level</td>
-</tr>
-<tr>
-<td class="name"></td>
-<td>[Teardown]</td>
-<td>Run Keyword If Test Failed</td>
-<td>log</td>
-<td>"Something's gone wrong with ping msg"</td>
-</tr>
-<tr>
-<td class="name"></td>
-<td></td>
-<td></td>
-<td></td>
-<td></td>
-</tr>
-<tr>
-<td class="name"><a name="test_Flood packet loss should be acceptable">Flood packet loss should be acceptable</a></td>
-<td>[Documentation]</td>
-<td class="colspan3" colspan="3">Fails if packet loss percentage value exceeds acceptable level.\nShould be executed with root privileges.</td>
-</tr>
-<tr>
-<td class="name"></td>
-<td>[Tags]</td>
-<td>network</td>
-<td></td>
-<td></td>
-</tr>
-<tr>
-<td class="name"></td>
-<td>[Timeout]</td>
-<td>5 minutes</td>
-<td></td>
-<td></td>
-</tr>
-<tr>
-<td class="name"></td>
-<td>${_status}</td>
-<td>Ping</td>
-<td>${test_host}</td>
-<td>${packets_count_flood}</td>
-</tr>
-<tr>
-<td class="name"></td>
-<td>...</td>
-<td>${True}</td>
-<td>${packet_loss}</td>
-<td></td>
-</tr>
-<tr>
-<td class="name"></td>
-<td>Should Not Contain</td>
-<td>${_status}</td>
-<td>ERROR</td>
+<td>checksum ... OK</td>
 <td>${_status}</td>
 </tr>
 <tr>
@@ -839,20 +1027,6 @@ td.name, th.name {
 <td>False</td>
 <td></td>
 <td></td>
-</tr>
-<tr>
-<td class="name"></td>
-<td>Should Not Be Equal</td>
-<td>${_status}</td>
-<td>'FAIL'</td>
-<td>Packet loss's exceeded acceptable level</td>
-</tr>
-<tr>
-<td class="name"></td>
-<td>[Teardown]</td>
-<td>Run Keyword If Test Failed</td>
-<td>log</td>
-<td>"Something's gone wrong with ping msg"</td>
 </tr>
 <tr>
 <td class="name"></td>
@@ -870,6 +1044,13 @@ td.name, th.name {
 <td class="name"></td>
 <td>[Tags]</td>
 <td>serial</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>[Timeout]</td>
+<td>2 minutes</td>
 <td></td>
 <td></td>
 </tr>
@@ -909,23 +1090,548 @@ td.name, th.name {
 <td></td>
 </tr>
 <tr>
-<td class="name"><a name="test_Serial port">Serial port</a></td>
+<td class="name"><a name="test_Serial echo">Serial echo</a></td>
 <td>[Documentation]</td>
-<td class="colspan3" colspan="3">Fails if cannot open serial port of given number.\nShould be executed with root privileges.</td>
+<td class="colspan3" colspan="3">Fails if cannot open given tty or if test string was not returned. Also fails by timeout.\nShould be executed with root privileges.</td>
 </tr>
 <tr>
 <td class="name"></td>
 <td>[Tags]</td>
-<td>serial</td>
+<td>manual</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>[Timeout]</td>
+<td>5 minutes</td>
 <td></td>
 <td></td>
 </tr>
 <tr>
 <td class="name"></td>
 <td>${_status}</td>
-<td>Serial Test</td>
+<td>Serial Echo</td>
 <td>${tty_device}</td>
-<td>${test_string}</td>
+<td>'lalala\n'</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Should Not Be Empty</td>
+<td>${_status}</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Should Not Contain</td>
+<td>${_status}</td>
+<td>ERROR</td>
+<td>${_status}</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>...</td>
+<td>False</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Should Be Equal</td>
+<td>${_status}</td>
+<td>'lalala\n'</td>
+<td>${_status}</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>...</td>
+<td>False</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"><a name="test_Check ETH1">Check ETH1</a></td>
+<td>[Tags]</td>
+<td>manual</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Check ETH</td>
+<td>ETH1</td>
+<td>${test_eth12}</td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"><a name="test_Check ETH2">Check ETH2</a></td>
+<td>[Tags]</td>
+<td>manual</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Check ETH</td>
+<td>ETH2</td>
+<td>${test_eth12}</td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"><a name="test_Check ETH3">Check ETH3</a></td>
+<td>[Tags]</td>
+<td>manual</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Check ETH</td>
+<td>ETH3</td>
+<td>${test_eth34}</td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"><a name="test_Check ETH4">Check ETH4</a></td>
+<td>[Tags]</td>
+<td>manual</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Check ETH</td>
+<td>ETH4</td>
+<td>${test_eth34}</td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"><a name="test_SMBIOS/DMI">SMBIOS/DMI</a></td>
+<td>[Documentation]</td>
+<td class="colspan3" colspan="3">Fails if dmidecode output differs from standard one.</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>[Tags]</td>
+<td>DMI</td>
+<td>noncritical</td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>[Timeout]</td>
+<td>5 minutes</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Run</td>
+<td>dmidecode | grep -v "ID" | grep -v "UUID" &gt; dmi.test</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Files Should Be Identical</td>
+<td>'${goldend}/dmi'</td>
+<td>dmi.test</td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"><a name="test_FPGA">FPGA</a></td>
+<td>[Documentation]</td>
+<td class="colspan3" colspan="3">Fails if FPGA firmware was not written successfully.</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>[Tags]</td>
+<td>FPGA</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>[Timeout]</td>
+<td>5 minutes</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Run</td>
+<td>/sbin/fpga_flash &gt; fpga.test</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Files Should Be Identical</td>
+<td>'${goldend}/fpga'</td>
+<td>fpga.test</td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"><a name="test_IPMI bmc">IPMI bmc</a></td>
+<td>[Documentation]</td>
+<td class="colspan3" colspan="3">Fails if bmc info output differs from standard one.</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>[Tags]</td>
+<td>IPMI</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>[Timeout]</td>
+<td>5 minutes</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Run</td>
+<td>ipmitool bmc info &gt; bmc.test</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Files Should Be Identical</td>
+<td>'${goldend}/bmc'</td>
+<td>bmc.test</td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"><a name="test_IPMI sdr">IPMI sdr</a></td>
+<td>[Documentation]</td>
+<td class="colspan3" colspan="3">Fails if sdr list output differs from standard one.</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>[Tags]</td>
+<td>IPMI</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>[Timeout]</td>
+<td>5 minutes</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Ipmi Sdr</td>
+<td>${OUTPUT_DIR}</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Files Should Be Identical</td>
+<td>'${goldend}/sdr'</td>
+<td>sdr.test</td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"><a name="test_IPMI lan">IPMI lan</a></td>
+<td>[Documentation]</td>
+<td class="colspan3" colspan="3">Fails if bmc lan output differs from standard one.</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>[Tags]</td>
+<td>IPMI</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>[Timeout]</td>
+<td>5 minutes</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Run</td>
+<td>ipmitool lan print | grep -v "MAC Address" &gt; bmc_lan.test</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Files Should Be Identical</td>
+<td>'${goldend}/bmc_lan'</td>
+<td>bmc_lan.test</td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"><a name="test_Chassis ping">Chassis ping</a></td>
+<td>[Documentation]</td>
+<td class="colspan3" colspan="3">Fails if got any ping result differs from 'ok'.</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>[Tags]</td>
+<td>chassis</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>[Timeout]</td>
+<td>5 minutes</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>@{_output}=</td>
+<td>Run And Return Rc And Output</td>
+<td>/sbin/chassis_ping | grep -v " ok"</td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Should Be Equal</td>
+<td>@{_output}[1]</td>
+<td>${EMPTY}</td>
+<td>ERROR: @{_output}[1]</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>...</td>
+<td>False</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"><a name="test_Scan Serial Number">Scan Serial Number</a></td>
+<td>[Tags]</td>
+<td>head</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>: FOR</td>
+<td>${_tr}</td>
+<td>IN RANGE</td>
+<td>20</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td></td>
+<td>${_serial}=</td>
+<td>Get Value From User</td>
+<td>Input serial number</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td></td>
+<td>${_status}=</td>
+<td>Check Serial Number</td>
+<td>${_serial}</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td></td>
+<td>Run Keyword If</td>
+<td>${_status}==${True}</td>
+<td>Exit For Loop</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Run</td>
+<td>sqlite3 ${workd}/BFT2.db "UPDATE module SET state=0 WHERE state=1"</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Run</td>
+<td>sqlite3 ${workd}/BFT2.db "INSERT INTO module (id, trial) VALUES('${_serial}', (SELECT CASE WHEN (SELECT MAX(trial) from module WHERE id='${_serial}') THEN (SELECT MAX(trial) from module WHERE id='${_serial}') ELSE 0 END) + 1)"</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>${_trials}</td>
+<td>Run</td>
+<td>sqlite3 ${workd}/BFT2.db "SELECT MAX(trial) from module WHERE id='${_serial}'"</td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Run Keyword If</td>
+<td>${_trials}&gt;=5</td>
+<td>Pause Execution</td>
+<td>Warning: ${_trials}th retest</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>${_status}=</td>
+<td>Run Keyword And Expect Error</td>
+<td>Unable to boot</td>
+<td>Execute Manual Step</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>...</td>
+<td>Now run tests\n<br>
+Choose 'FAIL' if unable to test MM\n<br>
+Choose 'PASS' and press 'Enter' when finished\n</td>
+<td>Unable to boot</td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Log</td>
+<td>${_status}</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>@{_status}</td>
+<td>Run And Return Rc And Output</td>
+<td>sqlite3 ${workd}/BFT2.db "UPDATE module SET state=-1 WHERE id='${_serial}' AND trial=${_trials}"</td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Log</td>
+<td>@{_status}</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+</table>
+<table border="1" id="keyword">
+<tr>
+<th class="name" colspan="5">Keywords</th>
+</tr>
+<tr>
+<td class="name"><a name="keyword_Packet Loss Should Be Acceptable">Packet Loss Should Be Acceptable</a></td>
+<td>[Arguments]</td>
+<td>${host}</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>[Documentation]</td>
+<td class="colspan3" colspan="3">Fails if packet loss percentage value exceeds acceptable level</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>[Timeout]</td>
+<td>5 minutes</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>${_status}</td>
+<td>Ping</td>
+<td>${host}</td>
+<td>${packets_count}</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>...</td>
+<td>${False}</td>
+<td>${packet_loss}</td>
+<td></td>
 </tr>
 <tr>
 <td class="name"></td>
@@ -944,117 +1650,9 @@ td.name, th.name {
 <tr>
 <td class="name"></td>
 <td>Should Not Be Equal</td>
-<td>${_status}</td>
-<td>${test_string}</td>
-<td>Unexpected result read from serial port ${_status}</td>
-</tr>
-<tr>
-<td class="name"></td>
-<td>...</td>
-<td>False</td>
-<td></td>
-<td></td>
-</tr>
-<tr>
-<td class="name"></td>
-<td></td>
-<td></td>
-<td></td>
-<td></td>
-</tr>
-<tr>
-<td class="name"><a name="test_CPUs frequency check">CPUs frequency check</a></td>
-<td>[Documentation]</td>
-<td class="colspan3" colspan="3">Fails if CPU frequency differ from expected one.</td>
-</tr>
-<tr>
-<td class="name"></td>
-<td>[Tags]</td>
-<td>cpu</td>
-<td></td>
-<td></td>
-</tr>
-<tr>
-<td class="name"></td>
-<td>${_status}</td>
-<td>CPU Frequency</td>
-<td>${CPU_frequency}</td>
-<td></td>
-</tr>
-<tr>
-<td class="name"></td>
-<td>Should Not Contain</td>
-<td>${_status}</td>
-<td>ERROR</td>
-<td>${_status}</td>
-</tr>
-<tr>
-<td class="name"></td>
-<td>...</td>
-<td>False</td>
-<td></td>
-<td></td>
-</tr>
-<tr>
-<td class="name"></td>
-<td>Should Be Equal</td>
-<td>${_status}</td>
-<td>PASS</td>
-<td>${_status}</td>
-</tr>
-<tr>
-<td class="name"></td>
-<td>...</td>
-<td>False</td>
-<td></td>
-<td></td>
-</tr>
-<tr>
-<td class="name"></td>
-<td></td>
-<td></td>
-<td></td>
-<td></td>
-</tr>
-<tr>
-<td class="name"><a name="test_CPUs count check">CPUs count check</a></td>
-<td>[Documentation]</td>
-<td class="colspan3" colspan="3">Fails if resulting CPUs count differs from expected one.</td>
-</tr>
-<tr>
-<td class="name"></td>
-<td>[Tags]</td>
-<td>cpu</td>
-<td></td>
-<td></td>
-</tr>
-<tr>
-<td class="name"></td>
-<td>${_status}</td>
-<td>CPUs</td>
-<td></td>
-<td></td>
-</tr>
-<tr>
-<td class="name"></td>
-<td>Should Not Contain</td>
 <td>'${_status}'</td>
-<td>ERROR</td>
-<td>${_status}</td>
-</tr>
-<tr>
-<td class="name"></td>
-<td>...</td>
-<td>False</td>
-<td></td>
-<td></td>
-</tr>
-<tr>
-<td class="name"></td>
-<td>Should Be Equal As Numbers</td>
-<td>${_status}</td>
-<td>${CPUs}</td>
-<td>Unexpected CPUs count: ${_status}, expected ${CPUs}</td>
+<td>'FAIL'</td>
+<td>Packet loss's exceeded acceptable level</td>
 </tr>
 <tr>
 <td class="name"></td>
@@ -1071,28 +1669,42 @@ td.name, th.name {
 <td></td>
 </tr>
 <tr>
-<td class="name"><a name="test_CPU hyper-threading check">CPU hyper-threading check</a></td>
+<td class="name"><a name="keyword_Flood Packet Loss Should Be Acceptable">Flood Packet Loss Should Be Acceptable</a></td>
+<td>[Arguments]</td>
+<td>${host}</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
 <td>[Documentation]</td>
-<td class="colspan3" colspan="3">Fails if there's no hyper-threading but expected otherwise, or the other way around (O_o)</td>
+<td class="colspan3" colspan="3">Fails if packet loss percentage value exceeds acceptable level.\nShould be executed with root privileges.</td>
 </tr>
 <tr>
 <td class="name"></td>
-<td>[Tags]</td>
-<td>cpu</td>
+<td>[Timeout]</td>
+<td>5 minutes</td>
 <td></td>
 <td></td>
 </tr>
 <tr>
 <td class="name"></td>
 <td>${_status}</td>
-<td>Hyper Threading Check</td>
-<td></td>
+<td>Ping</td>
+<td>${host}</td>
+<td>${packets_count_flood}</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>...</td>
+<td>${True}</td>
+<td>${packet_loss}</td>
 <td></td>
 </tr>
 <tr>
 <td class="name"></td>
 <td>Should Not Contain</td>
-<td>'${_status}'</td>
+<td>${_status}</td>
 <td>ERROR</td>
 <td>${_status}</td>
 </tr>
@@ -1105,10 +1717,10 @@ td.name, th.name {
 </tr>
 <tr>
 <td class="name"></td>
-<td>Should Be Equal</td>
-<td>${_status}</td>
-<td>${hyper_threading}</td>
-<td>Hyper-threading ${_status}, expected ${hyper_threading}</td>
+<td>Should Not Be Equal</td>
+<td>'${_status}'</td>
+<td>'FAIL'</td>
+<td>Packet loss's exceeded acceptable level</td>
 </tr>
 <tr>
 <td class="name"></td>
@@ -1125,187 +1737,442 @@ td.name, th.name {
 <td></td>
 </tr>
 <tr>
-<td class="name"><a name="test_CPUs cores count check">CPUs cores count check</a></td>
+<td class="name"><a name="keyword_Should Receive Echo reply">Should Receive Echo reply</a></td>
+<td>[Arguments]</td>
+<td>${host}</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
 <td>[Documentation]</td>
-<td class="colspan3" colspan="3">Fails if resulting CPUs count differs from expected one.</td>
+<td class="colspan3" colspan="3">Fails if cannot receive echo reply from any of given hosts</td>
 </tr>
 <tr>
 <td class="name"></td>
-<td>[Tags]</td>
-<td>cpu</td>
-<td></td>
-<td></td>
-</tr>
-<tr>
-<td class="name"></td>
-<td>${_status}</td>
-<td>CPU Cores</td>
+<td>[Timeout]</td>
+<td>1 minute</td>
 <td></td>
 <td></td>
 </tr>
 <tr>
 <td class="name"></td>
-<td>Should Not Contain</td>
-<td>'${_status}'</td>
-<td>ERROR</td>
-<td>${_status}</td>
+<td>${_status}=</td>
+<td>Ping</td>
+<td>${host}</td>
+<td>1</td>
 </tr>
 <tr>
 <td class="name"></td>
 <td>...</td>
-<td>False</td>
-<td></td>
-<td></td>
-</tr>
-<tr>
-<td class="name"></td>
-<td>Should Be Equal As Numbers</td>
-<td>${_status}</td>
-<td>${CPU_cores}</td>
-<td>Unexpected CPUs cores count: ${_status}, expected ${CPU_cores}</td>
-</tr>
-<tr>
-<td class="name"></td>
-<td>...</td>
-<td>False</td>
-<td></td>
-<td></td>
-</tr>
-<tr>
-<td class="name"></td>
-<td></td>
-<td></td>
-<td></td>
-<td></td>
-</tr>
-<tr>
-<td class="name"><a name="test_Total memory amount check">Total memory amount check</a></td>
-<td>[Documentation]</td>
-<td class="colspan3" colspan="3">Fails if total memory amount differs from expected one.\nAlso fails if cannot determine total amount of memory.</td>
-</tr>
-<tr>
-<td class="name"></td>
-<td>[Tags]</td>
-<td>memory</td>
-<td></td>
-<td></td>
-</tr>
-<tr>
-<td class="name"></td>
-<td>${_status}</td>
-<td>Total Memory</td>
-<td></td>
-<td></td>
-</tr>
-<tr>
-<td class="name"></td>
-<td>Should Not Contain</td>
-<td>'${_status}'</td>
-<td>ERROR</td>
-<td>${_status}</td>
-</tr>
-<tr>
-<td class="name"></td>
-<td>...</td>
-<td>False</td>
-<td></td>
-<td></td>
-</tr>
-<tr>
-<td class="name"></td>
-<td>Should Be Equal</td>
-<td>${_status}</td>
-<td>${memtotal}</td>
-<td>Unexpected total amount of memory: ${_status}</td>
-</tr>
-<tr>
-<td class="name"></td>
-<td>...</td>
-<td>False</td>
-<td></td>
-<td></td>
-</tr>
-<tr>
-<td class="name"></td>
-<td></td>
-<td></td>
-<td></td>
-<td></td>
-</tr>
-<tr>
-<td class="name"><a name="test_Messages test">Messages test</a></td>
-<td>[Tags]</td>
-<td>manual</td>
-<td></td>
+<td>${False}</td>
+<td>0</td>
 <td></td>
 </tr>
 <tr>
 <td class="name"></td>
 <td>Run Keyword And Continue On Failure</td>
+<td>Should Be Equal</td>
+<td>'${_status}'</td>
+<td>REPLIED</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>...</td>
+<td>${host} is not replying</td>
+<td>False</td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Run Keyword And Continue On Failure</td>
+<td>Should Not Contain</td>
+<td>${_status}</td>
+<td>ERROR</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>...</td>
+<td>${_status}</td>
+<td>False</td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"><a name="keyword_Link Should Be UP">Link Should Be UP</a></td>
+<td>[Arguments]</td>
+<td>${name}</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>[Documentation]</td>
+<td class="colspan3" colspan="3">Fails if physical link of network device is Down. \ndevID should be Linux OS network device name.</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>[Timeout]</td>
+<td>1 minute</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>${_status}=</td>
+<td>Link Up</td>
+<td>${name}</td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Run Keyword And Continue On Failure</td>
+<td>Should Be Equal</td>
+<td>'${_status}'</td>
+<td>up</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>...</td>
+<td>Link ${name} is DOWN or its state is unknown</td>
+<td>False</td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Run Keyword And Continue On Failure</td>
+<td>Should Not Contain</td>
+<td>${_status}</td>
+<td>ERROR</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>...</td>
+<td>${_status}</td>
+<td>False</td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"><a name="keyword_Link Should Not Be UP">Link Should Not Be UP</a></td>
+<td>[Arguments]</td>
+<td>${name}</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>[Documentation]</td>
+<td class="colspan3" colspan="3">Fails if physical link of network device is Up. \ndevID should be Linux OS network device name.</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>[Timeout]</td>
+<td>1 minute</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>${_status}=</td>
+<td>Link Up</td>
+<td>${name}</td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Run Keyword And Continue On Failure</td>
+<td>Should Not Be Equal</td>
+<td>${_status}</td>
+<td>up</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>...</td>
+<td>Link ${name} is UP</td>
+<td>False</td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Run Keyword And Continue On Failure</td>
+<td>Should Not Contain</td>
+<td>${_status}</td>
+<td>ERROR</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>...</td>
+<td>${_status}</td>
+<td>False</td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"><a name="keyword_Files Should Be Identical">Files Should Be Identical</a></td>
+<td>[Arguments]</td>
+<td>${file0}</td>
+<td>${file1}</td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>[Documentation]</td>
+<td class="colspan3" colspan="3">Fails if diff is not empty.</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>@{_output}=</td>
+<td>Run And Return Rc And Output</td>
+<td>diff ${file0} ${file1} &gt; ${file1}.diff</td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Should Not Be Equal</td>
+<td>'@{_output}[0]'</td>
+<td>'1'</td>
+<td>ERROR: files are different</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>...</td>
+<td>False</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Should Not Be Equal</td>
+<td>'@{_output}[0]'</td>
+<td>'2'</td>
+<td>ERROR: diff got some trouble</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>...</td>
+<td>False</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Should Be Equal</td>
+<td>'@{_output}[0]'</td>
+<td>'0'</td>
+<td>STDERR: diff is not empty</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>...</td>
+<td>False</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>File Should Be Empty</td>
+<td>${file1}.diff</td>
+<td>ERROR: files don't match</td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"><a name="keyword_Check Interface HwAddr">Check Interface HwAddr</a></td>
+<td>[Arguments]</td>
+<td>${iface}</td>
+<td>${_current_sn}</td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>${_output}=</td>
+<td>Run</td>
+<td>cat /sys/class/net/${iface}/address</td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>${_output_db}=</td>
+<td>Run</td>
+<td>sqlite3 ${workd}/BFT2.db "SELECT * FROM hwaddr WHERE hwaddr='${_output}' AND id != '${_current_sn}'"</td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Should Be Equal</td>
+<td>${_output_db}</td>
+<td>${EMPTY}</td>
+<td>Duplicate HwAddr, ${_output_db}, ${_output}</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>...</td>
+<td>False</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>${_output_db}=</td>
+<td>Run</td>
+<td>sqlite3 ${workd}/BFT2.db "SELECT * FROM hwaddr WHERE hwaddr='${_output}'"</td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Run Keyword If</td>
+<td>'${_output_db}'==''</td>
+<td>Run</td>
+<td>sqlite3 ${workd}/BFT2.db "INSERT INTO hwaddr (id, hwaddr) VALUES('${_current_sn}', '${_output}')"</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"><a name="keyword_Check ETH">Check ETH</a></td>
+<td>[Arguments]</td>
+<td>${eth}</td>
+<td>${host}</td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
 <td>Pause Execution</td>
-<td>Hello world!</td>
+<td>Disconnect cables from all ETH ports. Then connect cable to ${eth}</td>
+<td></td>
 <td></td>
 </tr>
 <tr>
 <td class="name"></td>
+<td>: FOR</td>
+<td>${_tr}</td>
+<td>IN RANGE</td>
+<td>3</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td></td>
+<td>Sleep</td>
+<td>1s</td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td></td>
 <td>${_status}=</td>
-<td>Run Keyword And Continue On Failure</td>
-<td>Get Value From User</td>
-<td>Hello</td>
+<td>Ping</td>
+<td>${host}</td>
 </tr>
 <tr>
 <td class="name"></td>
+<td></td>
 <td>...</td>
-<td>Default Value</td>
+<td>5</td>
+<td>${False}</td>
+</tr>
+<tr>
+<td class="name"></td>
 <td></td>
+<td>...</td>
+<td>0</td>
 <td></td>
 </tr>
 <tr>
 <td class="name"></td>
-<td>Log</td>
-<td>${_status}</td>
 <td></td>
+<td>Run Keyword If</td>
+<td>'${_status}'=='PASS'</td>
+<td>Exit For Loop</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Run Keyword If</td>
+<td>'${_status}'!='PASS'</td>
+<td>Pause Execution</td>
+<td>Please check ${eth}</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>: FOR</td>
+<td>${_tr}</td>
+<td>IN RANGE</td>
+<td>3</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td></td>
+<td>Run Keyword If</td>
+<td>'${_status}'=='PASS'</td>
+<td>Exit For Loop</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td></td>
+<td>Sleep</td>
+<td>1s</td>
 <td></td>
 </tr>
 <tr>
 <td class="name"></td>
+<td></td>
 <td>${_status}=</td>
-<td>Run Keyword And Continue On Failure</td>
-<td>Get Selection From User</td>
-<td>Hello, select something</td>
+<td>Ping</td>
+<td>${host}</td>
 </tr>
 <tr>
 <td class="name"></td>
+<td></td>
 <td>...</td>
-<td>value0</td>
-<td>value1</td>
-<td>yet another value</td>
+<td>5</td>
+<td>${False}</td>
 </tr>
 <tr>
 <td class="name"></td>
+<td></td>
 <td>...</td>
-<td>and there's more</td>
+<td>0</td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Packet Loss Should Be Acceptable</td>
+<td>${host}</td>
 <td></td>
 <td></td>
 </tr>
 <tr>
 <td class="name"></td>
-<td>Log</td>
-<td>${_status}</td>
-<td></td>
-<td></td>
-</tr>
-<tr>
-<td class="name"></td>
-<td>${_status}=</td>
-<td>Run Keyword And Continue On Failure</td>
-<td>Execute Manual Step</td>
-<td>Hello!1</td>
-</tr>
-<tr>
-<td class="name"></td>
-<td>Log</td>
-<td>${_status}</td>
+<td>Flood Packet Loss Should Be Acceptable</td>
+<td>${host}</td>
 <td></td>
 <td></td>
 </tr>
