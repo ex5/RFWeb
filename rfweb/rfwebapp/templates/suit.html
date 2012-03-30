@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+{% load rfweb_filters %}
+{% block title %}{{ suit.name }}{% endblock title %}
+{% block content %}
+<h2>{{ suit.name }}</h2>
+{% ifnotequal suit.version "<unknown>" %}
+<p class="version"><b>Version:</b> {{ suit.version|safe }}</p>
+{% endifnotequal %}
+<h3 id="introduction">Introduction</h3>
+<p class="suitintro">{{ suit.doc|eol|safe }}</p>
+{% if suit.inits %}
+<h3 id="importing">Importing</h3>
+<table class="keywords">
+  <tr>
+    <th class="arg">Arguments</th>
+    <th class="doc">Documentation</th>
+  </tr>
+  {% for init in suit.inits %}
+  <tr>
+    <td class="arg">{{ init.args }}</td>
+    <td class="doc">{{ init.doc|eol|safe }}</td>
+  </tr>
+  {% endfor %}
+</table>
+{% endif %}
+<h3>Shortcuts</h3>
+<div class='shortcuts'>
+{% for kw in suit.keywords %}
+<a href="#{{ kw.name }}" title="{{ kw.shortdoc }}">{{ kw.name|nbsp|safe }}</a>
+{% if not forloop.last %}&middot;{% endif %}
+{% endfor %}
+</div>
+<div class='shortcuts'>
+{% for tc in suit.tests %}
+<a href="#{{ tc.name }}" title="{{ tc.shortdoc }}">{{ tc.name|nbsp|safe }}</a>
+{% if not forloop.last %}&middot;{% endif %}
+{% endfor %}
+</div>
+<h3>Keywords</h3>
+<table class="keywords">
+  <tr>
+    <th class="kw">Keyword</th>
+    <th class="arg">Arguments</th>
+    <th class="doc">Documentation</th>
+  </tr>
+  {% for kw in suit.keywords %}
+  <tr>
+    <td class="kw" id="{{ kw.name }}">{{ kw.name }}</td>
+    <td class="arg">{{ kw.args }}</td>
+    <td class="doc">{{ kw.doc|eol|safe }}</td>
+  </tr>
+  {% endfor %}
+</table>
+<h3>Test Cases</h3>
+<table class="keywords">
+  <tr>
+    <th class="kw">Test case</th>
+    <th class="doc">Documentation</th>
+  </tr>
+  {% for tc in suit.tests %}
+  <tr>
+    <td class="kw" id="{{ tc.name }}">{{ tc.name }}</td>
+    <td class="doc">{{ tc.doc|eol|safe }}</td>
+  </tr>
+  {% endfor %}
+</table>
+<div class="hr"><hr /></div>
+<p class="info">Altogether {{ suit.keywords|length }} keywords.</p>
+{% endblock content %}

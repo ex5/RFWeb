@@ -1,0 +1,14 @@
+<h2>Search keywords</h2>
+<form enctype="multipart/form-data" action="/search/" method="POST">
+  {{ form.search_term.errors }}
+  <table id="search">
+    <tr>
+      <td>{{ form.search_term }}</td>
+      <td>
+        {{ form.include_doc }}
+        <label for="id_include_doc">Search also documentation</label>
+      </td>
+  </table>
+  <input type="submit" name="search_button" value="Search" />
+</form>
+

@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block title %}Welcome{% endblock title %}
+{% block navi %}[<a href="/upload/">upload</a>][<a href="/create_task/">create task</a>]{% endblock navi %}
+{% block content %}
+
+<h2>Generic model table</h2>
+
+<table class="table" id="table">
+    {% for field in model %}
+    <th>{{ field }}</th>        
+    {% endfor %}
+    {% for obj in objects %}
+    <tr>
+        {% for field, value in obj.fields.items %}
+        <td>
+            {{ value }}
+        </td>
+        {% endfor %}
+    </tr>
+    {% endfor %}
+</table>
+{% endblock content %}
+

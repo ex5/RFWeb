@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% load rfweb_filters %}
+{% block title %}Search{% endblock title %}
+{% block content %}
+{% include "search_form.html" %}
+{% if search_performed %}
+<div class="hr"><hr /></div>
+<h2>Search results</h2>
+<p class="info">
+  {% if not kws %}No{% else %}{{ kws|length }}{% endif %}
+  matching keyword{{ kws|length|pluralize }} found.
+</p>
+{% if kws %}
+<table class="keywords results">
+  {% for kw in kws %}
+  <tr>
+    <td><a href="/suit/{{ kw.suit.name }}#{{ kw.name }}">{{ kw.name }}</a></td>
+    <td><a href="/suit/{{ kw.suit.name }}">{{ kw.suit.name }}</a></td>
+    <td>{{ kw.doc|first_line }}</td>
+  </tr>
+  {% endfor %}
+</table>
+{% endif %}
+{% endif %}
+{% endblock content %}
+
+
