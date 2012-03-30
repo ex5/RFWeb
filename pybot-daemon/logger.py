@@ -4,13 +4,13 @@ import logging.handlers
 def get_logger(name, logfile):
     logger = logging.getLogger(name)
     file_handler = logging.FileHandler(logfile)
-    formatter = logging.Formatter('%(asctime)s,%(msecs)d %(levelname)s %(name)s %(message)s')
+    formatter = logging.Formatter('%(asctime)s %(levelname)s %(name)s %(message)s')
     file_handler.setFormatter(formatter)
     logger.addHandler(file_handler)
-    file_handler.setLevel(logging.DEBUG)
     rotation_handler = logging.handlers.RotatingFileHandler(logfile, 
             maxBytes=20, backupCount=3)
     logger.debug("logger initialized %s" % logfile)
+    logger.setLevel(logging.DEBUG)
     return logger
 
 def get_child_logger(logger, name, logfile):

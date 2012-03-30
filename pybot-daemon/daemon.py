@@ -1,22 +1,25 @@
 #!/usr/bin/env python
 
-import sys, os, time, atexit
+import sys
+import os
+import time
+import atexit
 from signal import SIGTERM
 import logger
 
-class Daemon:
+class Daemon(object):
     """
     A generic daemon class.
 
     Usage: subclass the Daemon class and override the run() method
     """
-    def __init__(self, pidfile, logfile='/dev/null', stdin='/dev/null', stdout='/dev/null', stderr='/dev/null'):
+    def __init__(self, pidfile, logfile=sys.stdout, stdin=None, stdout=None, stderr=None):
         self.stdin = stdin
         self.stdout = stdout
         self.stderr = stderr
         self.pidfile = pidfile
         self.logger = logger.get_logger(__name__, logfile)
-        self.logger.debug("__init__, pidfile: %s, stdin: %s, stdout: %s, stderr: %s" % (pidfile, stdin, stdout, stderr))
+        self.logger.info("__init__, pidfile: %s, stdin: %s, stdout: %s, stderr: %s" % (pidfile, stdin, stdout, stderr))
 
     def daemonize(self):
         """
@@ -51,12 +54,15 @@ class Daemon:
         # redirect standard file descriptors
         sys.stdout.flush()
         sys.stderr.flush()
-        si = file(self.stdin, 'r')
-        so = file(self.stdout, 'a+')
-        se = file(self.stderr, 'a+', 0)
-        os.dup2(si.fileno(), sys.stdin.fileno())
-        os.dup2(so.fileno(), sys.stdout.fileno())
-        os.dup2(se.fileno(), sys.stderr.fileno())
+        if self.stdin:
+            si = file(self.stdin, 'r')
+            os.dup2(si.fileno(), sys.stdin.fileno())
+        if self.stdout:
+            so = file(self.stdout, 'a+')
+            os.dup2(so.fileno(), sys.stdout.fileno())
+        if self.stderr:
+            se = file(self.stderr, 'a+', 0)
+            os.dup2(se.fileno(), sys.stderr.fileno())
 
         # write pidfile
         atexit.register(self.delpid)
@@ -92,11 +98,8 @@ class Daemon:
         Stop the daemon
         """
         # Close log file
-        try:
-            logger.info('stopping log')
-    	    logger.shutdown()
-        except AttributeError:
-            pass
+        self.logger.info('stop')
+        logger.shutdown()
 
         # Get the pid from the pidfile
         try:
@@ -114,6 +117,9 @@ class Daemon:
         # Try killing the daemon process	
         try:
             while 1:
+                # suicide dirty workaround TODO
+                if os.getpid() == pid:
+                    os.remove(self.pidfile)
                 os.kill(pid, SIGTERM)
                 time.sleep(0.1)
         except OSError, err:
