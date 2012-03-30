@@ -39,6 +39,7 @@ def on_exit(process, logger):
     logger.info("\n%s\n" % process.stderr.read())
     logger.info("subprocess %d's finished" % process.pid)
     logger.info("LOGGER: %s, HANDLERS: %s" % (str(logger), str(logger.handlers)))
+    logger.handlers = []
 
 class RobotDaemon(daemon.Daemon):
     def run_tasks(self):
