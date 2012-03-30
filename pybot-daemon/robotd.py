@@ -55,9 +55,6 @@ class RobotDaemon(daemon.Daemon):
         super(RobotDaemon, self).__init__(*argv, **kwargs)
         self.test_suit_path = config.path.test_suit
         self.logger.debug("path to the test suit: %s" % self.test_suit_path)
-        signal.signal(signal.SIGUSR1, self.reload_config)
-        signal.signal(signal.SIGUSR2, self.run_tasks)
-        signal.signal(signal.SIGQUIT, self.quit)
         self.tasks = []
 
     def run_tasks(self, signum, frame):
@@ -105,13 +102,22 @@ class RobotDaemon(daemon.Daemon):
             self.stop()
 
     def run(self):
+        signal.signal(signal.SIGUSR1, self.reload_config)
+        signal.signal(signal.SIGUSR2, self.run_tasks)
+        signal.signal(signal.SIGQUIT, self.quit)
         signal.pause()
 
-if __name__ == "__main__":
-    robotd = RobotDaemon(pidfile=config.path.pid_file, 
+robotd_init = lambda: RobotDaemon(pidfile=config.path.pid_file, 
                          logfile=os.path.join(config.path.logs, "robotd.log"),
                          stdout=config.path.stdout, 
                          stderr=config.path.stderr)
+
+def check_status():
+    robotd = robotd_init()
+    return robotd.status()
+
+def main():
+    robotd = robotd_init()
     if len(sys.argv) == 2:
         if 'start' == sys.argv[1]:
             robotd.start()
@@ -119,6 +125,8 @@ if __name__ == "__main__":
             robotd.stop()
         elif 'restart' == sys.argv[1]:
             robotd.restart()
+        elif 'status' == sys.argv[1]:
+            print robotd.status() and "Running" or "Not running"
         else:
             print "Unknown command"
             sys.exit(2)
@@ -126,4 +134,7 @@ if __name__ == "__main__":
     else:
         print "usage: %s start|stop|restart" % sys.argv[0]
         sys.exit(2)
+
+if __name__ == "__main__":
+    main()
 
