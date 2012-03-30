@@ -85,7 +85,6 @@ class BFT2UI(helpers.CmdRunner):
         self.logfile.write(str(time.ctime()) + ': ' + str(args) + '\n')
 
     def quit(self):
-        self.text_update(" Bye! ")
         self.log("quit", self)
         self.logfile.close()
         exit(0)
@@ -117,16 +116,21 @@ class BFT2UI(helpers.CmdRunner):
         if not os.path.isfile(self.suit_path):
             self.text_update("[FAIL] Could not load test suit")
             return
-        # reading test suite file
         try:
+            # reading test suite file
             self.suit = robot.parsing.TestData(source=self.suit_path)
-            self.tags = set([])
-            self.log(self.tags)
+            self.tags = {}
             for testcase in self.suit.testcase_table:
                 if testcase.tags.value.__class__ == list:
-                    self.tags.update(map(str,testcase.tags.value))
+                    for tag in map(str, testcase.tags.value):
+                        if tag not in self.tags:
+                            self.tags[tag] = []
+                        self.tags[tag].append(str(testcase.name))
                 else:
-                    self.tags.add(str(testcase.tags.value))
+                    if str(testcase.tags.value) not in self.tags:
+                        self.tags[str(testcase.tags.value)] = []
+                    self.tags[str(testcase.tags.value)].append(testcase.name)
+            self.log(self.tags)
         except Exception, e:
             self.log(e)
             self.title = colorize["Error"]
@@ -135,8 +139,8 @@ class BFT2UI(helpers.CmdRunner):
         self.text_update("[OK] Test suit %s" % self.suit)
 
     def check_pybot(self):
-        # checking pybot executable
         try:
+            # checking pybot executable
             self.pybot = dialog._path_to_executable("pybot")
         except Exception:
             self.title = colorize["Error"]
@@ -153,20 +157,25 @@ class BFT2UI(helpers.CmdRunner):
         if self.tags:
             self.chosen_tags = self.dlg.checklist(text="Please, choose tests:", choices=[(str(x[1]), str(x[0]), 'off') for x in zip(range(len(self.tags) + 1), self.tags)])[1]
         if not self.chosen_tags:
-            self.chosen_tags = self.tags
-        self.text_update("[OK] Tags to run: %s" % self.chosen_tags)
-        exit = self.dlg.yesno(self.text + "\nProceed?\n", len(self.text.split('\n')) + 5, max(map(len, self.text.split('\n'))) + 5, "Run", "Exit")
-        if exit:
+            self.chosen_tags = self.tags.keys()
+        self.text_update("[OK] Tags to run: %s\n\nProceed?\n" % self.chosen_tags)
+        if self.dlg.yesno(self.text, self.height, self.width, "Run", "Exit"):
             self.state = "exit"
             return
-        self.log(' '.join(map(str, self.chosen_tags)))
-        self.text_update("", clear=True)
-        _cmd = [self.pybot, "--include"]
-        _cmd.extend(self.chosen_tags)
-        _cmd.append(self.suit_path)
-        self.log(_cmd)
-        self.run(_cmd, shell=False, pipe=False)
-        # TODO read report, show results
+        _cmd = self.pybot + ' ' + ' '.join(map(lambda x: ' '.join(["--test \"%s\"" % y for y in self.tags[x]]), self.chosen_tags)) + ' ' + self.suit_path
+        self.log("Pybot command: ", _cmd)
+        self.run(_cmd, pipe=False, do_raise=True)
+        from xml.etree import ElementTree
+        _botout = ElementTree.parse('output.xml').getroot()
+        self.log("xml: ", _botout)
+        self.text_update('', clear=True)
+        for test in _botout.findall('*/test'):
+            self.log(test)
+            _status = test.find('status').text
+            self.text_update("[%s] \Zb%s\Zn " % (_status and 'FAIL' or 'PASS', test.attrib['name']))
+            self.text_update(_status and "Status: %s \n" % _status.replace('\n\n','\n') or '')
+        del _botout
+        self.log('text: ', self.text)
         exit = self.dlg.yesno(self.text, self.height, self.width, "Run again", "Write to USB and exit")
         if exit:
             self.state = "exit"

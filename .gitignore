@@ -27,7 +27,7 @@
 **/*.log
 **/log.html
 **/report.html
-**/output.html
+**/output.xml
 **/*.sql
 **/*.sqlite
 **/*.swp
