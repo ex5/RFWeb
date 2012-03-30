@@ -1,4 +1,5 @@
-import os, sys
+import sys
+import os
 
 # path is the parent directory of this script
 path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
