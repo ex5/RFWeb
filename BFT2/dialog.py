@@ -736,7 +736,7 @@ class Dialog:
         Notable exceptions:
 
             DialogTerminatedBySignal
-            DialogError
+            messageDialogError
             PythonDialogErrorBeforeExecInChildProcess
             PythonDialogIOError
             PythonDialogBug

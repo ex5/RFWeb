@@ -105,13 +105,13 @@ class BFT2Library:
             return None
         return _tmp[0]
 
-    def serial_test(self, port_num=0, _test_string="hello serial port"):
+    def serial_test(self, device='/dev/ttyS0', _test_string="hello serial port"):
         import serial
         try:
-            _p = serial.Serial(int(port_num), timeout=5, writeTimeout=5, interCharTimeout=5, xonxoff=False, rtscts=False)
+            _p = serial.Serial(device, timeout=5, writeTimeout=5, interCharTimeout=5, xonxoff=False, rtscts=False)
             _p.flowControl(False)
         except Exception:
-            return "ERROR: cannot open port %s" % port_num
+            return "ERROR: cannot open port %s" % device
         if False in (_p.writable(), _p.readable()):
             _p.close()
             return "ERROR: cannot write to/read from port %s" % _p.port

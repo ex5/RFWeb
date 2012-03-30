@@ -54,13 +54,9 @@ class TestScheduler():
         return str([(attr, getattr(self, attr)) for attr in self.__dict__])
 
     def _reports_to_usb_drive(self, devID):
-        _mount_path = "/mnt/%s" % devID
+        _mount_path = "/mnt/%s" % devID + str(time.time())
         _device = "/dev/disk/by-id/%s" % devID
-        if not os.path.exists(_mount_path) or not os.path.isdir(_mount_path):
-            os.mkdir(_mount_path)
-        if os.listdir(_mount_path):
-            _mount_path += str(time.time())
-            os.mkdir(_mount_path)
+        os.mkdir(_mount_path)
         _out = _run_command("mount %s %s" % (_device, _mount_path))
         self.text_update(str(_out))
         self.dlg.infobox(self.text, self.height, self.width)
@@ -154,7 +150,7 @@ class TestScheduler():
         #keywords = map(lambda x: (str(x.name), "", 1), self.suit.keywords)
         #self.log(self.suit, keywords)
         if self.tags:
-            self.chosen_tags = self.dlg.checklist(text="Please, choose tests:", choices=[(str(x[1]), str(x[0]), 'on') for x in zip(range(len(self.tags) + 1), self.tags)])[1]
+            self.chosen_tags = self.dlg.checklist(text="Please, choose tests:", choices=[(str(x[1]), str(x[0]), 'off') for x in zip(range(len(self.tags) + 1), self.tags)])[1]
             self.log(self.chosen_tags)
             self.text_update("[OK] Tags to run: %s" % self.chosen_tags)
         exit = self.dlg.yesno(self.text + "\nProceed?\n", len(self.text.split('\n')) + 5, max(map(len, self.text.split('\n'))) + 5, "Run", "Exit")

@@ -68,6 +68,13 @@ td.name, th.name {
 <td></td>
 </tr>
 <tr>
+<td class="name">Library</td>
+<td>Dialogs_re</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
 <td class="name"></td>
 <td></td>
 <td></td>
@@ -181,6 +188,13 @@ td.name, th.name {
 <td class="name">${test_string}</td>
 <td>hellohello</td>
 <td># Test string for serial port test</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name">${tty_device}</td>
+<td>/dev/ttyUSB0</td>
+<td># Serial port device</td>
 <td></td>
 <td></td>
 </tr>
@@ -833,6 +847,13 @@ td.name, th.name {
 </tr>
 <tr>
 <td class="name"></td>
+<td>[Tags]</td>
+<td>serial</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
 <td>${tty}=</td>
 <td>Serial Exists</td>
 <td></td>
@@ -880,9 +901,16 @@ td.name, th.name {
 </tr>
 <tr>
 <td class="name"></td>
+<td>[Tags]</td>
+<td>serial</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
 <td>${_status}</td>
 <td>Serial Test</td>
-<td>0</td>
+<td>${tty_device}</td>
 <td>${test_string}</td>
 </tr>
 <tr>
@@ -1180,6 +1208,83 @@ td.name, th.name {
 <td class="name"></td>
 <td>...</td>
 <td>False</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"><a name="test_Message test">Message test</a></td>
+<td>[Tags]</td>
+<td>manual</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Run Keyword And Continue On Failure</td>
+<td>Pause Execution</td>
+<td>Hello world!</td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>${_status}=</td>
+<td>Run Keyword And Continue On Failure</td>
+<td>Get Value From User</td>
+<td>Hello</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>...</td>
+<td>Default Value</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Log</td>
+<td>${_status}</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>${_status}=</td>
+<td>Run Keyword And Continue On Failure</td>
+<td>Get Selection From User</td>
+<td>Hello, select something</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>...</td>
+<td>value0</td>
+<td>value1</td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Log</td>
+<td>${_status}</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>${_status}=</td>
+<td>Run Keyword And Continue On Failure</td>
+<td>Execute Manual Step</td>
+<td>Hello!1</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Log</td>
+<td>${_status}</td>
 <td></td>
 <td></td>
 </tr>
