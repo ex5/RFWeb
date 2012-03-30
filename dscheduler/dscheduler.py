@@ -7,6 +7,7 @@ import helpers
 import subprocess
 import time
 import dialog
+import robot
 
 colorize= { 
 # black, red, green, yellow, blue, magenta, cyan white \Z0-\Z9
@@ -65,6 +66,11 @@ class TestScheduler():
         width = max(max(max(map(lambda x: len(x[1]), self.info[1])), len(self.info[0])), len(self.title)) + 5
         return self.dlg.menu(text=self.info[0], height=height, width=width, menu_height=7, choices=self.info[1])
 
+    def draw_checklist(self):
+        height = len(self.info[1]) + 7
+        width = max(max(max(map(lambda x: len(x[0]), self.info[1])), len(self.info[0])), len(self.title)) + 12
+        return self.dlg.checklist(text=self.info[0], height=height, width=width, list_height=7, choices=self.info[1])
+
     def display(self):
         while self.state != "exit":
             if self.state == "restart":
@@ -100,20 +106,24 @@ class TestScheduler():
             self.flush_state()
             return
         self.info_update("[OK] Found pybot executable")
-        self.log(self.info_update(info="\n\ZbRun available tests\Zn", widget="msgbox"))
+        try:
+            test_data = robot.parsing.TestData(source=self.suit.name)
+        except Exception:
+            self.title = colorize["Error"]
+            self.info_update("[FAIL] %s is not a valid test suit file" % self.suit.name, widget="msgbox")
+            self.flush_state()
+            return
+        keywords = map(lambda x: (str(x.name), "", 1), test_data.keywords)
+        self.info = ["Please, choose tests:", keywords]
+        chosen = self.draw_checklist()
+        self.log(chosen)
+
+        #self.log(self.info_update(info="\n\ZbRun available tests\Zn", widget="msgbox"))
         testrun = subprocess.Popen([self.pybot, self.suit.name], stderr=subprocess.PIPE, stdout=subprocess.PIPE)
         self.info_update("", clear=True)
-        is_valid = False
         while testrun.poll() is None: #Check if child process has terminated
             line = testrun.stdout.readline()
             self.log(line)
-            if bool(line):
-                is_valid = True
-            if not is_valid:
-                self.title = colorize["Error"]
-                self.info_update("[FAIL] %s is not a valid test suit file" % self.suit.name, widget="msgbox")
-                self.flush_state()
-                return
             if '|' in line or ',' in line:
                 if 'FAIL' in line:
                     self.state = "alarm"

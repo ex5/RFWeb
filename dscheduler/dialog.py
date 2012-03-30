@@ -936,7 +936,7 @@ class Dialog:
         # backslash--the output makes you think you've encountered an embedded
         # double-quote).
         kwargs["separate_output"] = True
-
+        print cmd
 	(code, output) = self._perform(*(cmd,), **kwargs)
 
         # Since we used --separate-output, the tags are separated by a newline

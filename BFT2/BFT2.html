@@ -1,0 +1,272 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<style type="text/css">
+html {
+  font-family: Arial,Helvetica,sans-serif;
+  background-color: white;
+  color: black;
+}
+table {
+  border-collapse: collapse;
+  empty-cells: show;
+  margin: 1em 0em;
+  border: 1px solid black;
+}
+th, td {
+  border: 1px solid black;
+  padding: 0.1em 0.2em;
+  height: 1.5em;
+  width: 12em;
+}
+td.colspan4, th.colspan4 {
+    width: 48em;
+}
+td.colspan3, th.colspan3 {
+    width: 36em;
+}
+td.colspan2, th.colspan2 {
+    width: 24em;
+}
+th {
+  background-color: rgb(192, 192, 192);
+  color: black;
+  height: 1.7em;
+  font-weight: bold;
+  text-align: center;
+  letter-spacing: 0.1em;
+}
+td.name {
+  background-color: rgb(240, 240, 240);
+  letter-spacing: 0.1em;
+}
+td.name, th.name {
+  width: 10em;
+}
+</style>
+<title>BFT2</title>
+</head>
+<body>
+<h1>BFT2</h1>
+<table border="1" id="setting">
+<tr>
+<th class="name" colspan="5">Settings</th>
+</tr>
+<tr>
+<td class="name">Library</td>
+<td>BFT2Library.py</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+</table>
+<table border="1" id="testcase">
+<tr>
+<th class="name" colspan="5">Test Cases</th>
+</tr>
+<tr>
+<td class="name"><a name="test_MAC should be unique">MAC should be unique</a></td>
+<td>HwAddr</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Status Should Be</td>
+<td>UNIQUE</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Any Errors</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>[Teardown]</td>
+<td>Run Keyword If Test Failed</td>
+<td>log</td>
+<td>"MAC isn't unique"</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"><a name="test_PCI device should exist">PCI device should exist</a></td>
+<td>[Documentation]</td>
+<td class="colspan3" colspan="3">Fails if the specified PCI/PCIe device doesn't exists. \ndevID should be in same format as corresponding argument of the lspci utility (see man 8 lspci)</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>PCI Device</td>
+<td>10ec:8168</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Status Should Not Be</td>
+<td>${EMPTY}</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Any Errors</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>[Teardown]</td>
+<td>Run Keyword If Test Failed</td>
+<td>log</td>
+<td>"Device not found"</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"><a name="test_Network device should exist">Network device should exist</a></td>
+<td>[Documentation]</td>
+<td class="colspan3" colspan="3">Fails is the specified network devices doesn't exists \nname should be Linux OS network device name as eth0, eth1, ib0 , tun0 , etc.</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Network Device</td>
+<td>eth0</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Status Should Be</td>
+<td>EXISTS</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Any Errors</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>[Teardown]</td>
+<td>Run Keyword If Test Failed</td>
+<td>log</td>
+<td>"Network device not found"</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"><a name="test_Link should be Up">Link should be Up</a></td>
+<td>[Documentation]</td>
+<td class="colspan3" colspan="3">Fails if physical link of the specified network device is Down. \ndevID should be Linux OS network device name.</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Link Up</td>
+<td>eth0</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Status Should Be</td>
+<td>up</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Any Errors</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>[Teardown]</td>
+<td>Run Keyword If Test Failed</td>
+<td>log</td>
+<td>"Link is down or its state is unknown"</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"><a name="test_Link should not be up">Link should not be up</a></td>
+<td>[Documentation]</td>
+<td class="colspan3" colspan="3">Fails if physical link of the specified network device is Up. \ndevID should be Linux OS network device name.</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Link Up</td>
+<td>lo</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Status Should Not Be</td>
+<td>up</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Any Errors</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>[Teardown]</td>
+<td>Run Keyword If Test Failed</td>
+<td>log</td>
+<td>"Link is up or its state is unknown"</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+</table>
+</body>
+</html>
