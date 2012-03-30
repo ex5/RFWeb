@@ -2,10 +2,10 @@
 
 import sys
 import os
-import subprocess
 import time
 import dialog
 import robot
+import helpers
 
 colorize= { 
 # black, red, green, yellow, blue, magenta, cyan white \Z0-\Z9
@@ -16,21 +16,9 @@ colorize= {
         'PASS': "\Z2\ZbPASS\Zn",
         }
 
-def _run_command(command):
-    process = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    return {'stdout': process.stdout.read().strip(),
-            'stderr': process.stderr.read().strip()
-           }
-
-def _find_usb_drive():
-    _out  = _run_command('ls /dev/disk/by-id| grep "usb.*part1"')
-    if _out['stderr']:
-        return "ERROR: %s" % _out['stderr']
-    return _out['stdout']
-
-class TestScheduler():
+class BFT2UI(helpers.CmdRunner):
     '''
-    Simple test scheduler with UI based on dialog/xdialog
+    Simple UI for BFT2 collections of test cases. Uses on dialog/xdialog
     '''
     def __init__(self, logfile="dscheduler.log", suit_path="quickstart"):
         self.logfile = open(logfile, 'w')
@@ -42,13 +30,28 @@ class TestScheduler():
         self.dlg.setBackgroundTitle(self.backtitle)
         self.display()
 
-    def get_info_height(self):
-        return len(self.text.split('\n')) + 5
-    height = property(get_info_height)
+    def _find_usb_drive(self):
+        _attempts = 3
+        while not self._output and _attempts:
+            self.run('ls /dev/disk/by-id | grep "usb.*part1"')
+            if self._error:
+                return "ERROR: %s" % self._error
+            if not self._output:
+                _attempts -= 1
+                self.dlg.msgbox("Please insert the USB drive then press OK")
+        if not _attempts:
+            return "ERROR: couldn't find any USB drives"
+        return self._output
 
-    def get_info_width(self):
+    def _get_text_height(self):
+        return len(self.text.split('\n')) + 5
+    def _set(self, x):
+        raise Exception("Property is readonly!")
+    height = property(_get_text_height, _set)
+
+    def get_text_width(self):
         return max(map(len, self.text.split('\n'))) + 5
-    width = property(get_info_width)
+    width = property(get_text_width, _set)
 
     def __str__(self):
         return str([(attr, getattr(self, attr)) for attr in self.__dict__])
@@ -56,19 +59,19 @@ class TestScheduler():
     def _reports_to_usb_drive(self, devID):
         _mount_path = "/mnt/%s" % devID + str(time.time())
         _device = "/dev/disk/by-id/%s" % devID
-        os.mkdir(_mount_path)
-        _out = _run_command("mount %s %s" % (_device, _mount_path))
-        self.text_update(str(_out))
-        self.dlg.infobox(self.text, self.height, self.width)
-        if _out['stderr']:
-            return "ERROR: %s" % _out['stderr']
-        _dest_path = _mount_path + "/bft2report_%s" % time.strftime("%Y_%m_%d-%H-%M-%s")
-        os.mkdir(_dest_path)
-        _out = _run_command("cp *.html %(path)s; cp *.xml %(path)s; cp *.log %(path)s" % {'path':_dest_path})
-        _out = _run_command("umount %s" % _mount_path)
-        os.rmdir(_mount_path)
-        if _out['stderr']:
-            return "ERROR: %s" % _out['stderr']
+        try:
+            os.mkdir(_mount_path)
+            self.run("mount %s %s" % (_device, _mount_path), do_raise=True)
+            self.text_update(str(_out))
+            self.dlg.infobox(self.text, self.height, self.width)
+            _dest_path = _mount_path + "/bft2report_%s" % time.strftime("%Y_%m_%d-%H-%M-%s")
+            os.mkdir(_dest_path)
+            self.run("cp *.html %(path)s; cp *.xml %(path)s; cp *.log %(path)s" % {'path':_dest_path}, do_raise=True)
+            self.run("umount %s" % _mount_path, do_raise=True)
+            os.rmdir(_mount_path)
+        except Exception, e:
+            return "ERROR: %s" % e
+        return 'OK'
 
     def flush_state(self):
         self.suit = None
@@ -82,7 +85,7 @@ class TestScheduler():
         self.logfile.write(str(time.ctime()) + ': ' + str(args) + '\n')
 
     def quit(self):
-        self.text_update(" Bye! ", clear=True)
+        self.text_update(" Bye! ")
         self.log("quit", self)
         self.logfile.close()
         exit(0)
@@ -147,52 +150,42 @@ class TestScheduler():
         if not self.suit or not self.pybot:
             self.state = "exit"
             return
-        #keywords = map(lambda x: (str(x.name), "", 1), self.suit.keywords)
-        #self.log(self.suit, keywords)
         if self.tags:
             self.chosen_tags = self.dlg.checklist(text="Please, choose tests:", choices=[(str(x[1]), str(x[0]), 'off') for x in zip(range(len(self.tags) + 1), self.tags)])[1]
-            self.log(self.chosen_tags)
-            self.text_update("[OK] Tags to run: %s" % self.chosen_tags)
+        if not self.chosen_tags:
+            self.chosen_tags = self.tags
+        self.text_update("[OK] Tags to run: %s" % self.chosen_tags)
         exit = self.dlg.yesno(self.text + "\nProceed?\n", len(self.text.split('\n')) + 5, max(map(len, self.text.split('\n'))) + 5, "Run", "Exit")
         if exit:
             self.state = "exit"
             return
         self.log(' '.join(map(str, self.chosen_tags)))
-        _cmd = self.chosen_tags and [self.pybot, "--include", ' '.join(map(str, self.chosen_tags)), self.suit_path] or [self.pybot, self.suit_path]
-        testrun = subprocess.Popen(_cmd, stderr=subprocess.PIPE, stdout=subprocess.PIPE)
         self.text_update("", clear=True)
-        while testrun.poll() is None:
-            line = testrun.stdout.readline()
-            if '|' in line or ',' in line:
-                if 'FAIL' in line:
-                    self.state = "alarm"
-                self.text_update(line)
-                self.dlg.infobox(self.text, self.height, self.width)
-        exit = self.dlg.yesno(self.text, self.height + 20, self.width + 20, "Run again", "Write to USB and exit")
+        _cmd = [self.pybot, "--include"]
+        _cmd.extend(self.chosen_tags)
+        _cmd.append(self.suit_path)
+        self.log(_cmd)
+        self.run(_cmd, shell=False, pipe=False)
+        # TODO read report, show results
+        exit = self.dlg.yesno(self.text, self.height, self.width, "Run again", "Write to USB and exit")
         if exit:
             self.state = "exit"
-            _usb = _find_usb_drive()
+            _usb = self._find_usb_drive()
             self.log(_usb)
-            _attemts = 3
-            while not _usb and _attemts:
-                self.log("Waiting")
-                time.sleep(5)
-                _attemts -= 1
-                self.dlg.msgbox("Please, insert USB-drive\nPress OK when finished")
-                _usb = _find_usb_drive()
-            self.log(_usb)
-            if not _usb:
-                self.dlg.msgbox("Cannot write reports")
+            if not _usb or 'ERROR' in _usb:
+                self.dlg.msgbox(_usb and "%s" % _usb or "Cannot write reports")
             else:
-                self.dlg.infobox("Writing reports to USB-drive..")
-                self._reports_to_usb_drive(_usb)
+                self.text_update("Writing reports to USB-drive.. ", clear=True)
+                self.dlg.infobox(self.text, self.height, self.width)
+                self.text_update(self._reports_to_usb_drive(_usb))
+                self.dlg.infobox(self.text, self.height, self.width)
         else:
             self.flush_state()
 
 def main():
     if len(sys.argv) > 1:
         print sys.argv
-        scheduler = TestScheduler(suit_path=sys.argv[1])
+        scheduler = BFT2UI(suit_path=sys.argv[1])
 
 if __name__ == "__main__":
     main()
