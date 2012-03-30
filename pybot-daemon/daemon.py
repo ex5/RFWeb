@@ -15,13 +15,14 @@ class Daemon:
         self.stdout = stdout
         self.stderr = stderr
         self.pidfile = pidfile
-        logging.basicConfig(filename=logfile,
-                            filemode='a+',
-                            format='%(asctime)s,%(msecs)d %(name)s %(levelname)s %(message)s',
-                            datefmt='%H:%M:%S',
-                            level=logging.DEBUG)
-        self.logger = logging.getLogger('daemon')
-        logging.debug("__init__, pidfile: %s, stdin: %s, stdout: %s, stderr: %s" % (pidfile, stdin, stdout, stderr))
+        self.logger = logging.getLogger(__name__)
+        self.logger.setLevel(logging.DEBUG)
+        fh = logging.FileHandler(logfile)
+        formatter = logging.Formatter('%(asctime)s,%(msecs)d %(levelname)s %(name)s %(message)s')
+        fh.setFormatter(formatter)
+        self.logger.addHandler(fh)
+        fh.setLevel(logging.DEBUG)
+        self.logger.debug("__init__, pidfile: %s, stdin: %s, stdout: %s, stderr: %s" % (pidfile, stdin, stdout, stderr))
 
     def daemonize(self):
         """
@@ -99,8 +100,7 @@ class Daemon:
         # Close log file
         try:
     	    self.logger.info("stopping")
-            self.logger.flush()
-            self.logger.close()
+            logging.shutdown()
         except AttributeError:
             pass
 
