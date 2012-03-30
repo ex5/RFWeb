@@ -10,45 +10,36 @@ from lxml import etree
 import subprocess
 import threading
 
-def _popen(on_exit, popenArgs):
-    """
-    Runs the given args in a subprocess.Popen, and then calls the function
-    on_exit when the subprocess completes.
-    on_exit is a callable object, and popenArgs is a list/tuple of args that 
-    would give to subprocess.Popen.
-    """
-    def runInThread(on_exit, popenArgs):
-        proc = subprocess.Popen(*popenArgs)
-        proc.wait()
-        on_exit()
-        return
-    thread = threading.Thread(target=runInThread, args=(on_exit, popenArgs))
-    thread.start()
-    # returns immediately after the thread starts
-    return thread
-
 class RobotDaemon(daemon.Daemon):
+    def run_and_report(self, on_exit, popenArgs):
+        """
+        Runs the given args in a subprocess.Popen, and then calls the function
+        on_exit when the subprocess completes.
+        on_exit is a callable object, and popenArgs is a list/tuple of args that 
+        would give to subprocess.Popen.
+        """
+        def runInThread(on_exit, popenArgs):
+            proc = subprocess.Popen(*popenArgs)
+            proc.wait()
+            on_exit(proc)
+            return
+        thread = threading.Thread(target=runInThread, args=(on_exit, popenArgs))
+        thread.start()
+        # returns immediately after the thread starts
+        return thread
+
     def run(self):
         self.test_suit_path = config.path.test_suit
         self.logger.debug("path to the test suit: %s" % self.test_suit_path)
         self.subprocesses = []
 
-        def report_exit():
-            self.logger.info("subprocess has finished")
+        def on_exit(process):
+            self.logger.info(process.stdout.read())
+            self.logger.info(process.stderr.read())
+            self.logger.info("subprocess %d's finished" % process.pid)
 
         while True:
             time.sleep(1)
-            '''
-            if self.subprocesses:
-                to_remove = []
-                for process in self.subprocesses:
-                    if process.poll():
-                        to_remove.append(process)
-                        self.logger.info(process.stdout.read())
-                        self.logger.info(process.stderr.read())
-                        self.logger.info("subprocess %d's finished" % process.pid)
-                self.subprocesses = filter(lambda x: x not in to_remove, self.subprocesses)
-            '''
             if not os.path.isfile(config.path.start_flag):
                 continue
             try:
@@ -64,9 +55,7 @@ class RobotDaemon(daemon.Daemon):
                     self.logger.info(_cmd)
                     if not os.path.isdir(suit.attrib['output']):
                         os.mkdir(suit.attrib['output'])
-                    #self.subprocesses.append(subprocess.Popen(_cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE))
-                    _popen(report_exit, (_cmd, 0, None, None, subprocess.PIPE, subprocess.PIPE))
-                    self.logger.debug('subprocesses %s' % str(map(lambda x: x.pid, self.subprocesses)))
+                    self.run_and_report(on_exit, (_cmd, 0, None, None, subprocess.PIPE, subprocess.PIPE))
             except Exception, e:
                 self.logger.error("Cannot open test suit: %s" % str(e))
 
