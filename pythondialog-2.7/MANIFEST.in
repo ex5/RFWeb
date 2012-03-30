@@ -1,3 +1,0 @@
-include COPYING INSTALL AUTHORS TODO DEBUGGING demo.py
-include MANIFEST.in
-# global-exclude *~
