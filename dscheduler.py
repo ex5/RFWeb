@@ -2,8 +2,7 @@
 
 import sys
 import os
-from os import path
-sys.path.append(path.abspath(path.curdir) + "/pythondialog-2.7")
+sys.path.append(os.path.abspath(os.path.curdir) + "/pythondialog-2.7")
 import helpers
 import subprocess
 import time
@@ -41,7 +40,6 @@ class TestScheduler():
         self.backtitle = self.title
 
     def log(self, *args):
-        #print str(time.ctime()), ': ', map(str, args)
         self.logfile.write(str(time.ctime()) + ': ' + str(args) + '\n')
 
     def quit(self):
@@ -60,7 +58,7 @@ class TestScheduler():
 
     def draw(self, mode="", widget="infobox"):
         size = "%s %s" % (len(self.info.split('\n')) + 5, max(map(len, self.info.split('\n'))))
-        self.log(subprocess.check_call("DIALOGRC=.dialogrc.%s dialog --title \"%s\" --backtitle \"%s\" --colors --%s \"%s\" %s" % (mode, self.title, self.backtitle, widget, self.info, size), shell=True, stderr=self.logfile))
+        subprocess.call("DIALOGRC=.dialogrc.%s dialog --keep-window --title \"%s\" --backtitle \"%s\" --colors --%s \"%s\" %s" % (mode, self.title, self.backtitle, widget, self.info, size), shell=True, stderr=self.logfile)
 
     def draw_menu(self):
         height = len(self.info[1]) + 7
@@ -120,11 +118,14 @@ class TestScheduler():
                 if 'FAIL' in line:
                     self.state = "alarm"
                 self.info_update(line)
+                #time.sleep(.8)
         self.info_update("", widget="msgbox")
         self.flush_state()
 
 def main():
-    scheduler = TestScheduler()
+    if len(sys.argv) > 1:
+        print sys.argv
+        scheduler = TestScheduler(suit_path=sys.argv[1])
 
 if __name__ == "__main__":
     main()
