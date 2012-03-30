@@ -68,21 +68,54 @@ td.name, th.name {
 <td></td>
 </tr>
 </table>
+<table border="1" id="variable">
+<tr>
+<th class="name" colspan="5">Variables</th>
+</tr>
+<tr>
+<td class="name">@{devIDs}</td>
+<td>1002:68e1</td>
+<td>1002:aa68</td>
+<td>1002:68e3</td>
+<td># List of PCI devices IDs to check</td>
+</tr>
+<tr>
+<td class="name">@{network_devices}</td>
+<td>lo</td>
+<td>eth0</td>
+<td>eth1</td>
+<td># List of network devices to check</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+</table>
 <table border="1" id="testcase">
 <tr>
 <th class="name" colspan="5">Test Cases</th>
 </tr>
 <tr>
 <td class="name"><a name="test_MAC should be unique">MAC should be unique</a></td>
-<td>HwAddr</td>
-<td></td>
+<td>${serial_num}</td>
+<td>Serial</td>
 <td></td>
 <td></td>
 </tr>
 <tr>
 <td class="name"></td>
-<td>Status Should Be</td>
+<td>Should Be Equal</td>
+<td>Hw Addr</td>
 <td>UNIQUE</td>
+<td>${serial_num} has duplicate HwAddr</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>...</td>
+<td>${False}</td>
 <td></td>
 <td></td>
 </tr>
@@ -114,23 +147,44 @@ td.name, th.name {
 </tr>
 <tr>
 <td class="name"></td>
-<td>PCI Device</td>
-<td>10ec:8168</td>
-<td></td>
-<td></td>
+<td>: FOR</td>
+<td>${devID}</td>
+<td>IN</td>
+<td>@{devIDs}</td>
 </tr>
 <tr>
 <td class="name"></td>
-<td>Status Should Not Be</td>
+<td></td>
+<td>${_status}=</td>
+<td>Pci Device</td>
+<td>${devID}</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td></td>
+<td>Run Keyword And Continue On Failure</td>
+<td>Should Not Be Equal</td>
+<td>${_status}</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td></td>
+<td>...</td>
 <td>${EMPTY}</td>
+<td>Device ${devID} not found</td>
+</tr>
+<tr>
+<td class="name"></td>
 <td></td>
+<td>...</td>
+<td>False</td>
 <td></td>
 </tr>
 <tr>
 <td class="name"></td>
+<td></td>
+<td>Run Keyword And Continue On Failure</td>
 <td>Any Errors</td>
-<td></td>
-<td></td>
 <td></td>
 </tr>
 <tr>
@@ -154,23 +208,37 @@ td.name, th.name {
 </tr>
 <tr>
 <td class="name"></td>
+<td>: FOR</td>
+<td>${name}</td>
+<td>IN</td>
+<td>@{network_devices}</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td></td>
+<td>${_status}=</td>
 <td>Network Device</td>
-<td>eth0</td>
-<td></td>
-<td></td>
+<td>${name}</td>
 </tr>
 <tr>
 <td class="name"></td>
-<td>Status Should Be</td>
+<td></td>
+<td>Run Keyword And Continue On Failure</td>
+<td>Should Be Equal</td>
+<td>${_status}</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>...</td>
 <td>EXISTS</td>
-<td></td>
-<td></td>
+<td>Network device ${name} not found</td>
+<td>False</td>
 </tr>
 <tr>
 <td class="name"></td>
+<td></td>
+<td>Run Keyword And Continue On Failure</td>
 <td>Any Errors</td>
-<td></td>
-<td></td>
 <td></td>
 </tr>
 <tr>
@@ -194,23 +262,37 @@ td.name, th.name {
 </tr>
 <tr>
 <td class="name"></td>
+<td>: FOR</td>
+<td>${name}</td>
+<td>IN</td>
+<td>@{network_devices}</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td></td>
+<td>${_status}=</td>
 <td>Link Up</td>
-<td>eth0</td>
-<td></td>
-<td></td>
+<td>${name}</td>
 </tr>
 <tr>
 <td class="name"></td>
-<td>Status Should Be</td>
+<td></td>
+<td>Run Keyword And Continue On Failure</td>
+<td>Should Be Equal</td>
+<td>${_status}</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>...</td>
 <td>up</td>
-<td></td>
-<td></td>
+<td>Link ${name} is DOWN or its state is unknown</td>
+<td>False</td>
 </tr>
 <tr>
 <td class="name"></td>
+<td></td>
+<td>Run Keyword And Continue On Failure</td>
 <td>Any Errors</td>
-<td></td>
-<td></td>
 <td></td>
 </tr>
 <tr>
@@ -234,16 +316,58 @@ td.name, th.name {
 </tr>
 <tr>
 <td class="name"></td>
-<td>Link Up</td>
-<td>lo</td>
+<td>: FOR</td>
+<td>${name}</td>
+<td>IN</td>
+<td>@{network_devices}</td>
+</tr>
+<tr>
+<td class="name"></td>
 <td></td>
+<td>${_status}=</td>
+<td>Link Up</td>
+<td>${name}</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td></td>
+<td>Run Keyword And Continue On Failure</td>
+<td>Should Not Be Equal</td>
+<td>${_status}</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>...</td>
+<td>up</td>
+<td>Link ${name} is UP</td>
+<td>False</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td></td>
+<td>Run Keyword And Continue On Failure</td>
+<td>Any Errors</td>
 <td></td>
 </tr>
 <tr>
 <td class="name"></td>
-<td>Status Should Not Be</td>
-<td>up</td>
+<td>[Teardown]</td>
+<td>Run Keyword If Test Failed</td>
+<td>log</td>
+<td>"Link is up or its state is unknown"</td>
+</tr>
+<tr>
+<td class="name"></td>
 <td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"><a name="test_Ping">Ping</a></td>
+<td>Ping</td>
+<td>127.0.0.1</td>
+<td>10</td>
 <td></td>
 </tr>
 <tr>
@@ -258,7 +382,49 @@ td.name, th.name {
 <td>[Teardown]</td>
 <td>Run Keyword If Test Failed</td>
 <td>log</td>
-<td>"Link is up or its state is unknown"</td>
+<td>"Something's gone wrong with ping msg"</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"><a name="test_Simple Exit For Loop">Simple Exit For Loop</a></td>
+<td>: FOR</td>
+<td>${var}</td>
+<td>IN</td>
+<td>one</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>...</td>
+<td>two</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td></td>
+<td>Exit For Loop</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td></td>
+<td>Fail</td>
+<td>Should not be executed</td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Should BE Equal</td>
+<td>${var}</td>
+<td>one</td>
+<td></td>
 </tr>
 <tr>
 <td class="name"></td>

@@ -1,11 +1,14 @@
 import re
 from subprocess import Popen, PIPE
+import sys
 
 HwAddr = lambda x: re.search(r".* ([0-9a-e:]*) .*", x)
 substr = lambda subs, x: re.findall("^.*%s.*$" % subs, x, re.MULTILINE)
 
 class BFT2Library:
-    ROBOT_LIBRARY_SCOPE = 'GLOBAL'
+    ROBOT_SYSLOG_FILE = 'robot.log'
+    SUIT_STATUS = "test suite status set be script"
+    #ROBOT_LIBRARY_SCOPE = 'GLOBAL'
     def __init__(self):
         self._hwaddrs_file_path = 'hwaddrs.log'
         self._hwaddrs = set()
@@ -89,13 +92,23 @@ class BFT2Library:
     def network_device(self, name):
         self._run_command("ls /sys/class/net")
         if not substr(name, self._status):
-            self._status = 'NOT FOUND'
+            return 'NOT FOUND'
         else:
-            self._status = 'EXISTS'
+            return 'EXISTS'
 
     def pci_device(self, devID):
         self._run_command("lspci -d %s -vvv" % devID)
+        return self._status
     
     def link_up(self, name):
         self._run_command("cat /sys/class/net/%s/operstate" % name)
+        return self._status
+
+    def ping(self, ip, count=100, flood=False):
+        print "ping %s -c %s %s" % (flood and "-i 0" or '', count, ip)
+        self._run_command("ping %s -c %s %s" % (flood and "-i 0" or '', count, ip))
+        print self._status
+
+    def serial(self):
+        return "1234567890"
 
