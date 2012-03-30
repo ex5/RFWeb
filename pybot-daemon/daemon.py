@@ -2,7 +2,7 @@
 
 import sys, os, time, atexit
 from signal import SIGTERM
-import logging
+import logger
 
 class Daemon:
     """
@@ -15,13 +15,7 @@ class Daemon:
         self.stdout = stdout
         self.stderr = stderr
         self.pidfile = pidfile
-        self.logger = logging.getLogger(__name__)
-        self.logger.setLevel(logging.DEBUG)
-        fh = logging.FileHandler(logfile)
-        formatter = logging.Formatter('%(asctime)s,%(msecs)d %(levelname)s %(name)s %(message)s')
-        fh.setFormatter(formatter)
-        self.logger.addHandler(fh)
-        fh.setLevel(logging.DEBUG)
+        self.logger = logger.get_logger(__name__, logfile)
         self.logger.debug("__init__, pidfile: %s, stdin: %s, stdout: %s, stderr: %s" % (pidfile, stdin, stdout, stderr))
 
     def daemonize(self):
@@ -99,8 +93,8 @@ class Daemon:
         """
         # Close log file
         try:
-    	    self.logger.info("stopping")
-            logging.shutdown()
+            logger.info('stopping log')
+    	    logger.shutdown()
         except AttributeError:
             pass
 
