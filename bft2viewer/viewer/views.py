@@ -36,8 +36,25 @@ def show_table(request):
     modules = _c.execute('SELECT * FROM module WHERE t>="2012-02-29" AND state != "%d" ORDER BY id' % states['HIDE']).fetchall()
     _header = "Serial number,Number of trials,Result,Timestamp,Download link,HwAddr 0,HwAddr 1".split(",")
     _table = []
+<<<<<<< HEAD
     for _row in modules:
         _hwaddrs = _c.execute('SELECT hwaddr FROM hwaddr WHERE id="%s"' % _row[0]).fetchall()
+=======
+    if export:
+        _header = "Serial number,Trial#,Result,New result,Timestamp,HwAddr 0,HwAddr 1,Comment".split(",")
+        _table.append(_header)
+    for _row in mms:
+        _hwaddrs = _c_original.execute('SELECT hwaddr FROM hwaddr WHERE id="%s"' % _row[0]).fetchall()
+        mm_original_state = _c_original.execute('SELECT state FROM module WHERE id = "%s" AND trial = %d' % (_row[0], _row[1])).fetchall()
+        if export:
+            _table.append((_row[0], _row[1], 
+                       NUMSTATE[mm_original_state[0][0]], NUMSTATE[_row[2]], _row[3],
+                       _hwaddrs and len(_hwaddrs) > 0 and _hwaddrs[0][0] or '', 
+                       _hwaddrs and len(_hwaddrs) > 1 and _hwaddrs[1][0] or '',
+                       _row[4])
+                       )
+            continue
+>>>>>>> minor fix
         _report_link = None
         if os.path.isdir("%s/reports/%s_%03d" % (PROJECT_ROOT, _row[0], int(_row[1]))):
             _report_link = "reports/%(sn)s_%(tr)03d/report_%(sn)s_%(tr)03d.html" % {'sn': _row[0], 'tr': int(_row[1])}
