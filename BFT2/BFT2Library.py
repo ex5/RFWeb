@@ -117,27 +117,21 @@ class BFT2Library:
         self._run_command("cat /proc/cpuinfo")
         if self._error:
             return "ERROR: %s" % self._error
-        if max(map(int, re.findall("^processor.*: (\d*)$", self._status, re.M))) + 1 != cpus_count(self._status) * cores_count(self._status):
-            return 'YES'
-        return 'NO'
+        return max(map(int, re.findall("^processor.*: (\d*)$", self._status, re.M))) + 1 != cpus_count(self._status) * cores_count(self._status)
 
-    def CPU_cores(self, expect_cores=4):
+    def CPU_cores(self):
         #cat /proc/cpuinfo | grep "core id"
         self._run_command("cat /proc/cpuinfo")
         if self._error:
             return "ERROR: %s" % self._error
-        if cores_count(self._status) != int(expect_cores):
-            return 'Unexpected number of CPU cores %s' % cores_count(self._status)
-        return 'PASS'
+        return cores_count(self._status)
 
-    def CPUs(self, expect_cpus=4):
+    def CPUs(self):
         #cat /proc/cpuinfo | grep "physical id"
         self._run_command("cat /proc/cpuinfo")
         if self._error:
             return "ERROR: %s" % self._error
-        if cpus_count(self._status) != int(expect_cpus):
-            return 'Unexpected number of CPUs %s' % cpus_count(self._status)
-        return 'PASS'
+        return cpus_count(self._status)
     
     def CPU_frequency(self, expect_freq=3093.061):
         #cat /proc/cpuinfo |grep "cpu MHz"
@@ -148,5 +142,14 @@ class BFT2Library:
         if any(map(lambda x: x != expect_freq, _tmp)):
             return 'Unexpected CPU MHz %s' % _tmp
         return 'PASS'
-
+    
+    def total_memory(self):
+        #cat /proc/meminfo | grep "MemTotal:"
+        self._run_command("cat /proc/meminfo")
+        if self._error:
+            return "ERROR: %s" % self._error
+        _tmp = re.findall("^MemTotal:.* (\d*) kB$", self._status, re.M)
+        if not _tmp:
+            return "ERROR: cannot stat memory"
+        return _tmp[0]
 
