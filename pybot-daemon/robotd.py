@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/python2
 
 import sys
 import time
@@ -20,6 +20,7 @@ class Task(object):
         self.name = name
         self.on_exit = on_exit
         self.args = args
+        self.logfile = os.path.join(config.path.logs, "thread_%s.log" % self.name)
         self.logger = logger.get_logger(self.name, os.path.join(config.path.logs, "thread_%s.log" % self.name))
         self.logger.info("task initialized: %s, %s" % (on_exit, args))
 
@@ -48,13 +49,12 @@ def on_exit(process, logger):
     logger.info("\n%s\n" % process.stderr.read())
     logger.info("subprocess %d's finished" % process.pid)
     logger.info("LOGGER: %s, HANDLERS: %s" % (str(logger), str(logger.handlers)))
-    #logger.handlers = []
 
 class RobotDaemon(daemon.Daemon):
     def __init__(self, *argv, **kwargs):
         super(RobotDaemon, self).__init__(*argv, **kwargs)
         self.test_suit_path = config.path.test_suit
-        self.logger.debug("path to the test suit: %s" % self.test_suit_path)
+        self.logger.debug("%s" % config.path)
         self.tasks = []
 
     def run_tasks(self, signum, frame):
@@ -73,7 +73,8 @@ class RobotDaemon(daemon.Daemon):
             suits = etree.parse(os.path.abspath(config.path.testlist)).getroot()
             i = 0
             for suit in suits.findall("robot"):
-                _cmd = ['pybot', ]
+                _cmd = ['pybot', '--pythonpath', config.path.listener_path]
+                _cmd += ['--listener', "%s:%s" % (config.path.listener, "listener_task_%03d.log" % i)]
                 self.logger.info('found suit: %s' % str(suit.attrib))
                 for test in suit.findall("test"):
                     self.logger.info('found test: %s' % str(test.attrib))
