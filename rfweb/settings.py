@@ -1,24 +1,12 @@
 # Django settings for RFWeb project.
 # 
-# Local configuration should be done in `rfwebsettings.py` file as explained
-# in `rfwebsettings_defaults.py`. More settings can be made configurable that
-# way if there is a need.
-
 
 import os
-import rfwebsettings
 
 # Path to the directory containing this file. Don't edit!
-_BASEDIR = os.path.dirname(os.path.abspath(__file__))
-APPLICATION_DIR = os.path.abspath(os.path.dirname( globals()[ '__file__' ] ))
-
-# Helper method to get local settings either from `rfwebsettings.py`
-# or `rfwebsettings_defaults.py`.
-def localsetting(name):
-    try:
-        return getattr(rfwebsettings, name)
-    except AttributeError:
-        return getattr(rfwebsettings_defaults, name)
+_BASEDIR = os.path.dirname(__file__)
+APPLICATION_DIR = os.path.dirname(_BASEDIR)
+PROJECT_NAME = os.path.basename(_BASEDIR)
 
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
@@ -27,20 +15,27 @@ DAJAXICE_DEBUG = True
 DAJAXICE_JS_DOCSTRINGS = True
 DAJAXICE_NOTIFY_EXCEPTIONS = True
 
+ROBOTD_PATH = '/home/public/clone/pybot-daemon'
+TIME_ZONE = 'Europe/Moscow'
 ADMINS = (
-    # ('Your Name', 'your_email@domain.com'),
+    ('Anna Sirota', 'anna.sirota@t-platforms.ru'),
 )
 
 MANAGERS = ADMINS
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(APPLICATION_DIR, 'rfweb.db'),
+        'ENGINE': 'django.db.backends.mysql',
+        'USER': PROJECT_NAME,
+        'PASSWORD': '123456',
+        'NAME': PROJECT_NAME,
+#        'NAME': os.path.join(APPLICATION_DIR, 'rfweb.db'),
+        'HOST': 'localhost',
+        'PORT': '',
+        'OPTIONS': {
+               'init_command': 'SET storage_engine=INNODB',
+               }
     }
 }
-#DATABASE_ENGINE = 'django.db.backends.sqlite3' 
-#DATABASE_NAME = localsetting('DATABASE_NAME')
-TIME_ZONE = localsetting('TIME_ZONE')
 
 # Language code for this installation. All choices can be found here:
 # http://www.i18nguy.com/unicode/language-identifiers.html
