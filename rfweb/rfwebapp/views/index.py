@@ -7,7 +7,7 @@ gzip_middleware = GZipMiddleware()
 from rfweb.rfwebapp.models import Suit
 from search import SearchForm
 import sys
-from rfwebsettings import ROBOTD_PATH
+from settings import ROBOTD_PATH
 sys.path.append(ROBOTD_PATH)
 import robotd
 

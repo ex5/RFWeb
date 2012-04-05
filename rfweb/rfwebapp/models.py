@@ -1,5 +1,12 @@
 from django.db import models
 
+LOG_TYPE = (
+    (0, 'Start'),
+    (1, 'Finish'),
+    (2, 'Status'),
+    (3, 'Unknown'),
+)
+
 class Suit(models.Model):
     name = models.CharField(max_length=80)
     path = models.CharField(max_length=80)
@@ -51,13 +58,31 @@ class Task(models.Model):
     def __unicode__(self):
         return self.name
 
-'''
-class Tag(models.Model):
-    test = models.ForeignKey(Test)
-    suit = models.ForeignKey(Suit)
-    name = models.CharField(max_length=80)
+class Run(models.Model):
+    task = models.ForeignKey(Task)
+    start = models.DateField(auto_now_add=True, auto_now=False)
+    finish = models.DateField(auto_now_add=False, auto_now=False)
+    running = models.BooleanField() # NULL --- need to be started, True --- already running, False --- do nothing
+    status = models.BooleanField()
+
+    def __str__(self):
+        return self.name
 
     def __unicode__(self):
         return self.name
-'''
+
+class Log(models.Model):
+    type = models.IntegerField(max_length=1, choices=LOG_TYPE) 
+    task = models.ForeignKey(Task)
+    keyword = models.ForeignKey(Keyword)
+    test = models.ForeignKey(Test)
+    time = models.DateField(auto_now_add=True, auto_now=False)
+    status = models.BooleanField()
+    comment = models.CharField(max_length=250)
+
+    def __str__(self):
+        return self.name
+
+    def __unicode__(self):
+        return self.name
 

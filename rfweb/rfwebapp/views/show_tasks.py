@@ -9,7 +9,6 @@ from django.core import serializers
 
 def show_tasks(request):
     def _raw(request):
-        #assert False, serializers.serialize("python", Task.objects.all())
         return render_to_response('show_tasks.html', {'tasks': serializers.serialize("python", Task.objects.all()) }, context_instance=RequestContext(request))
     response = _raw(request)
     return gzip_middleware.process_response(request, response)

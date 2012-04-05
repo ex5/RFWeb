@@ -33,3 +33,33 @@ def preview_task(request, name, suit_id, tests, comment):
     dajax.assign('#preview', 'innerText', _xml)
     return dajax.json()
 
+@dajaxice_register
+def start_tasks(request, selected):
+    dajax = Dajax()
+    tasks = Task.objects.filter(pk__in=map(int, selected))
+    out = "<root>"
+    for task in tasks:
+        out += '<robot suit="%s" output="%s">' % (task.suit.path, ".")
+        for test in task.tests.select_related():
+            out += "<test name='%s' />" % test.name
+        out += "</robot>"
+    out += "root"
+    dajax.assign('#start', 'innerHTML', out)
+    return dajax.json()
+
+@dajaxice_register
+def stop_tasks(request, selected):
+    dajax = Dajax()
+    return dajax.json()
+
+@dajaxice_register
+def show_task_tests(request, task_id, test_ids):
+    dajax = Dajax()
+    tests = Test.objects.filter(pk__in=map(int, test_ids.replace('L', '').replace('[', '').replace(']', '').split(','))) # quite a temporary solution
+    out = "<ul>"
+    for test in tests:
+        out += "<li>%s</li>" % test.name
+    out += "</ul>"
+    dajax.assign('#tests_%s' % task_id, 'innerHTML', out)
+    return dajax.json()
+
