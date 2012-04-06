@@ -7,7 +7,7 @@ LOG_TYPE = (
     (3, 'Unknown'),
 )
 
-class Suit(models.Model):
+class Suite(models.Model):
     name = models.CharField(max_length=80)
     path = models.CharField(max_length=80)
     doc = models.TextField(verbose_name='Documentation')
@@ -20,7 +20,7 @@ class Suit(models.Model):
         return self.name
 
 class Keyword(models.Model):
-    suit = models.ForeignKey(Suit)
+    suite = models.ForeignKey(Suite)
     name = models.CharField(max_length=80)
     doc = models.TextField(verbose_name='Documentation')
     args = models.CharField(max_length=200, verbose_name='Arguments',
@@ -33,7 +33,7 @@ class Keyword(models.Model):
         return self.name
 
 class Test(models.Model):
-    suit = models.ForeignKey(Suit)
+    suite = models.ForeignKey(Suite)
     name = models.CharField(max_length=80)
     doc = models.TextField(verbose_name='Documentation')
     tasks = models.ManyToManyField('Task', blank=True)
@@ -45,7 +45,7 @@ class Test(models.Model):
         return self.name
 
 class Task(models.Model):
-    suit = models.ForeignKey(Suit)
+    suite = models.ForeignKey(Suite)
     name = models.CharField(max_length=80)
     comment = models.TextField(verbose_name='Comment')
     tests = models.ManyToManyField(Test, through=Test.tasks.through, blank=True)
@@ -72,7 +72,8 @@ class Run(models.Model):
         return self.name
 
 class Log(models.Model):
-    type = models.IntegerField(max_length=1, choices=LOG_TYPE) 
+    type = models.IntegerField(max_length=1, choices=LOG_TYPE)
+    host_id = models.IntegerField()
     task = models.ForeignKey(Task)
     keyword = models.ForeignKey(Keyword)
     test = models.ForeignKey(Test)

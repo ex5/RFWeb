@@ -1,5 +1,5 @@
 from django.contrib import admin
-from rfweb.rfwebapp.models import Suit, Keyword, Test
+from rfweb.rfwebapp.models import Suite, Keyword, Test
 
 class TestInline(admin.StackedInline):
     model = Test
@@ -27,4 +27,4 @@ class SuitAdmin(admin.ModelAdmin):
         )
     inlines = [KeywordInline, TestInline]
 
-admin.site.register(Suit, SuitAdmin)
+admin.site.register(Suite, SuitAdmin)

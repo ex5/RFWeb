@@ -1,12 +1,12 @@
 from dajax.core import Dajax
 from dajaxice.decorators import dajaxice_register
-from rfweb.rfwebapp.models import Suit, Test, Task
+from rfweb.rfwebapp.models import Suite, Test, Task
 from django.utils import simplejson
 
 @dajaxice_register
-def get_test_list(request, suit_id):
+def get_test_list(request, suite_id):
     dajax = Dajax()
-    tests = Test.objects.filter(suit_id__exact=(int(suit_id))).distinct()
+    tests = Test.objects.filter(suite_id__exact=(int(suite_id))).distinct()
     out = ""
     for test in tests:
         out += "<option value='%s'>%s" % (test, test)
@@ -16,12 +16,12 @@ def get_test_list(request, suit_id):
     return dajax.json()
 
 @dajaxice_register
-def preview_task(request, name, suit_id, tests, comment):
-    if not suit_id:
+def preview_task(request, name, suite_id, tests, comment):
+    if not suite_id:
         return
     dajax = Dajax()
     tests = filter(lambda x: bool(x) == True, tests.split(','))
-    task = Task(suit=Suit.objects.get(id__exact=(int(suit_id))), name=name, comment=comment)
+    task = Task(suite=Suite.objects.get(id__exact=(int(suite_id))), name=name, comment=comment)
     task.save()
     task.tests.add(*Test.objects.filter(name__in=tests))
     task.save()
@@ -39,7 +39,7 @@ def start_tasks(request, selected):
     tasks = Task.objects.filter(pk__in=map(int, selected))
     out = "<root>"
     for task in tasks:
-        out += '<robot suit="%s" output="%s">' % (task.suit.path, ".")
+        out += '<robot suite="%s" output="%s">' % (task.suite.path, ".")
         for test in task.tests.select_related():
             out += "<test name='%s' />" % test.name
         out += "</robot>"

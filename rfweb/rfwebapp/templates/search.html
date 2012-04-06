@@ -14,8 +14,8 @@
 <table class="keywords results">
   {% for kw in kws %}
   <tr>
-    <td><a href="/suit/{{ kw.suit.name }}#{{ kw.name }}">{{ kw.name }}</a></td>
-    <td><a href="/suit/{{ kw.suit.name }}">{{ kw.suit.name }}</a></td>
+    <td><a href="/suite/{{ kw.suite.name }}#{{ kw.name }}">{{ kw.name }}</a></td>
+    <td><a href="/suite/{{ kw.suite.name }}">{{ kw.suite.name }}</a></td>
     <td>{{ kw.doc|first_line }}</td>
   </tr>
   {% endfor %}

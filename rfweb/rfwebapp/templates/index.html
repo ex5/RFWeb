@@ -3,8 +3,7 @@
 {% block content %}
 <h2>Welcome</h2>
 <p class="info">
-  RFWeb is a system for storing and searching Robot Framework test
-  library and resource file documentations.
+  RFWeb is a system for storing and searching Robot Framework test suites.
 </p>
 <div class="hr"><hr /></div>
 <div>
@@ -16,19 +15,19 @@
     {% endif %}
 </div>
 <div class="hr"><hr /></div>
-{% include "search_form.html" %}
-<div class="hr"><hr /></div>
-<h2>suits</h2>
-{% if libs %}
-<ul class="suits">
-  {% for lib in libs %}
-  <li><a href="/lib/{{ lib.name }}">{{ lib.name }}</a></li>
+<h2>Test suites</h2>
+{% if suites %}
+<ul class="suites">
+  {% for suite in suites %}
+  <li><a href="/suite/{{ suite.name }}">{{ suite.name }}</a></li>
   {% endfor %}
 </ul>
 {% else %}
 <p class="info">
-  No suits in the system. Why don't you <a href="/upload/">upload</a> one?
+  No test suites found. Why don't you <a href="/upload/">upload</a> one?
 </p>
 {%endif %}
+<div class="hr"><hr /></div>
+{% include "search_form.html" %}
 {% endblock content %}
 

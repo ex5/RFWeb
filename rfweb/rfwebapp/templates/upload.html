@@ -1,15 +1,15 @@
 {% extends "base.html" %}
 {% block title %}Upload{% endblock title %}
 {% block content %}
-<h2>Upload test suit</h2>
+<h2>Upload test suite</h2>
 <p class="info">
-  Select an XML file containing suitrary or test suit 
+  Select an XML file containing test suite 
 </p>
 <div class="hr"><hr /></div>
 <form enctype="multipart/form-data" action="/upload/" method="POST">
   {% if suitname %}
   <div class="success">
-    Successfully uploaded suit <a href="/suit/{{ suitname }}">{{ suitname }}</a>.
+    Successfully uploaded suite <a href="/suite/{{ suitname }}">{{ suitname }}</a>.
   </div>
   {% endif %}
   {{ form.file.errors }}
@@ -18,7 +18,7 @@
   </div>
   <div>
     {{ form.override }}
-    <label for="id_override">Overwrite existing suit with same name</label>
+    <label for="id_override">Overwrite existing suite with same name</label>
   </div>
   <input type="submit" value="Upload" />
 </form>

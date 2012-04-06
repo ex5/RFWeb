@@ -17,7 +17,7 @@
     }
 </script>
 
-<h2>Create task for robotd</h2>
+<h2>Create task for RFDaemon</h2>
 
 <table id="task" valign=top>
     <tr>
@@ -30,10 +30,10 @@
     </tr>
 
     <tr>
-        <td valign=top>Select test suit:<br>
-            <select name="suits" id="suits" onclick="" onchange="Dajaxice.rfweb.rfwebapp.get_test_list(Dajax.process,{'suit_id':this.value})" size="10">
-                {% for suit in suits %}
-                <option value="{{ suit.id }}">{{ suit.name }}</option>
+        <td valign=top>Select test suite:<br>
+            <select name="suites" id="suites" onclick="" onchange="Dajaxice.rfweb.rfwebapp.get_test_list(Dajax.process,{'suite_id':this.value})" size="10">
+                {% for suite in suites %}
+                <option value="{{ suite.id }}">{{ suite.name }}</option>
                 {% endfor %}
             </select>
         </td>
@@ -50,7 +50,7 @@
     </tr>
     <tr>
         <td>
-            <input type="button" name="preview_task" id="preview_task" value="Preview" onclick="Dajaxice.rfweb.rfwebapp.preview_task(Dajax.process, { 'name': task_name.innerText, 'suit_id': suits.value, 'tests': getSelected('tests').toString(), 'comment': task_comment.innerText })"/>
+            <input type="button" name="preview_task" id="preview_task" value="Preview" onclick="Dajaxice.rfweb.rfwebapp.preview_task(Dajax.process, { 'name': task_name.innerText, 'suite_id': suites.value, 'tests': getSelected('tests').toString(), 'comment': task_comment.innerText })"/>
         </td>
     </tr>
 </table>

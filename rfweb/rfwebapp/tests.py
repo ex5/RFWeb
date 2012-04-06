@@ -4,7 +4,7 @@ from StringIO import StringIO
 from rfweb.rfwebapp.views.upload import SuitData, InvalidXmlError
 
 VALID_SPEC = '''
-<keywordspec generated="20090428 20:43:40" type="suit" name="TestSuit">
+<keywordspec generated="20090428 20:43:40" type="suite" name="TestSuit">
 <version>1.0</version>
 <doc>This is documentation</doc>
 <init>
@@ -65,7 +65,7 @@ class TestSuitData(unittest.TestCase):
 
     def test_parsing_empty_documentations(self):
         data = SuitData(self._create_input('''
-<keywordspec type="suit" name="Test">
+<keywordspec type="suite" name="Test">
 <doc></doc>
 <kw name="KW 1"><doc></doc><arguments/></kw>
 </keywordspec>'''))
@@ -76,7 +76,7 @@ class TestSuitData(unittest.TestCase):
         self._assert_parsing_fails('<keywordspec/>')
 
     def test_parsing_spec_without_keywords_fails(self):
-        self._assert_parsing_fails('<keywordspec type="suit" name="Test">'
+        self._assert_parsing_fails('<keywordspec type="suite" name="Test">'
                                    '<doc></doc></keywordspec>')
 
     def test_iterating_spec_with_incomplete_keyword_data_fails(self):
@@ -95,7 +95,7 @@ class TestSuitData(unittest.TestCase):
 
     def test_parsing_old_style_suit_data(self):
         data = SuitData(self._create_input('''
-<keywordspec type="suit" name="Test">
+<keywordspec type="suite" name="Test">
 <doc>No version here</doc>
 <keywords><kw name="KW 1"><doc>KW 1 doc</doc><arguments/></kw></keywords>
 </keywordspec>'''))

@@ -7,7 +7,7 @@ from django.shortcuts import render_to_response
 from django import forms
 from django.forms.util import ErrorList
 
-from rfweb.rfwebapp.models import Suit
+from rfweb.rfwebapp.models import Suite
 from settings import MEDIA_ROOT
 
 def upload(request):
@@ -36,12 +36,12 @@ class UploadFileForm(forms.Form):
     def parse_kw_spec(self, _tmpfile, override):
         try:
             suitdata = SuitData(_tmpfile)
-            if Suit.objects.filter(name=suitdata.name):
+            if Suite.objects.filter(name=suitdata.name):
                 if not override:
-                    raise Exception("Suit %s already exists." % suitdata.name)
+                    raise Exception("Suite %s already exists." % suitdata.name)
                 else:
-                    Suit.objects.filter(name=suitdata.name).delete()
-            suit = Suit(name=suitdata.name, doc=suitdata.doc, version=suitdata.version)
+                    Suite.objects.filter(name=suitdata.name).delete()
+            suit = Suite(name=suitdata.name, doc=suitdata.doc, version=suitdata.version)
             suit.save()
             for kw in suitdata.keywords:
                 suit.keyword_set.create(name=kw.name, doc=kw.doc.value, args=' | '.join(map(str, kw.args.value)))
