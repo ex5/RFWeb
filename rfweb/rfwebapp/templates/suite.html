@@ -1,21 +1,21 @@
 {% extends "base.html" %}
 {% load rfweb_filters %}
-{% block title %}{{ suit.name }}{% endblock title %}
+{% block title %}{{ suite.name }}{% endblock title %}
 {% block content %}
-<h2>{{ suit.name }}</h2>
-{% ifnotequal suit.version "<unknown>" %}
-<p class="version"><b>Version:</b> {{ suit.version|safe }}</p>
+<h2>{{ suite.name }}</h2>
+{% ifnotequal suite.version "<unknown>" %}
+<p class="version"><b>Version:</b> {{ suite.version|safe }}</p>
 {% endifnotequal %}
 <h3 id="introduction">Introduction</h3>
-<p class="suitintro">{{ suit.doc|eol|safe }}</p>
-{% if suit.inits %}
+<p class="suitintro">{{ suite.doc|eol|safe }}</p>
+{% if suite.inits %}
 <h3 id="importing">Importing</h3>
 <table class="keywords">
   <tr>
     <th class="arg">Arguments</th>
     <th class="doc">Documentation</th>
   </tr>
-  {% for init in suit.inits %}
+  {% for init in suite.inits %}
   <tr>
     <td class="arg">{{ init.args }}</td>
     <td class="doc">{{ init.doc|eol|safe }}</td>
@@ -25,13 +25,13 @@
 {% endif %}
 <h3>Shortcuts</h3>
 <div class='shortcuts'>
-{% for kw in suit.keywords %}
+{% for kw in suite.keywords %}
 <a href="#{{ kw.name }}" title="{{ kw.shortdoc }}">{{ kw.name|nbsp|safe }}</a>
 {% if not forloop.last %}&middot;{% endif %}
 {% endfor %}
 </div>
 <div class='shortcuts'>
-{% for tc in suit.tests %}
+{% for tc in suite.tests %}
 <a href="#{{ tc.name }}" title="{{ tc.shortdoc }}">{{ tc.name|nbsp|safe }}</a>
 {% if not forloop.last %}&middot;{% endif %}
 {% endfor %}
@@ -43,7 +43,7 @@
     <th class="arg">Arguments</th>
     <th class="doc">Documentation</th>
   </tr>
-  {% for kw in suit.keywords %}
+  {% for kw in suite.keywords %}
   <tr>
     <td class="kw" id="{{ kw.name }}">{{ kw.name }}</td>
     <td class="arg">{{ kw.args }}</td>
@@ -57,7 +57,7 @@
     <th class="kw">Test case</th>
     <th class="doc">Documentation</th>
   </tr>
-  {% for tc in suit.tests %}
+  {% for tc in suite.tests %}
   <tr>
     <td class="kw" id="{{ tc.name }}">{{ tc.name }}</td>
     <td class="doc">{{ tc.doc|eol|safe }}</td>
@@ -65,5 +65,5 @@
   {% endfor %}
 </table>
 <div class="hr"><hr /></div>
-<p class="info">Altogether {{ suit.keywords|length }} keywords.</p>
+<p class="info">Altogether {{ suite.keywords|length }} keywords.</p>
 {% endblock content %}

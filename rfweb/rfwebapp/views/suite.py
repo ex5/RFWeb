@@ -2,14 +2,14 @@ import re
 
 from django.shortcuts import render_to_response, get_object_or_404
 
-from rfweb.rfwebapp.models import Suit
+from rfweb.rfwebapp.models import Suite
 from rfweb.rfwebapp import utils
 
 
-def suit(request, suitname):
-    suit = get_object_or_404(Suit, name=suitname)
-    suitdoc = SuitDoc(suit)
-    return render_to_response('suit.html', {'suit': suitdoc })
+def suite(request, suitname):
+    suite = get_object_or_404(Suite, name=suitname)
+    suitdoc = SuitDoc(suite)
+    return render_to_response('suite.html', {'suite': suitdoc })
 
 class _DocHelper:
     # This code is adapted from libdoc.py, see
@@ -27,9 +27,9 @@ class _DocHelper:
         for kw in keywords:
             if utils.eq(name, kw.name):
                 return '<a href="#%s" class="name">%s</a>' % (kw.name, name)
-        if utils.eq_any(name, ['introduction', 'suit introduction']):
+        if utils.eq_any(name, ['introduction', 'suite introduction']):
             return '<a href="#introduction" class="name">%s</a>' % name
-        if utils.eq_any(name, ['importing', 'suit importing']):
+        if utils.eq_any(name, ['importing', 'suite importing']):
             return '<a href="#importing" class="name">%s</a>' % name
         return '<span class="name">%s</span>' % name
 
@@ -54,24 +54,24 @@ class SuitDoc(_DocHelper):
         '''
 
 class KeywordDoc(_DocHelper):
-    def __init__(self, kwdata, suit):
+    def __init__(self, kwdata, suite):
         self.name = kwdata.name
         self.args = kwdata.args
         self._doc = kwdata.doc
         self.shortdoc = self._doc.split('\n')[0]
-        self._suit = suit
+        self._suit = suite
  
 class TestDoc(_DocHelper):
-    def __init__(self, tcdata, suit):
+    def __init__(self, tcdata, suite):
         self.name = tcdata.name
         self._doc = tcdata.doc
         self.shortdoc = self._doc.split('\n')[0]
-        self._suit = suit
+        self._suit = suite
 
 '''
 class TagDoc(_DocHelper):
-    def __init__(self, tdata, test, suit):
+    def __init__(self, tdata, test, suite):
         self.name = tdata.name
         self._test = test
-        self._suit = suit
+        self._suit = suite
 '''

@@ -54,6 +54,7 @@
 </table>
 <input type="button" value="Start selected" id="start" onclick="Dajaxice.rfweb.rfwebapp.start_tasks(Dajax.process, {'selected': getChecked('select')})" />   
 <input type="button" value="Stop selected" id="stop" onclick="Dajaxice.rfweb.rfwebapp.stop_tasks(Dajax.process, {'selected': getChecked('select')})" /><br>
+<input type="button" value="Delete selected" id="delete" onclick="Dajaxice.rfweb.rfwebapp.delete_tasks(Dajax.process, {'selected': getChecked('select')})" /><br>
 <a href="#logs" onclick="toggle_visibility('show_logs');"><h2>Logs</h2></a>
 <textarea id="show_logs" name="show_logs" style="display:none">recent logs should be here</textarea>
 {% endblock content %}
