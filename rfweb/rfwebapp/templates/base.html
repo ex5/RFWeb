@@ -7,7 +7,8 @@
         {% dajaxice_js_import %}
         <script type="text/javascript" src="{{ MEDIA_URL }}js/jquery-1.7.2.min.js"></script>
         <script type="text/javascript" src="{{ MEDIA_URL }}js/jquery-1.7.2.js"></script>
-        <script src="{{ MEDIA_URL }}/js/jquery.dajax.core.js" type="text/javascript" charset="utf-8"></script>
+        <script type="text/javascript" src="{{ MEDIA_URL }}js/jquery.ba-serializeobject.js" charset="utf-8"></script>
+        <script type="text/javascript" src="{{ MEDIA_URL }}/js/jquery.dajax.core.js" charset="utf-8"></script>
         <style media="all" type="text/css">
             /*
             * The original source for these styles is the Graphite theme got from
@@ -28,7 +29,7 @@
             }
             #header, #content, #footer {
                 margin: 0 auto;
-                width: 70%;
+                width: 90%;
                 max-width: 1000px;
                 padding: 1.7em;
             }
@@ -264,6 +265,17 @@
             a.name:hover {
                 color: #444444;
             }
+            textarea {
+                width: 100%;
+                height: 100%;
+            }
+            div.log {
+                border: 1px solid gray;
+                width: 100%;
+                overflow : scroll;
+                min-height: 200px
+                max-height: 600px;
+            }
         </style>
         <style media="print" type="text/css">
             #header, #footer {
@@ -291,7 +303,7 @@
     <body>
         <div id="header">
             <h1><a href="/">RFWeb</a></h1>
-            <div id="navi">{% block navi %}[ <a href="/">Home</a> ][ <a href="/upload/">Upload test suite</a> ][ <a href="/create_task/">Create task</a> ][ <a href="/show_tasks/">Show tasks</a> ]{% endblock navi %}</div>
+            <div id="navi">{% block navi %}[ <a href="/">Home</a> ] [ <a href="/upload/">Upload suite or library</a> ] [ <a href="/create_task/">Create task</a> ] [ <a href="/tasks/">Show tasks</a> ] [ <a href="/log/">View log</a> ]{% endblock navi %}</div>
         </div>
         <div id="content">
             {% block content %}{% endblock content %}

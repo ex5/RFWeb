@@ -20,6 +20,7 @@ urlpatterns = patterns('',
     (r'^search/?$', views.search),
     (r'^suite/(.*)', views.suite),
     (r'^create_task/?$', views.create_task),
-    (r'^show_tasks/?$', views.show_tasks),
+    (r'^tasks/?$', views.tasks),
+    (r'^log/?$', views.log),
     (r'^$', views.index),
 )

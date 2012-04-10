@@ -50,7 +50,8 @@
     </tr>
     <tr>
         <td>
-            <input type="button" name="preview_task" id="preview_task" value="Preview" onclick="Dajaxice.rfweb.rfwebapp.preview_task(Dajax.process, { 'name': task_name.innerText, 'suite_id': suites.value, 'test_ids': getSelected('tests').toString(), 'comment': task_comment.innerText })"/>
+            <input type="button" name="create" id="create" value="Create" onclick="Dajaxice.rfweb.rfwebapp.create_task(Dajax.process, { 'name': task_name.innerText, 'suite_id': suites.value, 'test_ids': getSelected('tests').toString(), 'comment': task_comment.innerText, 'run': false })"/>
+        <input type="button" name="create_and_run" id="create_and_run" value="Create and run" onclick="Dajaxice.rfweb.rfwebapp.create_task(Dajax.process, { 'name': task_name.innerText, 'suite_id': suites.value, 'test_ids': getSelected('tests').toString(), 'comment': task_comment.innerText, 'run': true })"/>
         </td>
     </tr>
 </table>

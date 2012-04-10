@@ -17,5 +17,5 @@ def first_line(value):
 @register.filter
 @stringfilter
 def eol(value):
-    return value.replace('\n', '<br>').replace('\\n', '<br>')
+    return value.replace('\r\n', '<br>').replace('\n\r', '<br>').replace('\n', '<br>').replace('\\n', '<br>')
 
