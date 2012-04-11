@@ -100,9 +100,19 @@ def check_log(request, settings):
             logs = filter(lambda x: x.host_id == long(settings.data['host']), logs)
         except:
             pass
+
     task = settings.data['task']
     if task:
-        logs = filter(lambda x: task in x.task.name, logs)
+        logs = filter(lambda x: x.task and task in x.task.name or False, logs)
+
+    test = settings.data['test']
+    if test:
+        logs = filter(lambda x: x.test and test in x.test or False, logs)
+
+    suite = settings.data['suite']
+    if suite:
+        logs = filter(lambda x: x.suite and suite in x.suite or False, logs)
+
     logs = logs and '<br>'.join(map(unicode, logs)) or 'Log is empty'
     for _str in COLORIZE:
         logs = logs.replace(_str, COLORIZE[_str])

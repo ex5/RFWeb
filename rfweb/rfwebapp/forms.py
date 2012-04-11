@@ -10,6 +10,8 @@ class LogViewerForm(forms.Form):
     limit = forms.IntegerField(label=u'Limit', required=True, initial=20)
     host = forms.CharField(label=u'Host', max_length=15, required=False)
     task = forms.CharField(label=u'Task name', max_length=80, required=False)
+    test = forms.CharField(label=u'Test name', max_length=80, required=False)
+    suite = forms.CharField(label=u'Suite name', max_length=80, required=False)
 
 class SuiteData(object):
     def __init__(self, _tmpfile):
