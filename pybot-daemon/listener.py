@@ -33,7 +33,7 @@ class Listener():
     def start_test(self, name, attrs):
         _str = '[%s]: %s \n' % (__file__, (str(attrs)))
         self.outfile.write(_str)
-        self.log(type=TYPE['Start test'], time=attrs['starttime'], status=attrs['critical'] == 'yes' and True or False, test=name, comment=attrs['doc'])
+        self.log(type=TYPE['Start test'], time=attrs['starttime'], status=attrs['critical'] == 'yes' and True or False, suite=attrs['longname'], test=name, comment=attrs['doc'])
 
     def start_keyword(self, name, attrs):
         _str = '[%s]: %s \n' % (__file__, (str(attrs)))
@@ -48,7 +48,7 @@ class Listener():
     def end_test(self, name, attrs):
         _str = '[%s]: %s \n' % (__file__, (str(attrs)))
         self.outfile.write(_str)
-        self.log(type=TYPE['End test'], time=attrs['endtime'], status=attrs['status'] == 'PASS' and True or False, test=name, comment=attrs['message'])
+        self.log(type=TYPE['End test'], time=attrs['endtime'], status=attrs['status'] == 'PASS' and True or False, suite=attrs['longname'], test=name, comment=attrs['message'])
 
     def end_keyword(self, name, attrs):
         _str = '[%s]: %s \n' % (__file__, (str(attrs)))
