@@ -99,9 +99,15 @@ class Log(models.Model):
 
     def __str__(self):
         _res = ["%s:" % self.time, _LOG_TYPE[self.type]]
-        for field in ('host_id', 'suite', 'keyword', 'test', 'status', 'comment'):
-            _res.append(getattr(self, field))
-        return ' '.join(map(str, filter(lambda x: x != None, _res)))
+        for field in ('host_id', 'task', 'suite', 'keyword', 'test', 'status', 'comment'):
+            if field == 'status':
+                if self.type in (_LOG_TYPE['End test'], _LOG_TYPE['End suite'], _LOG_TYPE['End keyword']):
+                    _res.append(getattr(self, field) and 'PASS' or 'FAIL')
+                elif self.type in (_LOG_TYPE['Start test'], ):
+                    _res.append(getattr(self, field) and 'Critical' or 'Non critical')
+            else:
+                _res.append(getattr(self, field))
+        return ' '.join(map(unicode, filter(lambda x: x != None, _res)))
 
     def __unicode__(self):
         return self.__str__()

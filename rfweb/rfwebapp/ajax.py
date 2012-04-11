@@ -4,6 +4,12 @@ from rfweb.rfwebapp.models import Suite, Test, Task, Run, Log, LOG_TYPE
 from django.utils import simplejson
 from forms import LogViewerForm
 
+COLORIZE = {'FAIL': '<font color="red">FAIL</font>',
+            'PASS': '<font color="green">PASS</font>',
+            'Non critical': '<font color="green">Non critical</font>',
+            'Critical': '<font color="red">Critical</font>',
+}
+
 @dajaxice_register
 def get_test_list(request, suite_id):
     dajax = Dajax()
@@ -79,7 +85,7 @@ def show_task_runs(request, task_id):
     for run in runs:
         out += "<li>%s</li>" % str(run)
     out += "</ul>"
-    dajax.assign('#tests_%s' % task_id, 'innerHTML', out)
+    dajax.assign('#runs_%s' % task_id, 'innerHTML', out)
     return dajax.json()
 
 @dajaxice_register
@@ -89,6 +95,17 @@ def check_log(request, settings):
     if not settings.data:
         settings = LogViewerForm({'limit': 10, 'filter': map(lambda (x, y): x, LOG_TYPE), 'refresh_timeout': 1})
     logs = Log.objects.filter(type__in=map(int, settings.data['filter'])).order_by('-time')[:settings.data['limit'] or 10]
-    dajax.assign('#log', 'innerHTML', logs and '<br>'.join(map(str, logs)) or 'Log is empty')
+    if settings.data['host']:
+        try:
+            logs = filter(lambda x: x.host_id == long(settings.data['host']), logs)
+        except:
+            pass
+    task = settings.data['task']
+    if task:
+        logs = filter(lambda x: task in x.task.name, logs)
+    logs = logs and '<br>'.join(map(unicode, logs)) or 'Log is empty'
+    for _str in COLORIZE:
+        logs = logs.replace(_str, COLORIZE[_str])
+    dajax.assign('#log', 'innerHTML', logs)
     return dajax.json()
 

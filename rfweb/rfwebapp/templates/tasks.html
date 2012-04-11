@@ -45,10 +45,10 @@ function toggle_check_all(name, state) {
         {% for field, value in task.fields.items %}
         <td>
             {% if field == 'tests' %}
-            <a href="#tests" onclick="toggle_visibility('tests_{{ task.pk }}');Dajaxice.rfweb.rfwebapp.show_task_tests(Dajax.process, {'task_id': {{ task.pk }}, 'test_ids': '{{ value }}'})"><h3>Show tests</h3></a>
-            <a href="#runs" onclick="toggle_visibility('tests_{{ task.pk }}');Dajaxice.rfweb.rfwebapp.show_task_runs(Dajax.process, {'task_id': {{ task.pk }}})"><h3>Show runs</h3></a>
-            <div id='tests_{{ task.pk }}' style="display: none">
-            </div>
+            <a href="#tests_{{ task.pk }}" onclick="toggle_visibility('tests_{{ task.pk }}');Dajaxice.rfweb.rfwebapp.show_task_tests(Dajax.process, {'task_id': {{ task.pk }}, 'test_ids': '{{ value }}'})"><h3>Show tests</h3></a>
+            <div id='tests_{{ task.pk }}' style="display: none"></div>
+            <a href="#runs_{{ task.pk }}" onclick="toggle_visibility('runs_{{ task.pk }}');Dajaxice.rfweb.rfwebapp.show_task_runs(Dajax.process, {'task_id': {{ task.pk }}})"><h3>Show runs</h3></a>
+            <div id='runs_{{ task.pk }}' style="display: none"></div>
             {% else %}
             {{ value }}
             {% endif %}
@@ -58,7 +58,7 @@ function toggle_check_all(name, state) {
     {% endfor %}
 </table>
 <input type="button" value="Start selected" id="start" onclick="Dajaxice.rfweb.rfwebapp.start_tasks(Dajax.process, {'selected': get_checked('select')})" />   
-<input type="button" value="Stop selected" id="stop" onclick="Dajaxice.rfweb.rfwebapp.stop_tasks(Dajax.process, {'selected': get_checked('select')})" />
+<!--input type="button" value="Stop selected" id="stop" onclick="Dajaxice.rfweb.rfwebapp.stop_tasks(Dajax.process, {'selected': get_checked('select')})" /-->
 <input type="button" value="Delete selected" id="delete" onclick="Dajaxice.rfweb.rfwebapp.delete_tasks(Dajax.process, {'selected': get_checked('select')})" /><br>
 {% else %}
 No tasks
