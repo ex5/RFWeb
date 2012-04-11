@@ -1,12 +1,10 @@
 from lxml.html import parse
 import os
-import robot
 import tempfile
 
 from django.shortcuts import render_to_response
 from django import forms
 
-from rfweb.rfwebapp.models import Suite
 from rfweb.rfwebapp.forms import UploadFileForm
 from settings import MEDIA_ROOT
 

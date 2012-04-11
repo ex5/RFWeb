@@ -1,6 +1,9 @@
 from django import forms
 from models import LOG_TYPE
 from django.forms.util import ErrorList
+import robot
+import os
+from rfweb.rfwebapp.models import Suite
  
 class LogViewerForm(forms.Form):
     filter = forms.MultipleChoiceField(choices=LOG_TYPE, label="Show messages", required=True, initial=map(lambda x: x[0], LOG_TYPE))
@@ -14,10 +17,10 @@ class SuiteData(object):
             self.path = _tmpfile
             self.version = '1.0'
             self.doc = ''
-        except Exception:
+        except Exception, e:
             if _tmpfile.split('.')[-1] in ('py',):
                 raise Exception('Saving %s as a Python-library.' % _tmpfile)
-            raise Exception('Given file do not contain neither valid XML.')
+            raise Exception('Given file does not contain valid XML: %s.' % e)
         self.keywords = self.testdata.keywords
         self.tests = []
         if self.testdata.has_tests():

@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+
+{% block content %}
+<script language="JavaScript" type="text/javascript">
+    function toggle_hide(name) {
+        var obj = $(name);
+        if(obj.style.display == "block") {
+            obj.style.display = "none";
+        }
+        else obj.style.display = "block";
+    }
+function set_call() {
+    var data = $('#viewer_settings').serializeObject();
+    Dajaxice.rfweb.rfwebapp.check_log(Dajax.process, {'settings': data});
+    var timeout = 1000;
+    var t=setTimeout("set_call()", timeout);
+}
+</script>
+
+<h2>Log</h2>
+
+<div>
+    <form action="" method="POST" id="viewer_settings">
+        {{ viewer_settings.as_p }}
+        <!--input type="button" value="Ok"-->
+    </form>
+    <script>
+        set_call();
+    </script>
+    <br>
+    <div class='log' name='log' id='log'>
+    </div>
+</div>
+{% endblock content %}
+

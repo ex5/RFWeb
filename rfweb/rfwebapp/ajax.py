@@ -33,22 +33,18 @@ def create_task(request, name, suite_id, test_ids, comment, run):
     dajax.assign('#preview', 'cols', max(map(len, _xml.split('/'))) + 1)
     dajax.assign('#preview', 'innerText', _xml)
     if run:
-        run = Run(task=task, running=None)
+        run = Run(task=task, host_id=None)
         run.save()
     return dajax.json()
 
 @dajaxice_register
 def start_tasks(request, selected):
     dajax = Dajax()
-    tasks = Task.objects.filter(id__in=map(int, selected))
-    out = "<root>"
-    for task in tasks:
-        out += '<robot suite="%s" output="%s">' % (task.suite.path, ".")
-        for test in task.tests.select_related():
-            out += "<test name='%s' />" % test.name
-        out += "</robot>"
-    out += "root"
-    dajax.assign('#start', 'innerHTML', out)
+    runs = Run.objects.filter(task_id__in=map(int, selected)).delete()
+    for task_id in map(int, selected):
+        new_run = Run(task_id=task_id, host_id=None)
+        new_run.save()
+    dajax.redirect('/tasks/')
     return dajax.json()
 
 @dajaxice_register
@@ -59,7 +55,6 @@ def stop_tasks(request, selected):
 @dajaxice_register
 def delete_tasks(request, selected):
     dajax = Dajax()
-    dajax.assign('#show_logs', 'innerText', str(request))
     runs = Run.objects.filter(task_id__in=map(int, selected)).delete()
     tasks = Task.objects.filter(id__in=map(int, selected)).delete()
     dajax.redirect('/tasks/')
@@ -79,10 +74,10 @@ def show_task_tests(request, task_id, test_ids):
 @dajaxice_register
 def show_task_runs(request, task_id):
     dajax = Dajax()
-    runs = Run.objects.filter(task__exact=int(task_id))
+    runs = Run.objects.filter(task__exact=int(task_id)).order_by('start')
     out = "<ul>"
     for run in runs:
-        out += "<li>%s, %s, %s, %s</li>" % (run.start, run.running, run.status, run.finish)
+        out += "<li>%s</li>" % str(run)
     out += "</ul>"
     dajax.assign('#tests_%s' % task_id, 'innerHTML', out)
     return dajax.json()

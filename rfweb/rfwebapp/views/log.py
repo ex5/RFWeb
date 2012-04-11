@@ -10,9 +10,7 @@ from rfweb.rfwebapp.forms import LogViewerForm
 
 def log(request):
     def _raw(request):
-        return render_to_response('log.html', {'log': serializers.serialize("python", Log.objects.all()), 
-            'viewer_settings': LogViewerForm()}, 
-                                   context_instance=RequestContext(request))
+        return render_to_response('log.html', {'viewer_settings': LogViewerForm()}, context_instance=RequestContext(request))
     response = _raw(request)
     return gzip_middleware.process_response(request, response)
     return log

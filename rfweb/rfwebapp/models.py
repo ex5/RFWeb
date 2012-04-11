@@ -15,6 +15,13 @@ LOG_TYPE = (
 _LOG_TYPE = {y: x for x, y in LOG_TYPE}
 _LOG_TYPE.update({x: y for x, y in LOG_TYPE})
 
+class BigIntegerField(models.IntegerField):
+    empty_strings_allowed=False
+    def get_internal_type(self):
+        return "BigIntegerField"
+    def db_type(self):
+        return 'bigint' # Note this won't work with Oracle.
+
 class Suite(models.Model):
     name = models.CharField(max_length=80)
     path = models.CharField(max_length=80)
@@ -70,23 +77,21 @@ class Run(models.Model):
     task = models.ForeignKey(Task)
     start = models.DateTimeField(auto_now_add=True, auto_now=False)
     finish = models.DateTimeField(null=True)
-    running = models.NullBooleanField(null=True) # NULL --- need to be started, True --- already running, False --- do nothing
+    host_id = models.BigIntegerField(null=True) # NULL --- need to be started, Not NULL --- host_id
     status = models.NullBooleanField(null=True)
 
     def __str__(self):
-        return "%s: %s" % (self.task, self.running)
+        return "%s,%s %s: %s %s" % (self.start, self.finish and self.finish or '', self.host_id and self.host_id or 'Any host', self.task, self.status != None and self.status or '')
 
     def __unicode__(self):
-        return "%s: %s" % (self.task, self.running)
+        return self.__str__()
 
 class Log(models.Model):
     type = models.IntegerField(max_length=1, choices=LOG_TYPE)
-    host_id = models.IntegerField(null=True)
-    #task = models.ForeignKey(Task, null=True)
+    task = models.ForeignKey(Task)
+    host_id = models.BigIntegerField(null=True)
     suite = models.CharField(max_length=100, null=True)
-    #keyword = models.ForeignKey(Keyword, null=True)
     keyword = models.CharField(max_length=100, null=True)
-    #test = models.ForeignKey(Test, null=True)
     test = models.CharField(max_length=100, null=True)
     time = models.DateTimeField(auto_now_add=True, auto_now=True)
     status = models.NullBooleanField(null=True)

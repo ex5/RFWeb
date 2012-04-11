@@ -28,11 +28,10 @@ DATABASES = {
         'USER': PROJECT_NAME,
         'PASSWORD': '123456',
         'NAME': PROJECT_NAME,
-#        'NAME': os.path.join(APPLICATION_DIR, 'rfweb.db'),
         'HOST': 'localhost',
         'PORT': '',
         'OPTIONS': {
-               'init_command': 'SET storage_engine=INNODB',
+               'init_command': 'SET storage_engine=MYISAM',
                }
     }
 }
@@ -111,4 +110,3 @@ INSTALLED_APPS = (
 
 import logging
 logging.basicConfig(level=logging.DEBUG)
-
