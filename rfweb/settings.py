@@ -2,6 +2,7 @@
 # 
 
 import os
+import sys
 
 # Path to the directory containing this file. Don't edit!
 _BASEDIR = os.path.dirname(__file__)
@@ -108,6 +109,7 @@ INSTALLED_APPS = (
     'rfweb.rfwebapp'
 )
 
-import logging
-logging.basicConfig(level=logging.DEBUG)
+if not 'logging' in sys.modules:
+    import logging
+    logging.basicConfig(level=logging.DEBUG)
 
