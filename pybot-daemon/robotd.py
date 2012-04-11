@@ -10,38 +10,40 @@ import threading
 import logger
 os.environ['DJANGO_SETTINGS_MODULE'] = 'rfweb.settings'
 sys.path.append(config.django.app_dir)
+import rfweb.settings
 from rfweb.rfwebapp.models import Suite, Test, Task, Run, Log
-
-STATE = {'IDLE': 0, 'RUNNING': 1}
+from uuid import getnode as get_mac
+import datetime
 
 class Task(object):
-    def __init__(self, parent, name, on_exit, args):
+    def __init__(self, parent, task_id, on_exit, args):
         self.parent = parent
-        self.state = STATE['IDLE']
-        # name should be unique otherwise logger will be the same
-        self.name = name
+        self.task_id = task_id
         self.on_exit = on_exit
         self.args = args
-        self.logfile = os.path.join(config.path.logs, "thread_%s.log" % self.name)
-        self.logger = logger.get_logger(self.name, os.path.join(config.path.logs, "thread_%s.log" % self.name))
+        self.logfile = os.path.join(config.path.logs, "task_%s_%s.log" % (self.parent.host_id, self.task_id))
+        self.logger = logger.get_logger(self.task_id, self.logfile)
         self.logger.info("task initialized: %s, %s" % (on_exit, args))
 
     def run(self):
         """
-        Runs the given args in a subprocess.Popen, and then calls the function
-        on_exit when the subprocess completes.
-        on_exit is a callable object, and args is a list/tuple of args that 
-        would give to subprocess.Popen.
+        Runs the given args in a subprocess.Popen, calls the function on_exit when the subprocess completes.
+        on_exit is a callable object;
+        args is a list/tuple of args that would be given to subprocess.Popen.
         """
         def run_in_thread(on_exit, args):
+            my_run = Run(task_id=self.task_id, host_id=self.parent.host_id, status=True)
+            my_run.save()
             proc = subprocess.Popen(*args)
             proc.wait()
             on_exit(proc, self.logger)
+            my_run.status = False
+            my_run.finish = datetime.datetime.now()
+            my_run.save()
             self.parent.tasks.remove(self)
             return
         self.thread = threading.Thread(target=run_in_thread, args=(self.on_exit, self.args))
         self.thread.start()
-        self.state = STATE['RUNNING']
 
     def finish(self):
         self.logger.handlers = []
@@ -58,35 +60,38 @@ class RobotDaemon(daemon.Daemon):
         self.test_suit_path = config.path.test_suit
         self.logger.debug("%s" % config.path)
         self.tasks = []
+        self.host_id = get_mac()
+        self.is_startup = True
 
     def run_tasks(self):
         if not self.tasks:
-            self.logger.warning("no tasks available")
+            self.logger.debug("no tasks available")
         for task in self.tasks:
-            if task.state == STATE['IDLE']:
-                task.run()
+            task.run()
 
     def reload_config(self):
         self.clear_tasks()
         try:
-            for run in Run.objects.filter(running__exact=None):
+            for run in Run.objects.filter(host_id=None):
                 task = run.task
+                my_runs = Run.objects.filter(host_id=self.host_id, task=task)
+                if my_runs:
+                    self.logger.debug('Already run this task: %s' % task)
+                    continue
                 _id = "%s_%04d.log" % (task.name, task.pk)
-                _cmd = ['pybot', '--pythonpath', config.path.listener_path]
-                _cmd += ['--listener', "%s:%s" % (config.path.listener, "listener_" + _id)]
-                self.logger.info('found task: %s' % task.name)
+                _cmd = ['pybot', '--pythonpath', config.path.listener_path, '--listener',
+                        "%(module)s:%(task_id)s:%(filename)s" % {'module': config.path.listener, 'filename': "listener_" + _id, 'task_id': task.pk}]
                 _suites = set()
                 for test in task.tests.all():
-                    self.logger.info('found test: %s' % test.name)
                     _cmd += ['--test', test.name]
                     _suites.add(test.suite.path)
-                _outputdir = os.path.join(config.path.output, 'task_' + _id)
+                _outputdir = os.path.join(rfweb.settings.MEDIA_ROOT, 'task_' + _id)
                 _cmd += ['--outputdir', _outputdir]
                 _cmd += _suites
-                self.logger.info(_cmd)
                 if not os.path.isdir(_outputdir):
                     os.mkdir(_outputdir)
-                self.tasks.append(Task(self, _id, on_exit, (_cmd, 0, None, None, subprocess.PIPE, subprocess.PIPE)))
+                self.logger.info(_cmd)
+                self.tasks.append(Task(self, task.pk, on_exit, (_cmd, 0, None, None, subprocess.PIPE, subprocess.PIPE)))
         except Exception, e:
             self.logger.error("Cannot fetch tasks: %s" % str(e))
 
@@ -96,11 +101,10 @@ class RobotDaemon(daemon.Daemon):
         self.logger.debug("task list cleared")
 
     def quit(self):
-        if not any(map(lambda x: x.state == STATE['RUNNING'], self.tasks)):
-            self.clear_tasks()
-            self.logger.info('exiting')
-            logger.shutdown()
-            self.stop()
+        self.clear_tasks()
+        self.logger.info('exiting')
+        logger.shutdown()
+        self.stop()
 
     def run(self):
         while True:
@@ -109,7 +113,7 @@ class RobotDaemon(daemon.Daemon):
             self.run_tasks()
 
 robotd_init = lambda: RobotDaemon(pidfile=config.path.pid_file, 
-                         logfile=os.path.join(config.path.logs, "robotd.log"),
+                         logfile=config.path.stdout,
                          stdout=config.path.stdout, 
                          stderr=config.path.stderr)
 

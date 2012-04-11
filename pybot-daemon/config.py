@@ -14,8 +14,8 @@ class Path():
         self.test_suit = '.'
         self.pid_file = '/tmp/robotd.pid'
         self.logs = '/tmp'
-        self.stderr = '/tmp/robotd_err.log'
-        self.stdout = '/tmp/robotd_out.log'
+        self.stderr = '/tmp/robotd.log'
+        self.stdout = '/tmp/robotd.log'
         self.testlist = os.path.join(self.source_dir, 'example.xml')
         self.listener_path = self.source_dir
         self.listener = 'listener.Listener'
@@ -24,14 +24,5 @@ class Path():
     def __str__(self):
         return '\n'.join(map(lambda x: "%s: %s" % (x, getattr(self, x)), self.__dict__))
 
-class DB():
-    def __init__(self):
-        self.host = 'localhost'
-        self.db = 'rfweb'
-        self.prefix = 'rfwebapp'
-        self.user = 'rfweb'
-        self.password = '123456'
-
-db = DB()
 path = Path()
 
