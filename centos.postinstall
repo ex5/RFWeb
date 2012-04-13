@@ -28,8 +28,8 @@ pwd
 echo 'Setting up Python 2.7'
 cd $dist_dir/Python-2.7
 make install
-touch /etc/ld.conf.d/python2.7.conf
-echo '/usr/lib/python2.7/lib' > /etc/ld.conf.d/python2.7.conf
+touch /etc/ld.so.conf.d/python2.7.conf
+echo '/usr/lib/python2.7/lib' > /etc/ld.so.conf.d/python2.7.conf
 ldconfig 
 
 alias python=$python_bin/python
