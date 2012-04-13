@@ -1,0 +1,82 @@
+#!/bin/bash
+#
+# rfdaemon        This starts and stops rfdaemon.
+#
+# chkconfig: 345 56 50
+### BEGIN INIT INFO
+# Provides: 
+# Required-Start:
+# Required-Stop: 
+# Should-Start: 
+# Should-Stop: 
+# Default-Start: 3 4 5
+# Default-Stop: 0 1 2 6
+# Short-Description: start and stop xinetd
+# Description: 
+### END INIT INFO
+
+#PATH=/sbin:/bin:/usr/bin:/usr/sbin
+
+start(){
+    cd /home/public/ta/pybot-daemon
+    /usr/lib/python2.7/bin/python robotd.py start
+    RETVAL=$?
+    return $RETVAL
+}
+
+stop(){
+    cd /home/public/ta/pybot-daemon
+    /usr/lib/python2.7/bin/python robotd.py stop
+    RETVAL=$?
+    return $RETVAL
+
+}
+
+reload(){
+    RETVAL=0
+    return $RETVAL
+}
+
+restart(){
+    stop
+    start
+}
+
+condrestart(){
+    RETVAL=0
+    return $RETVAL
+}
+
+
+# See how we were called.
+case "$1" in
+    start)
+	start
+	RETVAL=$?
+	;;
+    stop)
+	stop
+	RETVAL=$?
+	;;
+    status)
+	status $prog
+	RETVAL=$?
+	;;
+    restart)
+	restart
+	RETVAL=$?
+	;;
+    reload|force-reload)
+	reload
+	RETVAL=$?
+	;;
+    condrestart|try-restart)
+	condrestart
+	RETVAL=$?
+	;;
+    *)
+	echo $"Usage: $0 {start|stop|status|restart|condrestart|reload}"
+	RETVAL=2
+esac
+
+exit $RETVAL
