@@ -7,10 +7,11 @@ PATHS = []
 import os
 import sys
 
-PATHS = [os.path.abspath(os.path.dirname(__file__)), os.path.dirname(os.path.dirname(os.path.abspath(__file__)))]
+PATHS = [os.path.dirname(os.path.dirname(os.path.abspath(__file__))), os.path.dirname(os.path.abspath(__file__))]
 for path in PATHS:
     sys.path.append(path)
 
+os.environ['PYTHON_EGG_CACHE'] = os.path.join(os.path.abspath(os.path.dirname(__file__)), 'cache')
 os.environ['DJANGO_SETTINGS_MODULE'] = 'rfweb.settings'
 
 import django.core.handlers.wsgi
