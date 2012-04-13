@@ -66,7 +66,8 @@ python setup.py install
 
 mkdir /home/public
 cp -r $dist_dir/ta /home/public
-
+mkdir -p /var/www/django
+ln -s /home/public/ta/rfweb /var/www/django/rfweb
 cp $dist_dir/ta/pybot-daemon/rfd /etc/init.d
 chkconfig --level 345 rfd on
 
