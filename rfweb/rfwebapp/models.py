@@ -100,7 +100,9 @@ class Log(models.Model):
     def __str__(self):
         _res = ["%s:" % self.time, _LOG_TYPE[self.type]]
         for field in ('host_id', 'task', 'suite', 'keyword', 'test', 'status', 'comment'):
-            if field == 'status':
+            if field == 'host_id':
+                _res.append(hex(getattr(self, field))[2:13])
+            elif field == 'status':
                 if self.type in (_LOG_TYPE['End test'], _LOG_TYPE['End suite'], _LOG_TYPE['End keyword']):
                     _res.append(getattr(self, field) and 'PASS' or 'FAIL')
                 elif self.type in (_LOG_TYPE['Start test'], ):

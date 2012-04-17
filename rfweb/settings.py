@@ -8,6 +8,7 @@ import sys
 _BASEDIR = os.path.dirname(__file__)
 APPLICATION_DIR = os.path.dirname(_BASEDIR)
 PROJECT_NAME = os.path.basename(_BASEDIR)
+APPEND_SLASH = False
 
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
@@ -16,7 +17,6 @@ DAJAXICE_DEBUG = True
 DAJAXICE_JS_DOCSTRINGS = True
 DAJAXICE_NOTIFY_EXCEPTIONS = True
 
-ROBOTD_PATH = '/home/public/clone/pybot-daemon'
 TIME_ZONE = 'Europe/Moscow'
 ADMINS = (
     ('Anna Sirota', 'anna.sirota@t-platforms.ru'),
@@ -32,7 +32,7 @@ DATABASES = {
         'HOST': 'localhost',
         'PORT': '',
         'OPTIONS': {
-               'init_command': 'SET storage_engine=MYISAM',
+               'init_command': 'SET storage_engine=INNODB,character_set_connection=utf8,collation_connection=utf8_unicode_ci'
                }
     }
 }
@@ -54,12 +54,12 @@ MEDIA_ROOT = os.path.join(_BASEDIR, 'media')
 # URL that handles the media served from MEDIA_ROOT. Make sure to use a
 # trailing slash if there is a path component (optional in other cases).
 # Examples: "http://media.lawrence.com", "http://example.com/media/"
-MEDIA_URL = 'http://localhost:8000/media/'
+MEDIA_URL = 'http://192.168.100.146:8181/media/'
 
 # URL prefix for admin media -- CSS, JavaScript and images. Make sure to use a
 # trailing slash.
 # Examples: "http://foo.com/media/", "/media/".
-ADMIN_MEDIA_PREFIX = '/media/'
+ADMIN_MEDIA_PREFIX = 'media/'
 
 # Make this unique, and don't share it with anybody.
 SECRET_KEY = 'pmst_958#g=ks#i+(ci!pnf5=1b73@nf(c%h8)p&sc7wongki6'
@@ -111,5 +111,5 @@ INSTALLED_APPS = (
 
 if not 'logging' in sys.modules:
     import logging
-    logging.basicConfig(level=logging.DEBUG)
+    logging.basicConfig(level=logging.DEBUG, format='%(asctime)s %(levelname)s %(name)s %(message)s')
 

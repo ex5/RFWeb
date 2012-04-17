@@ -13,7 +13,7 @@ COLORIZE = {'FAIL': '<font color="red">FAIL</font>',
 @dajaxice_register
 def get_test_list(request, suite_id):
     dajax = Dajax()
-    tests = Test.objects.filter(suite_id__exact=(int(suite_id))).distinct()
+    tests = Test.objects.filter(suite__exact=(int(suite_id))).distinct()
     out = ""
     for test in tests:
         out += "<option value='%d'>%s" % (test.id, test)
@@ -46,9 +46,9 @@ def create_task(request, name, suite_id, test_ids, comment, run):
 @dajaxice_register
 def start_tasks(request, selected):
     dajax = Dajax()
-    runs = Run.objects.filter(task_id__in=map(int, selected)).delete()
+    runs = Run.objects.filter(task__in=map(int, selected)).delete()
     for task_id in map(int, selected):
-        new_run = Run(task_id=task_id, host_id=None)
+        new_run = Run(task=Task.objects.get(id=task_id), host_id=None)
         new_run.save()
     dajax.redirect('/tasks/')
     return dajax.json()
@@ -61,7 +61,7 @@ def stop_tasks(request, selected):
 @dajaxice_register
 def delete_tasks(request, selected):
     dajax = Dajax()
-    runs = Run.objects.filter(task_id__in=map(int, selected)).delete()
+    runs = Run.objects.filter(task__in=map(int, selected)).delete()
     tasks = Task.objects.filter(id__in=map(int, selected)).delete()
     dajax.redirect('/tasks/')
     return dajax.json()
@@ -96,10 +96,7 @@ def check_log(request, settings):
         settings = LogViewerForm({'limit': 10, 'filter': map(lambda (x, y): x, LOG_TYPE), 'refresh_timeout': 1})
     logs = Log.objects.filter(type__in=map(int, settings.data['filter'])).order_by('-time')[:settings.data['limit'] or 10]
     if settings.data['host']:
-        try:
-            logs = filter(lambda x: x.host_id == long(settings.data['host']), logs)
-        except:
-            pass
+        logs = filter(lambda x: settings.data['host'] in hex(x.host_id), logs)
 
     task = settings.data['task']
     if task:
