@@ -1,4 +1,4 @@
-#!/usr/bin/python2
+#!/usr/bin/python2.7
 
 import sys
 import time
@@ -7,7 +7,7 @@ import daemon
 import config
 import subprocess
 import threading
-import logger
+import logger # should be imported _before_ rfweb.settings
 os.environ['DJANGO_SETTINGS_MODULE'] = 'rfweb.settings'
 sys.path.append(config.django.app_dir)
 import rfweb.settings
@@ -21,7 +21,7 @@ class Task(object):
         self.task_id = task_id
         self.on_exit = on_exit
         self.args = args
-        self.logfile = os.path.join(config.path.logs, "task_%s_%s.log" % (self.parent.host_id, self.task_id))
+        self.logfile = os.path.join(config.path.logs, "task_%s_%s.log" % (hex(self.parent.host_id)[2:13], self.task_id))
         self.logger = logger.get_logger(self.task_id, self.logfile)
         self.logger.info("task initialized: %s, %s" % (on_exit, args))
 
@@ -79,7 +79,7 @@ class RobotDaemon(daemon.Daemon):
                     self.logger.debug('Already run this task: %s' % task)
                     continue
                 _id = "%s_%04d.log" % (task.name, task.pk)
-                _cmd = ['pybot', '--pythonpath', config.path.listener_path, '--listener',
+                _cmd = ['python2.7', 'pybot', '--pythonpath', config.path.listener_path, '--listener',
                         "%(module)s:%(task_id)s:%(filename)s" % {'module': config.path.listener, 'filename': "listener_" + _id, 'task_id': task.pk}]
                 _suites = set()
                 for test in task.tests.all():

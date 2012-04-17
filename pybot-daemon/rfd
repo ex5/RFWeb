@@ -19,14 +19,14 @@
 
 start(){
     cd /home/public/ta/pybot-daemon
-    /usr/lib/python2.7/bin/python robotd.py start
+    python2.7 robotd.py start
     RETVAL=$?
     return $RETVAL
 }
 
 stop(){
     cd /home/public/ta/pybot-daemon
-    /usr/lib/python2.7/bin/python robotd.py stop
+    python2.7 robotd.py stop
     RETVAL=$?
     return $RETVAL
 
@@ -59,7 +59,8 @@ case "$1" in
 	RETVAL=$?
 	;;
     status)
-	status $prog
+        cd /home/public/ta/pybot-daemon
+    	python2.7 robotd.py status
 	RETVAL=$?
 	;;
     restart)
