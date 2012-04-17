@@ -29,7 +29,7 @@ DATABASES = {
         'USER': PROJECT_NAME,
         'PASSWORD': '123456',
         'NAME': PROJECT_NAME,
-        'HOST': 'localhost',
+        'HOST': '192.168.100.146',
         'PORT': '',
         'OPTIONS': {
                'init_command': 'SET storage_engine=INNODB,character_set_connection=utf8,collation_connection=utf8_unicode_ci'

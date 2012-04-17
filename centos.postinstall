@@ -22,13 +22,6 @@ dist_dir=/root/to_install
 #none            /var/tmp tmpfs  defaults,size=10m 0 2
 #END
 
-#cat > /usr/bin/pybot <<DELIM
-#!/usr/bin/python2.7
-#import sys
-#from robot import run_cli
-#run_cli(sys.argv[1:])
-#DELIM
-
 cp -r $installroot/../to_install $installroot/root
 
 chroot $installroot /bin/sh >postinstall.log 2>&1 <<EOF
@@ -37,7 +30,7 @@ echo 'Setting up Python 2.7'
 cd $dist_dir/Python-2.7
 make install
 touch /etc/ld.so.conf.d/python2.7.conf
-echo '/usr/lib/python2.7/lib' > /etc/ld.so.conf.d/python2.7.conf
+echo '$python_dir/lib' > /etc/ld.so.conf.d/python2.7.conf
 ldconfig 
 
 ln -sf $python_bin/python2.7 /usr/bin/python2.7
@@ -54,17 +47,6 @@ LDFLAGS=-L$python_dir/lib python2.7 setup.py install
 echo 'Setting up Django'
 cd $dist_dir/Django-1.3
 python2.7 setup.py install  
-
-echo 'Configuring apache/rfweb'
-touch /etc/httpd/conf.d/rfweb.conf
-cat > /etc/httpd/conf.d/rfweb.conf <<DELIM
-LoadModule wsgi_module modules/mod_wsgi.so 
-WSGIScriptAlias / /var/www/django/rfweb/rfweb.wsgi.py
-<Directory /var/www/django/rfweb>
-        Order deny,allow
-        Allow from all
-</Directory>  
-DELIM
 
 echo 'Setting up RobotFramework 2.7.1'
 cd $dist_dir/robotframework-2.7.1
@@ -83,6 +65,7 @@ cp -r $dist_dir/ta /home/public
 mkdir -p /var/www/django
 ln -sf /home/public/ta/rfweb /var/www/django/rfweb
 cp $dist_dir/ta/pybot-daemon/rfd /etc/init.d
+chmod +x /etc/init.d/rfd
 chkconfig --level 345 rfd on
 
 EOF
