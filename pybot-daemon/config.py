@@ -11,11 +11,10 @@ django = Dj()
 class Path():
     def __init__(self):
         self.source_dir = os.path.abspath(os.path.dirname(__file__))
-        self.test_suit = '.'
         self.pid_file = '/tmp/robotd.pid'
         self.logs = '/tmp'
-        self.stderr = '/tmp/robotd.log'
-        self.stdout = '/tmp/robotd.log'
+        self.stderr = '/tmp/robotd_err.log'
+        self.stdout = '/tmp/robotd_out.log'
         self.testlist = os.path.join(self.source_dir, 'example.xml')
         self.listener_path = self.source_dir
         self.listener = 'listener.Listener'

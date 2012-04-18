@@ -18,7 +18,7 @@ class Daemon(object):
         self.stdout = stdout
         self.stderr = stderr
         self.pidfile = pidfile
-        self.logger = logger.get_logger(__name__, logfile)
+        self.logger = logger.get_logger(logfile)
         self.logger.info("__init__, pidfile: %s, stdin: %s, stdout: %s, stderr: %s" % (pidfile, stdin, stdout, stderr))
 
     def daemonize(self):

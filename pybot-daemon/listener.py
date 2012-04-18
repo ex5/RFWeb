@@ -16,15 +16,15 @@ from rfweb.rfwebapp.models import Suite, Test, Task, Run, Log, _LOG_TYPE as TYPE
 class Listener():
     ROBOT_LISTENER_API_VERSION = 2
 
-    def __init__(self, task_id, filename='listener.log'):
+    def __init__(self, run_id, filename='listener.log'):
         outpath = os.path.join(tempfile.gettempdir(), filename)
         self.outfile = open(outpath, 'w')
-        self.host_id = get_mac()
-        self.task_id = task_id
-        self.outfile.write("host: %s,  task: %s" % (self.host_id, self.task_id))
+        self.hwaddr = get_mac()
+        self.run_id = run_id
+        self.outfile.write("host: %s,  task: %s" % (self.hwaddr, self.run_id))
     
     def log(self, **kwargs):
-        log_entry = Log(task_id=self.task_id, host_id=self.host_id, **kwargs)
+        log_entry = Log(run_id=self.run_id, hwaddr=self.hwaddr, **kwargs)
         log_entry.save()
 
     def start_suite(self, name, attrs):
@@ -67,5 +67,5 @@ class Listener():
         _str = '[%s]: closing\n' % __file__
         self.outfile.write(_str)
         self.outfile.close()
-        self.log(type=TYPE['Close'], host_id=self.host_id)
+        self.log(type=TYPE['Close'], hwaddr=self.hwaddr)
 

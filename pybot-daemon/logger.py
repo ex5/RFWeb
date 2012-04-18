@@ -1,25 +1,20 @@
 import logging
 import logging.handlers
 
-def get_logger(name, logfile):
-    logger = logging.getLogger(name)
+def get_logger(logfile, name=None):
+    if name:
+        logger = logging.getLogger(name)
+    else:
+        logger = logging.getLogger()
     file_handler = logging.FileHandler(logfile)
-    formatter = logging.Formatter('%(asctime)s %(levelname)s %(name)s %(message)s')
+    formatter = logging.Formatter('%(asctime)s %(levelname)s %(name) %(message)s')
     file_handler.setFormatter(formatter)
     logger.addHandler(file_handler)
     rotation_handler = logging.handlers.RotatingFileHandler(logfile, maxBytes=5*10**6, backupCount=3)
     logger.addHandler(rotation_handler)
-    logger.debug("logger initialized %s" % logfile)
     logger.setLevel(logging.DEBUG)
-    logging.getLogger().addHandler(file_handler)
+    logger.debug("logger initialized %s" % logfile)
     return logger
-
-def get_child_logger(logger, name, logfile):
-    child_logger = logger.getChild(name)
-    file_handler = logging.FileHandler(logfile)
-    logger.addHandler(file_handler)
-    logger.debug("child logger initialized %s" % logfile)
-    return child_logger 
 
 def shutdown():
     logging.shutdown()
