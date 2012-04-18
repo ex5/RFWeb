@@ -39,7 +39,7 @@ def create_task(request, name, suite_id, test_ids, comment, run):
     dajax.assign('#preview', 'cols', max(map(len, _xml.split('/'))) + 1)
     dajax.assign('#preview', 'innerText', _xml)
     if run:
-        run = Run(task=task, host_id=None)
+        run = Run(task=task, hwaddr=None)
         run.save()
     return dajax.json()
 
@@ -48,7 +48,7 @@ def start_tasks(request, selected):
     dajax = Dajax()
     runs = Run.objects.filter(task__in=map(int, selected)).delete()
     for task_id in map(int, selected):
-        new_run = Run(task=Task.objects.get(id=task_id), host_id=None)
+        new_run = Run(task=Task.objects.get(id=task_id), hwaddr=None)
         new_run.save()
     dajax.redirect('/tasks/')
     return dajax.json()
@@ -96,7 +96,7 @@ def check_log(request, settings):
         settings = LogViewerForm({'limit': 10, 'filter': map(lambda (x, y): x, LOG_TYPE), 'refresh_timeout': 1})
     logs = Log.objects.filter(type__in=map(int, settings.data['filter'])).order_by('-time')[:settings.data['limit'] or 10]
     if settings.data['host']:
-        logs = filter(lambda x: settings.data['host'] in hex(x.host_id), logs)
+        logs = filter(lambda x: settings.data['host'] in hex(x.hwaddr), logs)
 
     task = settings.data['task']
     if task:

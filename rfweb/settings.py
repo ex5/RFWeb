@@ -32,7 +32,7 @@ DATABASES = {
         'HOST': '192.168.100.146',
         'PORT': '',
         'OPTIONS': {
-               'init_command': 'SET storage_engine=INNODB,character_set_connection=utf8,collation_connection=utf8_unicode_ci'
+               'init_command': 'SET storage_engine=MYISAM,character_set_connection=utf8,collation_connection=utf8_unicode_ci'
                }
     }
 }
@@ -109,7 +109,7 @@ INSTALLED_APPS = (
     'rfweb.rfwebapp'
 )
 
-if not 'logging' in sys.modules:
-    import logging
-    logging.basicConfig(level=logging.DEBUG, format='%(asctime)s %(levelname)s %(name)s %(message)s')
+#if not 'logging' in sys.modules:
+import logging
+logging.basicConfig(level=logging.DEBUG, format='%(asctime)s %(levelname)s %(name)s %(message)s')
 
