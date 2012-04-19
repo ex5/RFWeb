@@ -60,7 +60,7 @@ echo 'Setting up Dajax'
 cd $dist_dir/django-dajax-0.8.4
 python2.7 setup.py install
 
-mkdir /home/public
+mkdir -p /home/public
 cp -r $dist_dir/ta /home/public
 mkdir -p /var/www/django
 ln -sf /home/public/ta/rfweb /var/www/django/rfweb
