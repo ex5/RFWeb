@@ -1,42 +1,26 @@
 # Create your views here.
-from django.http import HttpResponse, HttpResponseRedirect
-import sqlite3
-import os
-import tempfile
-import zipfile
-from django.core.servers.basehttp import FileWrapper
-from contextlib import closing
-from django.shortcuts import render_to_response, render
 import sys
+import os
 _path = os.path.abspath(os.path.dirname(os.path.dirname(__file__)))
 _path not in sys.path and sys.path.append(_path)
 from settings import PROJECT_ROOT
+import sqlite3
+import tempfile
+import zipfile
 import re
+import time
+from contextlib import closing
+from django.core.servers.basehttp import FileWrapper
+from django.http import HttpResponse, HttpResponseRedirect
+from django.shortcuts import render_to_response
+from django.template import loader, Context
 
-href = lambda link, text: {'link': link, 'text': text}
-states = {'FAIL': -1, 'PASS': 0, 'RETEST': 2, 'HIDE': 3, 'LAST': 1}
-_states = {states[y]: y for y in states}
+Href = lambda link, text: {'link': link, 'text': text}
+STATE = {'FAIL': -1, 'PASS': 0, 'RETEST': 2, 'HIDE': 3, 'LAST': 1}
+NUMSTATE = {STATE[y]: y for y in STATE}
+DB_PATH = '%s/BFT2.db' % PROJECT_ROOT
+ORIGINAL_DB_PATH = '%s/BFT2.original.db' % PROJECT_ROOT
 
-<<<<<<< HEAD
-def mark(request):
-    if request.method == 'POST': # If the form has been submitted...
-        _new_state = request.POST['state']
-        MMs = map(lambda x: x.split(','), filter(lambda x: x != 'state', request.POST.keys()))
-        _c = sqlite3.Connection('%s/BFT2.db' % PROJECT_ROOT)
-        _tmp = ''
-        for _mm_id, _trial in MMs:
-            _sql = 'UPDATE module SET state = "%d" WHERE id="%s" AND trial="%d"' % (states[_new_state], _mm_id, int(_trial))
-            _tmp += _sql
-            _c.execute(_sql)
-        _c.commit()
-        _c.close()
-        return HttpResponseRedirect ('/d/')
-
-def show_table(request):
-    _c = sqlite3.Connection('%s/BFT2.db' % PROJECT_ROOT)
-    modules = _c.execute('SELECT * FROM module WHERE t>="2012-02-29" AND state != "%d" ORDER BY id' % states['HIDE']).fetchall()
-    _header = "Serial number,Number of trials,Result,Timestamp,Download link,HwAddr 0,HwAddr 1".split(",")
-=======
 # ------------------------------------------- ## --------------------------------------- #
 def _append_new(request):
     _tmp = ""
@@ -72,12 +56,7 @@ def _fetch_data(fetch_all=False, export=False):
        _sql =  'SELECT id, trial, state, t, comment FROM module ORDER BY id'
     mms = _c.execute(_sql).fetchall()
     _header = "Serial number,Trial#,Result,New result,Timestamp,Logs,HwAddr 0,HwAddr 1,Comment, New comment".split(",")
->>>>>>> forgot to append new db entries
     _table = []
-<<<<<<< HEAD
-    for _row in modules:
-        _hwaddrs = _c.execute('SELECT hwaddr FROM hwaddr WHERE id="%s"' % _row[0]).fetchall()
-=======
     if export:
         _header = "Serial number,Trial#,Result,New result,Timestamp,HwAddr 0,HwAddr 1,Comment".split(",")
         _table.append(_header)
@@ -92,20 +71,16 @@ def _fetch_data(fetch_all=False, export=False):
                        _row[4])
                        )
             continue
->>>>>>> minor fix
         _report_link = None
         if os.path.isdir("%s/reports/%s_%03d" % (PROJECT_ROOT, _row[0], int(_row[1]))):
             _report_link = "reports/%(sn)s_%(tr)03d/report_%(sn)s_%(tr)03d.html" % {'sn': _row[0], 'tr': int(_row[1])}
-        _table.append((href(_report_link, _row[0]),
+        _table.append((Href(_report_link, _row[0]),
                        _row[1],
-                       _states[_row[2]],
+                       NUMSTATE[mm_original_state[0][0]],
+                       NUMSTATE[_row[2]],
                        _row[3],
-                       href(_report_link and "tar/%s.tar.gz" % _report_link.split('/')[1] or '', "tar.gz"), 
+                       Href(_report_link and "tar/%s.tar.gz" % _report_link.split('/')[1] or '', "tar.gz"), 
                        _hwaddrs and len(_hwaddrs) > 0 and _hwaddrs[0][0] or '', 
-<<<<<<< HEAD
-                       _hwaddrs and len(_hwaddrs) > 1 and _hwaddrs[1][0] or ''))
-    return render_to_response("table_simple.html", {'header': _header, "table": _table})
-=======
                        _hwaddrs and len(_hwaddrs) > 1 and _hwaddrs[1][0] or '',
                        _row[4])
                        )
@@ -162,7 +137,7 @@ def mark(request):
                 _c.execute(_sql)
             _c.commit()
             _c.close()
-    return HttpResponseRedirect('/d/')
+    return HttpResponseRedirect('/')
 
 def show_table(request):
     _append_new(request)
@@ -171,7 +146,6 @@ def show_table(request):
 def show_all(request):
     _append_new(request)
     return render_to_response("table_simple.html", _fetch_data(fetch_all=True))
->>>>>>> forgot to append new db entries
 
 def show_report(request):
     return HttpResponse(open(PROJECT_ROOT + request.path_info).read())
