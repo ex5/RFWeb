@@ -29,7 +29,7 @@ DATABASES = {
         'USER': PROJECT_NAME,
         'PASSWORD': '123456',
         'NAME': PROJECT_NAME,
-        'HOST': '192.168.100.146',
+        'HOST': 'master',
         'PORT': '',
         'OPTIONS': {
                'init_command': 'SET storage_engine=MYISAM,character_set_connection=utf8,collation_connection=utf8_unicode_ci'
@@ -109,7 +109,6 @@ INSTALLED_APPS = (
     'rfweb.rfwebapp'
 )
 
-#if not 'logging' in sys.modules:
 import logging
 logging.basicConfig(level=logging.DEBUG, format='%(asctime)s %(levelname)s %(name)s %(message)s')
 

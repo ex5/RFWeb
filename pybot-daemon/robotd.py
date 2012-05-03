@@ -40,9 +40,9 @@ class Task(object):
             proc.wait()
             on_exit(proc, self.logger)
             self.logger.debug('Run TASK!')
-            my_run.status = False
-            my_run.finish = datetime.datetime.now()
-            my_run.save()
+            self.my_run.status = False
+            self.my_run.finish = datetime.datetime.now()
+            self.my_run.save()
             self.parent.tasks.remove(self)
             return
         self.thread = threading.Thread(target=run_in_thread, args=(self.on_exit, self.args))
@@ -84,10 +84,10 @@ class RobotDaemon(daemon.Daemon):
                 my_runs = Run.objects.filter(hwaddr=self.hwaddr, task=task)
                 self.logger.debug('My runs: %s' % my_runs)
                 if my_runs:
-                    self.logger.debug('Already run this task: %s' % task)
+                    self.logger.debug('Already ran this task: %s' % task)
                     continue
                 _id = "%s_%04d.log" % (task.name, run_id)
-                _cmd = ['/usr/bin/python2.7', '/usr/bin/pybot', '--pythonpath', config.path.listener_path, '--listener',
+                _cmd = ['python2.7', '/usr/bin/pybot', '--pythonpath', config.path.listener_path, '--listener',
                         "%(module)s:%(run_id)s:%(filename)s" % {'module': config.path.listener, 'filename': "listener_" + _id, 'run_id': run_id}]
                 _suites = set()
                 for test in task.tests.all():
