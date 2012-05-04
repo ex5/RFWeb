@@ -65,7 +65,7 @@ class RobotDaemon(daemon.Daemon):
         self.ip = subprocess.Popen("ifconfig  | grep 'inet addr:'| grep -v '127.0.0.1' | cut -d: -f2 | awk '{ print $1}'", shell=True, stdout=subprocess.PIPE)
         try:
            self.ip = self.ip.stdout.read().split('\n')[0]
-           self.logger.debug('IP address is %s, MAC %s' % (self.ip, self.host_id))
+           self.logger.debug('IP address is %s, MAC %s' % (self.ip, self.hwaddr))
         except Exception, e:
             self.logger.error('Cannot fetch host IP: %s' % e)
         self.tasks = []
