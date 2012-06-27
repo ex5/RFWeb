@@ -18,14 +18,14 @@
 #PATH=/sbin:/bin:/usr/bin:/usr/sbin
 
 start(){
-    cd /home/public/ta/pybot-daemon
+    cd /home/public/ta/rfdaemon
     python2.7 robotd.py start
     RETVAL=$?
     return $RETVAL
 }
 
 stop(){
-    cd /home/public/ta/pybot-daemon
+    cd /home/public/ta/rfdaemon
     python2.7 robotd.py stop
     RETVAL=$?
     return $RETVAL
@@ -59,7 +59,7 @@ case "$1" in
 	RETVAL=$?
 	;;
     status)
-        cd /home/public/ta/pybot-daemon
+        cd /home/public/ta/rfdaemon
     	python2.7 robotd.py status
 	RETVAL=$?
 	;;
