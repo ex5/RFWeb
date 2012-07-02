@@ -3,7 +3,7 @@ import os
 class Dj():
     def __init__(self):
         self.app_name = 'rfweb'
-        self.app_dir = '/home/public/ta/'
+        self.app_dir = '/opt/ta/'
         self.settings = '%s.settings' % self.app_name
 
 django = Dj()
