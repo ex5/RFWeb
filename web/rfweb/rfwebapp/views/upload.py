@@ -6,14 +6,14 @@ from django.shortcuts import render_to_response
 from django import forms
 
 from rfweb.rfwebapp.forms import UploadFileForm
-from settings import MEDIA_ROOT
+from settings import SUITS_PATH 
 
 def upload(request):
     suitname = None
     if request.method == 'POST':
         form = UploadFileForm(request.POST, request.FILES)
         if form.is_valid():
-            destination = os.path.join(MEDIA_ROOT, request.FILES['file'].name)
+            destination = os.path.join(SUITS_PATH, request.FILES['file'].name)
             handle_uploaded_file(request.FILES['file'], destination)
             suitname = form.parse_kw_spec(destination, form.cleaned_data['override'])
     else:

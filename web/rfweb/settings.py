@@ -29,7 +29,7 @@ DATABASES = {
         'USER': PROJECT_NAME,
         'PASSWORD': '123456',
         'NAME': PROJECT_NAME,
-        'HOST': 'master',
+        'HOST': 'qa-master',
         'PORT': '',
         'OPTIONS': {
                'init_command': 'SET storage_engine=MYISAM,character_set_connection=utf8,collation_connection=utf8_unicode_ci'
@@ -50,6 +50,8 @@ USE_I18N = False
 # Absolute path to the directory that holds media.
 # Example: "/home/media/media.lawrence.com/"
 MEDIA_ROOT = os.path.join(_BASEDIR, 'media')
+SUITS_PATH = os.path.join(MEDIA_ROOT, 'suits')
+RESULTS_PATH = os.path.join(MEDIA_ROOT, 'results')
 
 # URL that handles the media served from MEDIA_ROOT. Make sure to use a
 # trailing slash if there is a path component (optional in other cases).

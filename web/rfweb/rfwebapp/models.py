@@ -113,7 +113,7 @@ class Log(models.Model):
                     _res.append(getattr(self, field))
         except Exception, e:
             return 'No entries'
-            #raise '%s: %s' % (field, e)
+            #raise Exception('%s: %s' % (field, e))
         return ' '.join(map(unicode, filter(lambda x: x != None, _res)))
 
     def __unicode__(self):
