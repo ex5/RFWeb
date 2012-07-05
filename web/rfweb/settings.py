@@ -111,6 +111,6 @@ INSTALLED_APPS = (
     'rfweb.rfwebapp'
 )
 
-import logging
-logging.basicConfig(level=logging.DEBUG, format='%(asctime)s %(levelname)s %(name)s %(message)s')
+#import logging
+#logging.basicConfig(level=logging.DEBUG, format='%(asctime)s %(levelname)s %(name)s %(message)s')
 

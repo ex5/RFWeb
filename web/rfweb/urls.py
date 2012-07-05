@@ -21,6 +21,8 @@ urlpatterns = patterns('',
     (r'^suite/(.*)', views.suite),
     (r'^create_task/?$', views.create_task),
     (r'^tasks/?$', views.tasks),
+    (r'^results/$', views.results),
+    (r'results/(?P<path>.*)$', 'django.views.static.serve', {'document_root': settings.RESULTS_PATH, 'show_indexes':True}),
     (r'^log/?$', views.log),
     (r'^$', views.index),
 )

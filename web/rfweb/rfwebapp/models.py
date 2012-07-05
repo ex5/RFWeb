@@ -78,14 +78,28 @@ class Run(models.Model):
     start = models.DateTimeField(auto_now_add=True, auto_now=False)
     finish = models.DateTimeField(null=True)
     hwaddr = models.BigIntegerField(null=True) # NULL --- need to be started, Not NULL --- hwaddr
-    ip = models.CharField(max_length=14, null=True)
+    ip = models.CharField(max_length=15, null=True)
+    results = models.CharField(max_length=128, null=True)
     status = models.NullBooleanField(null=True)
+    viewed = models.NullBooleanField(default=False)
 
-    def __str__(self):
-        return "%s,%s %s %s: %s %s" % (self.start, self.finish and self.finish or '', self.hwaddr and self.hwaddr or 'Any host', self.ip and self.ip or '', self.task, self.status != None and self.status or '')
+    def get_fields_names(self):
+        # make a list of fields.
+        return [field.verbose_name for field in Run._meta.fields]
 
-    def __unicode__(self):
-        return self.__str__()
+    def get_fields(self):
+        # make a list of fields/values.
+        return [(field.verbose_name, field.value_to_string(self)) for field in Run._meta.fields]
+
+    def get_values(self):
+        # make a list of fields/values.
+        return [field.value_to_string(self) for field in Run._meta.fields]
+
+    #def __str__(self):
+    #    return "%s,%s %s %s: %s %s" % (self.start, self.finish and self.finish or '', self.hwaddr and self.hwaddr or 'Any host', self.ip and self.ip or '', self.task, self.status != None and self.status or '')
+
+    #def __unicode__(self):
+    #    return self.__str__()
 
 class Log(models.Model):
     type = models.IntegerField(max_length=1, choices=LOG_TYPE)
