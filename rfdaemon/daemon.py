@@ -5,7 +5,7 @@ import os
 import time
 import atexit
 from signal import SIGTERM
-import logger
+import syslog
 
 class Daemon(object):
     """
@@ -13,13 +13,13 @@ class Daemon(object):
 
     Usage: subclass the Daemon class and override the run() method
     """
-    def __init__(self, pidfile, logfile=sys.stdout, stdin=None, stdout=None, stderr=None):
+    def __init__(self, pidfile, stdin=None, stdout=None, stderr=None):
         self.stdin = stdin
         self.stdout = stdout
         self.stderr = stderr
         self.pidfile = pidfile
-        self.logger = logger.get_logger(logfile)
-        self.logger.info("__init__, pidfile: %s, stdin: %s, stdout: %s, stderr: %s" % (pidfile, stdin, stdout, stderr))
+        syslog.openlog(__name__, facility=syslog.LOG_DAEMON)
+        syslog.syslog("__init__, pidfile: %s, stdin: %s, stdout: %s, stderr: %s" % (pidfile, stdin, stdout, stderr))
 
     def daemonize(self):
         """
@@ -98,8 +98,7 @@ class Daemon(object):
         Stop the daemon
         """
         # Close log file
-        self.logger.info('stop')
-        logger.shutdown()
+        syslog.closelog()
 
         # Get the pid from the pidfile
         try:

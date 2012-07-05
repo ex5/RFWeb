@@ -56,7 +56,7 @@ class Listener():
     def end_keyword(self, name, attrs):
         _str = '[%s]: %s \n' % (__file__, (str(attrs)))
         self.outfile.write(_str)
-        self.log(type=TYPE['End keyword'], time=attrs['endtime'], status=attrs['status'] == 'PASS' and True or False, keyword=name, comment="Elapsed time: %s" % attrs['elapsedtime'][:LEN])
+        self.log(type=TYPE['End keyword'], time=attrs['endtime'], status=attrs['status'] == 'PASS' and True or False, keyword=name, comment="Elapsed time: %s" % attrs['elapsedtime'])
 
     def log_message(self, message):
         self.log(type=TYPE['Log message'], status=message['html'] == 'yes' and True or False, comment=message['message'][:LEN])
