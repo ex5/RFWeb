@@ -1,4 +1,6 @@
 from django.db import models
+from rfweb.settings import RESULTS_URL, RESULTS_PATH
+import os
 
 LOG_TYPE = (
     (0, 'Start suite'),
@@ -23,6 +25,7 @@ class BigIntegerField(models.IntegerField):
         return 'bigint' # Note this won't work with Oracle.
 
 class Suite(models.Model):
+    id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=80)
     path = models.CharField(max_length=80)
     doc = models.TextField(verbose_name='Documentation')
@@ -35,6 +38,7 @@ class Suite(models.Model):
         return self.name
 
 class Keyword(models.Model):
+    id = models.AutoField(primary_key=True)
     suite = models.ForeignKey(Suite)
     name = models.CharField(max_length=80)
     doc = models.TextField(verbose_name='Documentation')
@@ -48,6 +52,7 @@ class Keyword(models.Model):
         return self.name
 
 class Test(models.Model):
+    id = models.AutoField(primary_key=True)
     suite = models.ForeignKey(Suite)
     name = models.CharField(max_length=80)
     doc = models.TextField(verbose_name='Documentation')
@@ -60,6 +65,7 @@ class Test(models.Model):
         return self.name
 
 class Task(models.Model):
+    id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=80)
     suite = models.ForeignKey(Suite)
     tests = models.ManyToManyField(Test, through=Test.tasks.through, blank=True)
@@ -73,15 +79,24 @@ class Task(models.Model):
     def __unicode__(self):
         return self.name
 
-class Run(models.Model):
+class Run(models.Model, object):
+    id = models.AutoField(primary_key=True)
     task = models.ForeignKey(Task)
     start = models.DateTimeField(auto_now_add=True, auto_now=False)
     finish = models.DateTimeField(null=True)
     hwaddr = models.BigIntegerField(null=True) # NULL --- need to be started, Not NULL --- hwaddr
     ip = models.CharField(max_length=15, null=True)
-    results = models.CharField(max_length=128, null=True)
     status = models.NullBooleanField(null=True)
     viewed = models.NullBooleanField(default=False)
+    rerun = models.NullBooleanField(default=False)
+
+    def _get_url_to_results(self):
+        return "%s%s_%s_%s" % (RESULTS_URL, self.task.name, self.ip, self.id)
+    url_to_results = property(_get_url_to_results)
+
+    def _get_path_to_results(self):
+        return os.path.join(RESULTS_PATH, "%s_%s_%s" % (self.task.name, self.ip, self.id))
+    path_to_results = property(_get_path_to_results)
 
     def get_fields_names(self):
         # make a list of fields.
@@ -91,17 +106,22 @@ class Run(models.Model):
         # make a list of fields/values.
         return [(field.verbose_name, field.value_to_string(self)) for field in Run._meta.fields]
 
+    def get_fields_dict(self):
+        # make a dict of fields/values.
+        return {field.verbose_name: field.value_to_string(self) for field in Run._meta.fields}
+
     def get_values(self):
         # make a list of fields/values.
         return [field.value_to_string(self) for field in Run._meta.fields]
 
-    #def __str__(self):
-    #    return "%s,%s %s %s: %s %s" % (self.start, self.finish and self.finish or '', self.hwaddr and self.hwaddr or 'Any host', self.ip and self.ip or '', self.task, self.status != None and self.status or '')
+    def __str__(self):
+        return "%s-%s: %s, %s" % (self.start, self.finish and self.finish or '', self.ip, self.status)
 
-    #def __unicode__(self):
-    #    return self.__str__()
+    def __unicode__(self):
+        return self.__str__()
 
 class Log(models.Model):
+    id = models.AutoField(primary_key=True)
     type = models.IntegerField(max_length=1, choices=LOG_TYPE)
     run = models.ForeignKey(Run)
     hwaddr = models.BigIntegerField(null=True)

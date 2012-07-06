@@ -28,5 +28,3 @@ def results(request):
     return gzip_middleware.process_response(request, response)
     return results
 
-#def show_report(request):
-#    return HttpResponse(open(MEDIA_ROOT + request.path_info).read())

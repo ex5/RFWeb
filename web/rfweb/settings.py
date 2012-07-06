@@ -1,6 +1,5 @@
 # Django settings for RFWeb project.
 # 
-
 import os
 import sys
 
@@ -57,6 +56,7 @@ RESULTS_PATH = os.path.join(MEDIA_ROOT, 'results')
 # trailing slash if there is a path component (optional in other cases).
 # Examples: "http://media.lawrence.com", "http://example.com/media/"
 MEDIA_URL = 'http://192.168.100.146:8181/media/'
+RESULTS_URL = '/results/'
 
 # URL prefix for admin media -- CSS, JavaScript and images. Make sure to use a
 # trailing slash.
@@ -111,6 +111,13 @@ INSTALLED_APPS = (
     'rfweb.rfwebapp'
 )
 
-#import logging
-#logging.basicConfig(level=logging.DEBUG, format='%(asctime)s %(levelname)s %(name)s %(message)s')
+import logging
+from logging.handlers import SysLogHandler
+
+logger = logging.getLogger()
+logger.setLevel(logging.DEBUG)
+syslog = SysLogHandler(address='/dev/log', facility='local0')
+formatter = logging.Formatter('%(asctime)s %(levelname)s %(name)s %(message)s')
+syslog.setFormatter(formatter)
+logger.addHandler(syslog)
 

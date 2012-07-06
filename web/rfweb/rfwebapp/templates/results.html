@@ -33,41 +33,40 @@ function toggle_check_all(name, state) {
 
 <h2>Results</h2>
 
-{% if results %}
+{% if results and results.object_list %}
 <table class="tasks" id="tasks" valign=top>
     <th><input type="checkbox" name="select_all" id="select_all" onclick="toggle_check_all('select', this.checked)" />All</th>
     {% for field in results.object_list.0.get_fields_names %}
     <th>{{ field }}</th>
     {% endfor %}
+    <th>Results</th>
     {% for result in results.object_list %}
     <tr>
-        {% if result.results %}
+        {% if result.ip and result.hwaddr and result.finish %}
         <td><input type="checkbox" name="select" id="ololo" /></td>
         {% for field, value in result.get_fields %}
         <td>
-            {% if field == "results" %}
-            <a href="{{ value }}/report.html">{{ value }}</a>
+            
+            {% if field == "viewed" %}
+                {% if value == "True" %}
+                Checked
+                {% else %}
+                New!
+                {% endif %}
             {% else %}
-                {% if field == "viewed" %}
-                    {% if value == True %}
-                    Checked
+                {% if field == "status" %}
+                    {% if value == "True" %}
+                    <font color="green">PASS</font>
                     {% else %}
-                    New!
+                    <font color="red">FAIL</font>
                     {% endif %}
                 {% else %}
-                    {% if field == "status" %}
-                    {% if value == True %}
-                        <font color="green">PASS</font>
-                        {% else %}
-                        <font color="red">FAIL</font>
-                        {% endif %}
-                    {% else %}
-                        {{ value }}
-                    {% endif %}
+                {{ value }}
                 {% endif %}
             {% endif %}
         </td>
         {% endfor %}
+        <td><a href="{{ result.url_to_results }}/report.html">{{ result.url_to_results }}</a></td>
         {% endif %}
     </tr>
     {% endfor %}

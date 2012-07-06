@@ -46,10 +46,21 @@ def create_task(request, name, suite_id, test_ids, comment, run):
 @dajaxice_register
 def start_tasks(request, selected):
     dajax = Dajax()
-    runs = Run.objects.filter(task__in=map(int, selected)).delete()
+    #runs = Run.objects.filter(task__in=map(int, selected)).delete()
+    runs = Run.objects.filter(task__in=map(int, selected)).update(rerun=True)
+    if not runs:
+        for task_id in map(int, selected):
+            new_run = Run(task=Task.objects.get(id=task_id), hwaddr=None)
+            new_run.save()
+    '''
+    runs = Run.objects.filter(task__in=map(int, selected))
+    for run in runs:
+        run.rerun = True
+        run.save()
     for task_id in map(int, selected):
         new_run = Run(task=Task.objects.get(id=task_id), hwaddr=None)
         new_run.save()
+    '''
     dajax.redirect('/tasks/')
     return dajax.json()
 
