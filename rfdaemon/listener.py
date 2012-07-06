@@ -46,11 +46,19 @@ class Listener():
     def end_suite(self, name, attrs):
         _str = '[%s]: %s \n' % (__file__, (str(attrs)))
         self.outfile.write(_str)
-        self.log(type=TYPE['End suite'], time=attrs['endtime'], status=attrs['status'] == 'PASS' and True or False, suite=name, comment=attrs['statistics'][:LEN])
+        status = attrs['status'] == 'PASS' and True or False
+        run = Run.objects.get(pk=self.run_id)
+        run.status = status
+        run.save()
+        self.log(type=TYPE['End suite'], time=attrs['endtime'], status=status, suite=name, comment=attrs['statistics'][:LEN])
 
     def end_test(self, name, attrs):
         _str = '[%s]: %s \n' % (__file__, (str(attrs)))
         self.outfile.write(_str)
+        status = attrs['status'] == 'PASS' and True or False
+        run = Run.objects.get(pk=self.run_id)
+        run.status = status
+        run.save()
         self.log(type=TYPE['End test'], time=attrs['endtime'], status=attrs['status'] == 'PASS' and True or False, suite=attrs['longname'], test=name, comment=attrs['message'][:LEN])
 
     def end_keyword(self, name, attrs):

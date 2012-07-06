@@ -20,11 +20,12 @@ class Task(object):
         self.parent = parent
         self.on_exit = on_exit
         self.args = args
-        self.run_obj = Run.objects.get(pk=run_id)
+        #self.run_obj = Run.objects.get(pk=run_id)
+        self.my_run = Run.objects.get(pk=run_id)
         syslog.syslog(syslog.LOG_NOTICE, "task initialized: %s, %s" % (on_exit, args))
         # -------- #
-        self.my_run = Run(task_id=self.run_obj.task.pk, hwaddr=self.parent.hwaddr, ip=self.parent.ip, status=True)
-        self.my_run.save()
+        #self.my_run = Run(task_id=self.run_obj.task.pk, hwaddr=self.parent.hwaddr, ip=self.parent.ip, status=True)
+        #self.my_run.save()
         self.run_task()
 
     def run_task(self):
@@ -40,12 +41,13 @@ class Task(object):
             syslog.syslog(syslog.LOG_NOTICE, "Results path is: %s" % args[0][args[0].index('--outputdir') + 1])
             self.my_run.status = False
             self.my_run.finish = datetime.datetime.now()
-            self.my_run.results = args[0][args[0].index('--outputdir') + 1].replace(rfweb.settings.MEDIA_ROOT, '')
             self.my_run.save()
+            """
             try:
                 self.parent.tasks.remove(self)
             except Exception, e:
                 syslog.syslog(syslog.LOG_WARNING, "Task had been removed already or else: %s" % e)
+            """
             return
         self.thread = threading.Thread(target=run_in_thread, args=(self.on_exit, self.args))
         self.thread.start()
@@ -54,8 +56,8 @@ class Task(object):
         pass
         
 def on_exit(process):
-    syslog.syslog(syslog.LOG_DEBUG, "\n%s\n" % process.stdout.read())
-    syslog.syslog(syslog.LOG_DEBUG, "\n%s\n" % process.stderr.read())
+    syslog.syslog(syslog.LOG_DEBUG, "%s" % process.stdout.read())
+    syslog.syslog(syslog.LOG_DEBUG, "%s" % process.stderr.read())
     syslog.syslog(syslog.LOG_DEBUG, "subprocess %d's finished" % process.pid)
 
 class RobotDaemon(daemon.Daemon):
@@ -69,50 +71,45 @@ class RobotDaemon(daemon.Daemon):
             syslog.syslog(syslog.LOG_DEBUG, 'IP address is %s, MAC %s' % (self.ip, self.hwaddr))
         except Exception, e:
             syslog.syslog(syslog.LOG_ERROR, 'Cannot fetch host IP: %s' % e)
-        self.tasks = []
-
-    def run_tasks(self):
-        if not self.tasks:
-            #syslog.syslog(syslog.LOG_NOTICE, "no tasks available")
-            pass
-            #for task in self.tasks:
-            #    task.run_task()
+        #self.tasks = []
 
     def reload_config(self):
-        self.clear_tasks()
+        #self.clear_tasks()
         try:
-            for run in Run.objects.filter(hwaddr=None):
+            for main_run in Run.objects.filter(hwaddr=None):
                 i = 0
-                task = run.task
-                run_id = run.pk
-                my_runs = Run.objects.filter(hwaddr=self.hwaddr, task=task)
-                #syslog.syslog(syslog.LOG_DEBUG, 'My runs: %s' % my_runs)
+                task = main_run.task
+                syslog.syslog(syslog.LOG_DEBUG, "%s" % main_run)
+                main_run_id = main_run.pk
+                my_runs = Run.objects.filter(hwaddr=self.hwaddr, task=task, rerun=False)
+                syslog.syslog(syslog.LOG_DEBUG, "my_runs: %s" % my_runs)
                 if my_runs:
-                    #syslog.syslog(syslog.LOG_DEBUG, 'Already ran this task: %s' % task)
                     continue
-                _id = "%s_%04d_%s" % (task.name, run_id, self.ip)
+                my_run = Run(task_id=main_run.task.pk, hwaddr=self.hwaddr, ip=self.ip, status=True)
+                my_run.save()
+                _id = "%s_%04d_%s" % (task.name, my_run.pk, self.ip)
                 _cmd = ['python2.7', config.path.pybot, '--pythonpath', "%s:%s" % (config.path.listener_path, config.path.suits_path), '--listener',
-                        "%(module)s:%(run_id)s:%(filename)s" % {'module': config.path.listener, 'filename': "listener_" + _id, 'run_id': run_id}]
+                        "%(module)s:%(run_id)s:%(filename)s" % {'module': config.path.listener, 'filename': "listener_" + _id, 'run_id': my_run.pk}]
                 _suites = set()
                 for test in task.tests.all():
                     _cmd += ['--test', test.name]
                     _suites.add(test.suite.path)
-                _outputdir = os.path.join(config.path.output, _id)
+                _outputdir = my_run.path_to_results
                 _cmd += ['--outputdir', _outputdir]
                 _cmd += _suites
                 if not os.path.isdir(_outputdir):
                     os.mkdir(_outputdir)
-                #syslog.syslog(syslog.LOG_DEBUG, "%s" % _cmd)
-                self.tasks.append(Task(self, run_id, on_exit, (_cmd, 0, None, None, subprocess.PIPE, subprocess.PIPE)))
+                #self.tasks.append(Task(self, my_run.pk, on_exit, (_cmd, 0, None, None, subprocess.PIPE, subprocess.PIPE)))
+                Task(self, my_run.pk, on_exit, (_cmd, 0, None, None, subprocess.PIPE, subprocess.PIPE))
         except Exception, e:
-            syslog.syslog(syslog.LOG_ERROR, "Cannot fetch tasks: %s, %s" % (e.message, e.args))
+            syslog.syslog(syslog.LOG_DEBUG, "Cannot fetch tasks: %s, %s" % (e.message, e.args))
 
-    def clear_tasks(self):
-        map(lambda x: x.finish, self.tasks)
-        self.tasks = []
+#    def clear_tasks(self):
+#        map(lambda x: x.finish, self.tasks)
+#        self.tasks = []
 
     def quit(self):
-        self.clear_tasks()
+        #self.clear_tasks()
         syslog.syslog(syslog.LOG_NOTICE, 'exiting')
         self.stop()
 
@@ -120,9 +117,8 @@ class RobotDaemon(daemon.Daemon):
         while True:
             time.sleep(2)
             self.reload_config()
-            self.run_tasks()
 
-robotd_init = lambda: RobotDaemon(pidfile=config.path.pid_file, 
+robotd_init = lambda: RobotDaemon(pidfile=config.path.pid_file % get_mac(), 
                          stdout=config.path.stdout, 
                          stderr=config.path.stderr)
 
