@@ -11,7 +11,7 @@ from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
 def results(request):
     def _raw(request):
-        runs_all = Run.objects.all()
+        runs_all = Run.objects.all().order_by('-id')
         paginator = Paginator(runs_all, 15)
         page = request.GET.get('page')
         try:

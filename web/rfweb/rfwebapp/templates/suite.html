@@ -24,30 +24,39 @@
 </table>
 {% endif %}
 <h3>Shortcuts</h3>
+<h4>Variables</h4>
 <div class='shortcuts'>
-{% for kw in suite.keywords %}
-<a href="#{{ kw.name }}" title="{{ kw.shortdoc }}">{{ kw.name|nbsp|safe }}</a>
+{% for vr in suite.variables %}
+<a href="#{{ vr.name }}" title="{{ vr.value }}">{{ vr.name|nbsp|safe }}</a>
 {% if not forloop.last %}&middot;{% endif %}
 {% endfor %}
 </div>
+<h4>Tests</h4>
 <div class='shortcuts'>
 {% for tc in suite.tests %}
 <a href="#{{ tc.name }}" title="{{ tc.shortdoc }}">{{ tc.name|nbsp|safe }}</a>
 {% if not forloop.last %}&middot;{% endif %}
 {% endfor %}
 </div>
-<h3>Keywords</h3>
+<h4>Keywords</h4>
+<div class='shortcuts'>
+{% for kw in suite.keywords %}
+<a href="#{{ kw.name }}" title="{{ kw.shortdoc }}">{{ kw.name|nbsp|safe }}</a>
+{% if not forloop.last %}&middot;{% endif %}
+{% endfor %}
+</div>
+<h3>Variables</h3>
 <table class="keywords">
   <tr>
-    <th class="kw">Keyword</th>
-    <th class="arg">Arguments</th>
-    <th class="doc">Documentation</th>
+    <th class="kw">Name</th>
+    <th class="arg">Value</th>
+    <th class="doc">Comment</th>
   </tr>
-  {% for kw in suite.keywords %}
+  {% for vr in suite.variables %}
   <tr>
-    <td class="kw" id="{{ kw.name }}">{{ kw.name }}</td>
-    <td class="arg">{{ kw.args }}</td>
-    <td class="doc">{{ kw.doc|eol|safe }}</td>
+    <td class="vr" id="{{ vr.name }}">{{ vr.name }}</td>
+    <td class="arg">{{ vr.value }}</td>
+    <td class="doc">{{ vr.comment|eol|safe }}</td>
   </tr>
   {% endfor %}
 </table>
@@ -61,6 +70,21 @@
   <tr>
     <td class="kw" id="{{ tc.name }}">{{ tc.name }}</td>
     <td class="doc">{{ tc.doc|eol|safe }}</td>
+  </tr>
+  {% endfor %}
+</table>
+<h3>Keywords</h3>
+<table class="keywords">
+  <tr>
+    <th class="kw">Keyword</th>
+    <th class="arg">Arguments</th>
+    <th class="doc">Documentation</th>
+  </tr>
+  {% for kw in suite.keywords %}
+  <tr>
+    <td class="kw" id="{{ kw.name }}">{{ kw.name }}</td>
+    <td class="arg">{{ kw.args }}</td>
+    <td class="doc">{{ kw.doc|eol|safe }}</td>
   </tr>
   {% endfor %}
 </table>

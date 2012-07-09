@@ -6,10 +6,10 @@ from rfweb.rfwebapp.models import Suite
 from rfweb.rfwebapp import utils
 
 
-def suite(request, suitname):
-    suite = get_object_or_404(Suite, name=suitname)
-    suitdoc = SuitDoc(suite)
-    return render_to_response('suite.html', {'suite': suitdoc })
+def suite(request, suitename):
+    suite = get_object_or_404(Suite, name=suitename)
+    suitedoc = SuiteDoc(suite)
+    return render_to_response('suite.html', {'suite': suitedoc })
 
 class _DocHelper:
     # This code is adapted from libdoc.py, see
@@ -23,7 +23,7 @@ class _DocHelper:
 
     def _link_keywords(self, res):
         name = res.group(1)
-        keywords = self.keywords if isinstance(self, SuitDoc) else self._suit.keywords
+        keywords = self.keywords if isinstance(self, SuiteDoc) else self._suite.keywords
         for kw in keywords:
             if utils.eq(name, kw.name):
                 return '<a href="#%s" class="name">%s</a>' % (kw.name, name)
@@ -35,43 +35,38 @@ class _DocHelper:
 
     doc = property(_get_htmldoc)
 
-class SuitDoc(_DocHelper):
-    def __init__(self, suitdata):
-        self.name = suitdata.name
-        self.path = suitdata.path
-        self._doc = suitdata.doc
-        self.version = suitdata.version
+class SuiteDoc(_DocHelper):
+    def __init__(self, suitedata):
+        self.name = suitedata.name
+        self.path = suitedata.path
+        self._doc = suitedata.doc
+        self.version = suitedata.version
         self.keywords = [ KeywordDoc(kwdata, self)
-                          for kwdata in suitdata.keyword_set.all() ]
+                          for kwdata in suitedata.keyword_set.all() ]
         self.tests = [ TestDoc(tcdata, self)
-                          for tcdata in suitdata.test_set.all() ]
-        '''
-        self.tags = []
-        for test in self.test:
-            self.tags.extend([ TagDoc(tag, test, self) 
-                                for tag in filter(lambda x: x.name == test.name, suitdata.tag_set.all()) ])
-        assert self.tags[0]
-        '''
+                          for tcdata in suitedata.test_set.all() ]
+        self.variables = [ VariableDoc(vrdata, self)
+                          for vrdata in suitedata.variable_set.all() ]
 
+class VariableDoc(_DocHelper):
+    def __init__(self, vrdata, suite):
+        self.name = vrdata.name
+        self.value = vrdata.value
+        self.comment = vrdata.comment
+        self._suite = suite
+ 
 class KeywordDoc(_DocHelper):
     def __init__(self, kwdata, suite):
         self.name = kwdata.name
         self.args = kwdata.args
         self._doc = kwdata.doc
         self.shortdoc = self._doc.split('\n')[0]
-        self._suit = suite
+        self._suite = suite
  
 class TestDoc(_DocHelper):
     def __init__(self, tcdata, suite):
         self.name = tcdata.name
         self._doc = tcdata.doc
         self.shortdoc = self._doc.split('\n')[0]
-        self._suit = suite
+        self._suite = suite
 
-'''
-class TagDoc(_DocHelper):
-    def __init__(self, tdata, test, suite):
-        self.name = tdata.name
-        self._test = test
-        self._suit = suite
-'''

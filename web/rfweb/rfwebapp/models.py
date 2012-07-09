@@ -37,6 +37,19 @@ class Suite(models.Model):
     def __unicode__(self):
         return self.name
 
+class Variable(models.Model):
+    id = models.AutoField(primary_key=True)
+    suite = models.ForeignKey(Suite)
+    name = models.CharField(max_length=80)
+    value = models.TextField(verbose_name='Value')
+    comment = models.CharField(max_length=250, verbose_name='Comment', null=True)
+
+    def __str__(self):
+        return self.name
+
+    def __unicode__(self):
+        return self.name
+
 class Keyword(models.Model):
     id = models.AutoField(primary_key=True)
     suite = models.ForeignKey(Suite)

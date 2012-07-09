@@ -42,34 +42,44 @@ function toggle_check_all(name, state) {
     <th>Results</th>
     {% for result in results.object_list %}
     <tr>
-        {% if result.ip and result.hwaddr and result.finish %}
+        {% if result.ip and result.hwaddr %}
         <td><input type="checkbox" name="select" id="ololo" /></td>
         {% for field, value in result.get_fields %}
-        <td>
-            
-            {% if field == "viewed" %}
-                {% if value == "True" %}
-                Checked
-                {% else %}
-                New!
-                {% endif %}
-            {% else %}
-                {% if field == "status" %}
-                    {% if value == "True" %}
-                    <font color="green">PASS</font>
-                    {% else %}
-                    <font color="red">FAIL</font>
-                    {% endif %}
-                {% else %}
-                {{ value }}
-                {% endif %}
-            {% endif %}
-        </td>
-        {% endfor %}
-        <td><a href="{{ result.url_to_results }}/report.html">{{ result.url_to_results }}</a></td>
+        {% if field == "viewed" %}
+        {% if value == "True" %}
+        <td class="checked">Checked</td>
+        {% else %}
+        <td class="new">New!</td>
         {% endif %}
-    </tr>
+        {% else %}
+        {% if field == "status" %}
+        {% if not result.finish %}
+        <td class="unknown">unknown</td>
+        {% else %}
+        {% if value == "True" %}
+        <td class="pass">PASS</td>
+        {% else %}
+        <td class="fail">FAIL</td>
+        {% endif %}
+        {% endif %}
+        {% else %}
+        {% if field == "finish" and not value %}
+        <td class="progress">still running</td>
+        {% else %}
+        <td>{{ value }}</td>
+        {% endif %}
+        {% endif %}
+        {% endif %}
+    </td>
     {% endfor %}
+    <td>
+    {% if result.finish %}
+    <a href="{{ result.url_to_results }}/report.html">{{ result.url_to_results }}</a>
+    {% endif %}
+    </td>
+    {% endif %}
+</tr>
+{% endfor %}
 </table>
 <div class="pagination">
     <span class="step-links">

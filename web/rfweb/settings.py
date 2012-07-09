@@ -49,7 +49,7 @@ USE_I18N = False
 # Absolute path to the directory that holds media.
 # Example: "/home/media/media.lawrence.com/"
 MEDIA_ROOT = os.path.join(_BASEDIR, 'media')
-SUITS_PATH = os.path.join(MEDIA_ROOT, 'suits')
+SUITES_PATH = os.path.join(MEDIA_ROOT, 'suites')
 RESULTS_PATH = os.path.join(MEDIA_ROOT, 'results')
 
 # URL that handles the media served from MEDIA_ROOT. Make sure to use a

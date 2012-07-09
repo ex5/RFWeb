@@ -7,9 +7,9 @@
 </p>
 <div class="hr"><hr /></div>
 <form enctype="multipart/form-data" action="/upload/" method="POST">
-  {% if suitname %}
+  {% if suitename %}
   <div class="success">
-    Successfully uploaded suite <a href="/suite/{{ suitname }}">{{ suitname }}</a>.
+    Successfully uploaded suite <a href="/suite/{{ suitename }}">{{ suitename }}</a>.
   </div>
   {% endif %}
   {{ form.file.errors }}
