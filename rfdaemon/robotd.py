@@ -20,12 +20,8 @@ class Task(object):
         self.parent = parent
         self.on_exit = on_exit
         self.args = args
-        #self.run_obj = Run.objects.get(pk=run_id)
         self.my_run = Run.objects.get(pk=run_id)
         syslog.syslog(syslog.LOG_NOTICE, "task initialized: %s, %s" % (on_exit, args))
-        # -------- #
-        #self.my_run = Run(task_id=self.run_obj.task.pk, hwaddr=self.parent.hwaddr, ip=self.parent.ip, status=True)
-        #self.my_run.save()
         self.run_task()
 
     def run_task(self):
@@ -39,15 +35,9 @@ class Task(object):
             proc.wait()
             on_exit(proc)
             syslog.syslog(syslog.LOG_NOTICE, "Results path is: %s" % args[0][args[0].index('--outputdir') + 1])
-            self.my_run.status = False
+            self.my_run.status = (proc.returncode == 0) and True or False
             self.my_run.finish = datetime.datetime.now()
             self.my_run.save()
-            """
-            try:
-                self.parent.tasks.remove(self)
-            except Exception, e:
-                syslog.syslog(syslog.LOG_WARNING, "Task had been removed already or else: %s" % e)
-            """
             return
         self.thread = threading.Thread(target=run_in_thread, args=(self.on_exit, self.args))
         self.thread.start()
@@ -58,7 +48,7 @@ class Task(object):
 def on_exit(process):
     syslog.syslog(syslog.LOG_DEBUG, "%s" % process.stdout.read())
     syslog.syslog(syslog.LOG_DEBUG, "%s" % process.stderr.read())
-    syslog.syslog(syslog.LOG_DEBUG, "subprocess %d's finished" % process.pid)
+    syslog.syslog(syslog.LOG_DEBUG, "RobotD task %s has finished with returncode %s" % (process.pid, process.returncode))
 
 class RobotDaemon(daemon.Daemon):
     def __init__(self, *argv, **kwargs):
@@ -74,7 +64,6 @@ class RobotDaemon(daemon.Daemon):
         #self.tasks = []
 
     def reload_config(self):
-        #self.clear_tasks()
         try:
             for main_run in Run.objects.filter(hwaddr=None):
                 i = 0
@@ -85,7 +74,7 @@ class RobotDaemon(daemon.Daemon):
                 syslog.syslog(syslog.LOG_DEBUG, "my_runs: %s" % my_runs)
                 if my_runs:
                     continue
-                my_run = Run(task_id=main_run.task.pk, hwaddr=self.hwaddr, ip=self.ip, status=True)
+                my_run = Run(task_id=main_run.task.pk, hwaddr=self.hwaddr, ip=self.ip)
                 my_run.save()
                 _id = "%s_%04d_%s" % (task.name, my_run.pk, self.ip)
                 _cmd = ['python2.7', config.path.pybot, '--pythonpath', "%s:%s" % (config.path.listener_path, config.path.suits_path), '--listener',
@@ -99,17 +88,11 @@ class RobotDaemon(daemon.Daemon):
                 _cmd += _suites
                 if not os.path.isdir(_outputdir):
                     os.mkdir(_outputdir)
-                #self.tasks.append(Task(self, my_run.pk, on_exit, (_cmd, 0, None, None, subprocess.PIPE, subprocess.PIPE)))
                 Task(self, my_run.pk, on_exit, (_cmd, 0, None, None, subprocess.PIPE, subprocess.PIPE))
         except Exception, e:
             syslog.syslog(syslog.LOG_DEBUG, "Cannot fetch tasks: %s, %s" % (e.message, e.args))
 
-#    def clear_tasks(self):
-#        map(lambda x: x.finish, self.tasks)
-#        self.tasks = []
-
     def quit(self):
-        #self.clear_tasks()
         syslog.syslog(syslog.LOG_NOTICE, 'exiting')
         self.stop()
 
