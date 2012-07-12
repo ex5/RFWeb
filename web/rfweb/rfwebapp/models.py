@@ -111,6 +111,10 @@ class Run(models.Model, object):
         return os.path.join(RESULTS_PATH, "%s_%s_%s" % (self.task.name, self.ip, self.id))
     path_to_results = property(_get_path_to_results)
 
+    def _get_results_name(self):
+        return "%s_%s_%s" % (self.task.name, self.ip, self.id)
+    results_name = property(_get_results_name)
+
     def get_fields_names(self):
         # make a list of fields.
         return [field.verbose_name for field in Run._meta.fields]

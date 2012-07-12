@@ -2,6 +2,8 @@
 {% load rfweb_filters %}
 {% block title %}{{ suite.name }}{% endblock title %}
 {% block content %}
+<p><a href="/suite_csv/{{ suite.name }}">Download CSV</a></p>
+<p><a href="/suite_md/{{ suite.name }}">Download MarkDown</a></p>
 <h2>{{ suite.name }}</h2>
 {% ifnotequal suite.version "<unknown>" %}
 <p class="version"><b>Version:</b> {{ suite.version|safe }}</p>

@@ -1,0 +1,25 @@
+"Suite name";"Suite Version";"Suite Documentation";
+"{{ suite.name|addslashes }}";"{{ suite.version|addslashes }}";"{{ suite.doc|addslashes }}";
+;;;
+{% if suite.inits %}
+"Arguments";"Documentation";
+{% for init in suite.inits %}"{{ init.args|addslashes }}";"{{ init.doc|addslashes }}";{% endfor %}
+{% endif %}
+;;;
+"Variables";
+"Name";"Value";"Comment";
+{% for vr in suite.variables %}
+"{{ vr.name|addslashes }}";"{{ vr.value|addslashes }}";"{{ vr.comment|addslashes }}";
+{% endfor %}
+;;;
+"Test Cases";
+"Test case";"Documentation";
+{% for tc in suite.tests %}
+"{{ tc.name|addslashes }}";"{{ tc.doc|addslashes }}";
+{% endfor %}
+;;;
+"Keywords";
+"Keyword";"Arguments";"Documentation";
+{% for kw in suite.keywords %}
+"{{ kw.name|addslashes }}";"{{ kw.args|addslashes }}";"{{ kw.doc|addslashes }}";
+{% endfor %}

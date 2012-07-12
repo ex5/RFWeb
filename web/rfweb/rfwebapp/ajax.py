@@ -72,8 +72,8 @@ def stop_tasks(request, selected):
 @dajaxice_register
 def delete_tasks(request, selected):
     dajax = Dajax()
-    runs = Run.objects.filter(task__in=map(int, selected)).delete()
     tasks = Task.objects.filter(id__in=map(int, selected)).delete()
+    runs = Run.objects.filter(task__in=map(int, selected)).delete()
     dajax.redirect('/tasks/')
     return dajax.json()
 

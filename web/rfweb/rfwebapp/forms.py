@@ -3,7 +3,7 @@ from models import LOG_TYPE
 from django.forms.util import ErrorList
 import robot
 import os
-from rfweb.rfwebapp.models import Suite, Keyword, Test
+from rfweb.rfwebapp.models import Suite, Keyword, Test, Variable
  
 class LogViewerForm(forms.Form):
     filter = forms.MultipleChoiceField(choices=LOG_TYPE, label="Show messages", required=True, initial=map(lambda x: x[0], LOG_TYPE))
@@ -44,7 +44,6 @@ class UploadFileForm(forms.Form):
                 if not override:
                     raise Exception("Suite %s already exists." % suitedata.name)
                 else:
-                    #Suite.objects.filter(name=suitedata.name).delete()
                     suite = Suite.objects.get(name=suitedata.name)
             if not suite:
                 suite = Suite(name=suitedata.name, doc=suitedata.doc, version=suitedata.version, path=_tmpfile)
@@ -76,17 +75,17 @@ class UploadFileForm(forms.Form):
                     test.doc = tc.doc.value
                     test.save()
             for vr in suitedata.variables:
-                #assert False, "%s %s %s" % (vr.name, vr.comment._comment, vr.value)
                 variable = None
                 comment = len(vr.comment._comment) > 0 and vr.comment._comment[0] or None
+                value = ', '.join(map(str, vr.value))
                 try:
                     variable = Variable.objects.get(suite=suite.id, name=vr.name)
                 except Exception, e:
                     pass
                 if not variable:
-                    suite.variable_set.create(name=vr.name, value=vr.value, comment=comment)
+                    suite.variable_set.create(name=vr.name, value=value, comment=comment)
                 else:
-                    variable.value = vr.value
+                    variable.value = value
                     variable.comment = comment
                     variable.save()
         except Exception, err:

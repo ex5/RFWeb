@@ -2,14 +2,50 @@ import re
 
 from django.shortcuts import render_to_response, get_object_or_404
 
+from django.http import HttpResponse
 from rfweb.rfwebapp.models import Suite
 from rfweb.rfwebapp import utils
+from django.middleware.gzip import GZipMiddleware
+from django.template import loader, Context
 
+gzip_middleware = GZipMiddleware()
 
 def suite(request, suitename):
-    suite = get_object_or_404(Suite, name=suitename)
-    suitedoc = SuiteDoc(suite)
-    return render_to_response('suite.html', {'suite': suitedoc })
+    def _raw(request):
+        suite = get_object_or_404(Suite, name=suitename)
+        suitedoc = SuiteDoc(suite)
+        return render_to_response('suite.html', {'suite': suitedoc })
+    response = _raw(request)
+    return gzip_middleware.process_response(request, response)
+    return suite
+
+def suite_csv(request, suitename):
+    def _raw(request):
+        response = HttpResponse(mimetype='text/csv')
+        response['Content-Disposition'] = 'attachment; filename=suite_%s.csv' % suitename
+        t = loader.get_template('suite.csv')
+        suite = get_object_or_404(Suite, name=suitename)
+        suitedoc = SuiteDoc(suite)
+        c = Context({'suite': suitedoc,})
+        response.write(t.render(c))
+        return response
+    response = _raw(request)
+    return gzip_middleware.process_response(request, response)
+    return suite_csv
+
+def suite_md(request, suitename):
+    def _raw(request):
+        response = HttpResponse(mimetype='text/markdown')
+        response['Content-Disposition'] = 'attachment; filename=suite_%s.md' % suitename
+        t = loader.get_template('suite.md')
+        suite = get_object_or_404(Suite, name=suitename)
+        suitedoc = SuiteDoc(suite)
+        c = Context({'suite': suitedoc,})
+        response.write(t.render(c))
+        return response
+    response = _raw(request)
+    return gzip_middleware.process_response(request, response)
+    return suite_md
 
 class _DocHelper:
     # This code is adapted from libdoc.py, see

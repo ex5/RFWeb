@@ -39,7 +39,8 @@ function toggle_check_all(name, state) {
     {% for field in results.object_list.0.get_fields_names %}
     <th>{{ field }}</th>
     {% endfor %}
-    <th>Results</th>
+    <th>View result</th>
+    <th>Download result</th>
     {% for result in results.object_list %}
     <tr>
         {% if result.ip and result.hwaddr %}
@@ -75,6 +76,11 @@ function toggle_check_all(name, state) {
     <td>
     {% if result.finish %}
     <a href="{{ result.url_to_results }}/report.html">{{ result.url_to_results }}</a>
+    {% endif %}
+    </td>
+    <td>
+    {% if result.finish %}
+    <a href="/download/{{ result.results_name }}.zip">{{ result.results_name }}.zip</a>
     {% endif %}
     </td>
     {% endif %}
