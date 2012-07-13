@@ -21,7 +21,7 @@ class Task(object):
         self.on_exit = on_exit
         self.args = args
         self.my_run = Run.objects.get(pk=run_id)
-        syslog.syslog(syslog.LOG_NOTICE, "task initialized: %s, %s" % (on_exit, args))
+        syslog.syslog(syslog.LOG_NOTICE, "RobotD task initialized: %s, %s" % (on_exit, args))
         self.run_task()
 
     def run_task(self):
@@ -46,7 +46,6 @@ class Task(object):
         pass
         
 def on_exit(process):
-    syslog.syslog(syslog.LOG_DEBUG, "%s" % process.stdout.read())
     syslog.syslog(syslog.LOG_DEBUG, "%s" % process.stderr.read())
     syslog.syslog(syslog.LOG_DEBUG, "RobotD task %s has finished with returncode %s" % (process.pid, process.returncode))
 
@@ -61,17 +60,14 @@ class RobotDaemon(daemon.Daemon):
             syslog.syslog(syslog.LOG_DEBUG, 'IP address is %s, MAC %s' % (self.ip, self.hwaddr))
         except Exception, e:
             syslog.syslog(syslog.LOG_ERROR, 'Cannot fetch host IP: %s' % e)
-        #self.tasks = []
 
     def reload_config(self):
         try:
             for main_run in Run.objects.filter(hwaddr=None):
                 i = 0
                 task = main_run.task
-                syslog.syslog(syslog.LOG_DEBUG, "%s" % main_run)
                 main_run_id = main_run.pk
                 my_runs = Run.objects.filter(hwaddr=self.hwaddr, task=task, rerun=False)
-                syslog.syslog(syslog.LOG_DEBUG, "my_runs: %s" % my_runs)
                 if my_runs:
                     continue
                 my_run = Run(task_id=main_run.task.pk, hwaddr=self.hwaddr, ip=self.ip)
