@@ -58,10 +58,10 @@ class UploadFileForm(forms.Form):
                 except Exception, e:
                     pass
                 if not keyword:
-                    suite.keyword_set.create(name=kw.name, doc=kw.doc.value, args=' | '.join(map(str, kw.args.value)))
+                    suite.keyword_set.create(name=kw.name, doc=kw.doc.value, args=', '.join(map(str, kw.args.value)))
                 else:
                     keyword.doc = kw.doc.value
-                    keyword.args = ' | '.join(map(str, kw.args.value))
+                    keyword.args = ', '.join(map(str, kw.args.value))
                     keyword.save()
             for tc in suitedata.tests:
                 test = None
