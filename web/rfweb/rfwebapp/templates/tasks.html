@@ -57,9 +57,12 @@ function toggle_check_all(name, state) {
     </tr>
     {% endfor %}
 </table>
-<input type="button" value="Start selected" id="start" onclick="Dajaxice.rfweb.rfwebapp.start_tasks(Dajax.process, {'selected': get_checked('select')})" />   
-<!--input type="button" value="Stop selected" id="stop" onclick="Dajaxice.rfweb.rfwebapp.stop_tasks(Dajax.process, {'selected': get_checked('select')})" /-->
-<input type="button" value="Delete selected" id="delete" onclick="Dajaxice.rfweb.rfwebapp.delete_tasks(Dajax.process, {'selected': get_checked('select')})" /><br>
+<div id="wait" style="display: none"><br><img src="{{ MEDIA_URL}}/wait.gif" /></br></div>
+<div id="buttons" style="display: block"><br>
+    <input type="button" value="Start selected" id="start" onclick="toggle_visibility('wait'); toggle_visibility('buttons'); Dajaxice.rfweb.rfwebapp.start_tasks(Dajax.process, {'selected': get_checked('select')})" />
+    <input type="button" value="Stop selected" id="stop" onclick="toggle_visibility('wait'); toggle_visibility('buttons'); Dajaxice.rfweb.rfwebapp.stop_tasks(Dajax.process, {'selected': get_checked('select')})" />
+    <input type="button" value="Delete selected" id="delete" onclick="toggle_visibility('wait'); toggle_visibility('buttons'); Dajaxice.rfweb.rfwebapp.delete_tasks(Dajax.process, {'selected': get_checked('select')})" /></br>
+</div>
 {% else %}
 No tasks
 {% endif %}

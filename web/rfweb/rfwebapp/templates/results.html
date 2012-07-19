@@ -44,7 +44,7 @@ function toggle_check_all(name, state) {
     {% for result in results.object_list %}
     <tr>
         {% if result.ip and result.hwaddr %}
-        <td><input type="checkbox" name="select" id="ololo" /></td>
+        <td><input type="checkbox" name="select" id="{{ result.id }}" /></td>
         {% for field, value in result.get_fields %}
         {% if field == "viewed" %}
         {% if value == "True" %}
@@ -101,6 +101,8 @@ function toggle_check_all(name, state) {
         <a href="?page={{ results.next_page_number }}">next</a>
         {% endif %}
     </span>
+    <div id="wait" style="display: none"><br><img src="{{ MEDIA_URL}}/wait.gif" /></br></div>
+    <div id="buttons" style="display: block"><br><input type="button" value="Delete selected" id="delete" style="display: block"onclick="toggle_visibility('wait'); toggle_visibility('buttons'); Dajaxice.rfweb.rfwebapp.delete_runs(Dajax.process, {'selected': get_checked('select')})" /></br></div>
 </div>
 {% else %}
 No results

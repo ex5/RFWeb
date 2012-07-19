@@ -67,6 +67,8 @@ def start_tasks(request, selected):
 @dajaxice_register
 def stop_tasks(request, selected):
     dajax = Dajax()
+    runs = Run.objects.filter(task__in=map(int, selected), hwaddr=None).delete()
+    dajax.redirect('/tasks/')
     return dajax.json()
 
 @dajaxice_register
@@ -75,6 +77,13 @@ def delete_tasks(request, selected):
     tasks = Task.objects.filter(id__in=map(int, selected)).delete()
     runs = Run.objects.filter(task__in=map(int, selected)).delete()
     dajax.redirect('/tasks/')
+    return dajax.json()
+
+@dajaxice_register
+def delete_runs(request, selected):
+    dajax = Dajax()
+    run = Run.objects.filter(id__in=map(int, selected)).delete()
+    dajax.redirect('/results/')
     return dajax.json()
 
 @dajaxice_register
