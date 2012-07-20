@@ -37,15 +37,20 @@ function toggle_check_all(name, state) {
 <table class="tasks" id="tasks" valign=top>
     <th><input type="checkbox" name="select_all" id="select_all" onclick="toggle_check_all('select', this.checked)" />All</th>
     {% for field in results.object_list.0.get_fields_names %}
+    {% if field == "hwaddr" or field == "viewed"  or field == "rerun" or field == "id" %}
+    {% else %}
     <th>{{ field }}</th>
+    {% endif %}
     {% endfor %}
     <th>View result</th>
     <th>Download result</th>
     {% for result in results.object_list %}
-    <tr>
+    <tr bgcolor="#FFFFFF" onMouseOver="this.bgColor='gold';" onMouseOut="this.bgColor='#FFFFFF';">
         {% if result.ip and result.hwaddr %}
         <td><input type="checkbox" name="select" id="{{ result.id }}" /></td>
         {% for field, value in result.get_fields %}
+        {% if field == "hwaddr"  or field == "viewed" or field == "rerun" or field == "id" %}
+        {% else %}
         {% if field == "viewed" %}
         {% if value == "True" %}
         <td class="checked">Checked</td>
@@ -67,20 +72,25 @@ function toggle_check_all(name, state) {
         {% if field == "finish" and not value %}
         <td class="progress">still running</td>
         {% else %}
+        {% if field == "task" %}
+        <td>{{ result.task.name }}</td>
+        {% else %}
         <td>{{ value }}</td>
         {% endif %}
         {% endif %}
         {% endif %}
-    </td>
+        {% endif %}
+        </td>
+        {% endif %}
     {% endfor %}
     <td>
     {% if result.finish %}
-    <a href="{{ result.url_to_results }}/report.html">{{ result.url_to_results }}</a>
+    <a href="{{ result.url_to_results }}/report.html">view report</a>
     {% endif %}
     </td>
     <td>
     {% if result.finish %}
-    <a href="/download/{{ result.results_name }}.zip">{{ result.results_name }}.zip</a>
+    <a href="/download/{{ result.results_name }}.zip">download .zip</a>
     {% endif %}
     </td>
     {% endif %}

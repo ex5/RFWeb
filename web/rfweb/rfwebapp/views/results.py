@@ -28,7 +28,7 @@ class FileWrapperMine(FileWrapper):
 def results(request):
     def _raw(request):
         runs_all = Run.objects.all().order_by('-id')
-        paginator = Paginator(runs_all, 15)
+        paginator = Paginator(runs_all, 50)
         page = request.GET.get('page')
         try:
             runs = paginator.page(page != None and page or 1)

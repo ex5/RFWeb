@@ -99,21 +99,22 @@ class Run(models.Model, object):
     finish = models.DateTimeField(null=True)
     hwaddr = models.BigIntegerField(null=True) # NULL --- need to be started, Not NULL --- hwaddr
     ip = models.CharField(max_length=15, null=True)
+    uid = models.CharField(max_length=50, null=True)
     status = models.NullBooleanField(null=True)
     viewed = models.NullBooleanField(default=False)
     rerun = models.NullBooleanField(default=False)
 
+    def _get_results_name(self):
+        return "%s_%s_%s" % (self.task.name, self.uid and self.uid or self.ip, self.id)
+    results_name = property(_get_results_name)
+
     def _get_url_to_results(self):
-        return "%s%s_%s_%s" % (RESULTS_URL, self.task.name, self.ip, self.id)
+        return "%s%s" % (RESULTS_URL, self.results_name)
     url_to_results = property(_get_url_to_results)
 
     def _get_path_to_results(self):
-        return os.path.join(RESULTS_PATH, "%s_%s_%s" % (self.task.name, self.ip, self.id))
+        return os.path.join(RESULTS_PATH, self.results_name)
     path_to_results = property(_get_path_to_results)
-
-    def _get_results_name(self):
-        return "%s_%s_%s" % (self.task.name, self.ip, self.id)
-    results_name = property(_get_results_name)
 
     def get_fields_names(self):
         # make a list of fields.

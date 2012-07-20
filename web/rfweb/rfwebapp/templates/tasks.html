@@ -40,7 +40,7 @@ function toggle_check_all(name, state) {
     <th>{{ field }}</th> 
     {% endfor %}
     {% for task in tasks %}
-    <tr>
+    <tr bgcolor="#FFFFFF" onMouseOver="this.bgColor='gold';" onMouseOut="this.bgColor='#FFFFFF';">
         <td><input type="checkbox" name="select" id="{{ task.pk }}" /></td>
         {% for field, value in task.fields.items %}
         <td>
