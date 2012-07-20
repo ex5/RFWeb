@@ -17,12 +17,9 @@ LEN = 250
 class Listener():
     ROBOT_LISTENER_API_VERSION = 2
 
-    def __init__(self, run_id, filename='listener.log'):
-        outpath = os.path.join(tempfile.gettempdir(), filename)
-        self.outfile = open(outpath, 'w')
+    def __init__(self, run_id):
         self.hwaddr = get_mac()
         self.run_id = run_id
-        self.outfile.write("host: %s,  task: %s" % (self.hwaddr, self.run_id))
     
     def log(self, **kwargs):
         log_entry = Log(run_id=self.run_id, hwaddr=self.hwaddr, **kwargs)
@@ -30,22 +27,18 @@ class Listener():
 
     def start_suite(self, name, attrs):
         _str = '[%s]: %s \n' % (__file__, (str(attrs)))
-        self.outfile.write(_str)
         self.log(type=TYPE['Start suite'], time=attrs['starttime'], suite=name, comment=attrs['longname'][:LEN])
 
     def start_test(self, name, attrs):
         _str = '[%s]: %s \n' % (__file__, (str(attrs)))
-        self.outfile.write(_str)
         self.log(type=TYPE['Start test'], time=attrs['starttime'], status=attrs['critical'] == 'yes' and True or False, suite=attrs['longname'], test=name, comment=attrs['doc'][:LEN])
 
     def start_keyword(self, name, attrs):
         _str = '[%s]: %s \n' % (__file__, (str(attrs)))
-        self.outfile.write(_str)
         self.log(type=TYPE['Start keyword'], time=attrs['starttime'], keyword=name, comment=attrs['doc'][:LEN])
 
     def end_suite(self, name, attrs):
         _str = '[%s]: %s \n' % (__file__, (str(attrs)))
-        self.outfile.write(_str)
         status = attrs['status'] == 'PASS' and True or False
         run = Run.objects.get(pk=self.run_id)
         run.status = status
@@ -54,7 +47,6 @@ class Listener():
 
     def end_test(self, name, attrs):
         _str = '[%s]: %s \n' % (__file__, (str(attrs)))
-        self.outfile.write(_str)
         status = attrs['status'] == 'PASS' and True or False
         run = Run.objects.get(pk=self.run_id)
         run.status = status
@@ -63,7 +55,6 @@ class Listener():
 
     def end_keyword(self, name, attrs):
         _str = '[%s]: %s \n' % (__file__, (str(attrs)))
-        self.outfile.write(_str)
         self.log(type=TYPE['End keyword'], time=attrs['endtime'], status=attrs['status'] == 'PASS' and True or False, keyword=name, comment="Elapsed time: %s" % attrs['elapsedtime'])
 
     def log_message(self, message):
@@ -74,7 +65,5 @@ class Listener():
 
     def close(self):
         _str = '[%s]: closing\n' % __file__
-        self.outfile.write(_str)
-        self.outfile.close()
         self.log(type=TYPE['Close'])
 

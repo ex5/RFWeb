@@ -15,6 +15,8 @@ from uuid import getnode as get_mac
 import datetime
 import syslog
 
+WAT_TIME = 10
+
 class Task(object):
     def __init__(self, parent, run_id, on_exit, args):
         self.parent = parent
@@ -54,12 +56,31 @@ class RobotDaemon(daemon.Daemon):
         super(RobotDaemon, self).__init__(*argv, **kwargs)
         syslog.syslog(syslog.LOG_DEBUG, "%s" % config.path)
         self.hwaddr = get_mac()
+        self.uid = subprocess.Popen('modprobe ipmi_si && modprobe ipmi_devintf && ipmitool fru | grep "Board Serial" | sed "s/.*: \(.*\)/\\1/"', shell=True, stdout=subprocess.PIPE)
+        try:
+            last_time = time.time()
+            while self.uid.poll() == None:
+                if (time.time() - last_time) > WAT_TIME:
+                    syslog.syslog("%s, %s: %s" % (__name__, 'Waited long enough'))
+                    break
+            if self.uid.poll() != None:
+                self.uid = self.uid.stdout.read().split('\n')[0]
+        except Exception, e:
+            self.uid = None
+            syslog.syslog(syslog.LOG_ERROR, 'Cannot fetch host UID: %s' % e)
         self.ip = subprocess.Popen("ifconfig  | grep 'inet addr:'| grep -v '127.0.0.1' | cut -d: -f2 | awk '{ print $1}'", shell=True, stdout=subprocess.PIPE)
         try:
-            self.ip = self.ip.stdout.read().split('\n')[0]
-            syslog.syslog(syslog.LOG_DEBUG, 'IP address is %s, MAC %s' % (self.ip, self.hwaddr))
+            last_time = time.time()
+            while self.ip.poll() == None:
+                if (time.time() - last_time) > WAT_TIME:
+                    syslog.syslog("%s, %s: %s" % (__name__, 'Waited long enough'))
+                    break
+            if self.ip.poll() != None:
+                self.ip = self.ip.stdout.read().split('\n')[0]
         except Exception, e:
+            self.ip = None
             syslog.syslog(syslog.LOG_ERROR, 'Cannot fetch host IP: %s' % e)
+        syslog.syslog(syslog.LOG_DEBUG, 'IP: %s, MAC: %s, UID: %s' % (self.ip, self.hwaddr, self.uid))
 
     def reload_config(self):
         try:
@@ -70,11 +91,11 @@ class RobotDaemon(daemon.Daemon):
                 my_runs = Run.objects.filter(hwaddr=self.hwaddr, task=task, rerun=False)
                 if my_runs:
                     continue
-                my_run = Run(task_id=main_run.task.pk, hwaddr=self.hwaddr, ip=self.ip)
+                my_run = Run(task_id=main_run.task.pk, hwaddr=self.hwaddr, ip=self.ip, uid=self.uid)
                 my_run.save()
                 _id = "%s_%04d_%s" % (task.name, my_run.pk, self.ip)
-                _cmd = ['python2.7', config.path.pybot, '--pythonpath', "%s:%s" % (config.path.listener_path, config.path.suits_path), '--listener',
-                        "%(module)s:%(run_id)s:%(filename)s" % {'module': config.path.listener, 'filename': "listener_" + _id, 'run_id': my_run.pk}]
+                _cmd = ['python2.7', config.path.pybot, '--critical', 'critical', '--pythonpath', "%s:%s" % (config.path.listener_path, config.path.suits_path), '--listener',
+                        "%(module)s:%(run_id)s" % {'module': config.path.listener, 'run_id': my_run.pk}]
                 _suites = set()
                 for test in task.tests.all():
                     _cmd += ['--test', test.name]
