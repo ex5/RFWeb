@@ -3,6 +3,9 @@ from dajaxice.decorators import dajaxice_register
 from rfweb.rfwebapp.models import Suite, Test, Task, Run, Log, LOG_TYPE
 from django.utils import simplejson
 from forms import LogViewerForm
+from rfweb.settings import RESULTS_PATH
+import shutil
+import os
 
 COLORIZE = {'FAIL': '<font color="red">FAIL</font>',
             'PASS': '<font color="green">PASS</font>',
@@ -46,21 +49,11 @@ def create_task(request, name, suite_id, test_ids, comment, run):
 @dajaxice_register
 def start_tasks(request, selected):
     dajax = Dajax()
-    #runs = Run.objects.filter(task__in=map(int, selected)).delete()
+    main_runs = Run.objects.filter(task__in=map(int, selected), hwaddr=None).delete()
     runs = Run.objects.filter(task__in=map(int, selected)).update(rerun=True)
-    if not runs:
-        for task_id in map(int, selected):
-            new_run = Run(task=Task.objects.get(id=task_id), hwaddr=None)
-            new_run.save()
-    '''
-    runs = Run.objects.filter(task__in=map(int, selected))
-    for run in runs:
-        run.rerun = True
-        run.save()
     for task_id in map(int, selected):
         new_run = Run(task=Task.objects.get(id=task_id), hwaddr=None)
         new_run.save()
-    '''
     dajax.redirect('/tasks/')
     return dajax.json()
 
@@ -82,6 +75,12 @@ def delete_tasks(request, selected):
 @dajaxice_register
 def delete_runs(request, selected):
     dajax = Dajax()
+    runs = Run.objects.filter(id__in=map(int, selected))
+    for run in runs:
+        try:
+            shutil.rmtree(os.path.join(RESULTS_PATH, run.path_to_results))
+        except Exception, e:
+            assert False, 'ERROR: %s' % e
     run = Run.objects.filter(id__in=map(int, selected)).delete()
     dajax.redirect('/results/')
     return dajax.json()
