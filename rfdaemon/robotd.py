@@ -51,6 +51,21 @@ def on_exit(process):
     syslog.syslog(syslog.LOG_DEBUG, "%s" % process.stderr.read())
     syslog.syslog(syslog.LOG_DEBUG, "RobotD task %s has finished with returncode %s" % (process.pid, process.returncode))
 
+def get_ip():
+    ip = subprocess.Popen("ifconfig  | grep 'inet addr:'| grep -v '127.0.0.1' | cut -d: -f2 | awk '{ print $1}'", shell=True, stdout=subprocess.PIPE)
+    try:
+        last_time = time.time()
+        while ip.poll() == None:
+            if (time.time() - last_time) > WAT_TIME:
+                syslog.syslog("%s, %s: %s" % (__name__, 'Waited long enough'))
+                break
+        if ip.poll() != None:
+            ip = ip.stdout.read().split('\n')[0]
+    except Exception, e:
+        ip = None
+        syslog.syslog(syslog.LOG_DEBUG, 'Cannot fetch host IP: %s' % e)
+    return ip
+
 class RobotDaemon(daemon.Daemon):
     def __init__(self, *argv, **kwargs):
         super(RobotDaemon, self).__init__(*argv, **kwargs)
@@ -67,19 +82,8 @@ class RobotDaemon(daemon.Daemon):
                 self.uid = self.uid.stdout.read().split('\n')[0]
         except Exception, e:
             self.uid = None
-            syslog.syslog(syslog.LOG_ERROR, 'Cannot fetch host UID: %s' % e)
-        self.ip = subprocess.Popen("ifconfig  | grep 'inet addr:'| grep -v '127.0.0.1' | cut -d: -f2 | awk '{ print $1}'", shell=True, stdout=subprocess.PIPE)
-        try:
-            last_time = time.time()
-            while self.ip.poll() == None:
-                if (time.time() - last_time) > WAT_TIME:
-                    syslog.syslog("%s, %s: %s" % (__name__, 'Waited long enough'))
-                    break
-            if self.ip.poll() != None:
-                self.ip = self.ip.stdout.read().split('\n')[0]
-        except Exception, e:
-            self.ip = None
-            syslog.syslog(syslog.LOG_ERROR, 'Cannot fetch host IP: %s' % e)
+            syslog.syslog(syslog.LOG_DEBUG, 'Cannot fetch host UID: %s' % e)
+        self.ip = get_ip()
         syslog.syslog(syslog.LOG_DEBUG, 'IP: %s, MAC: %s, UID: %s' % (self.ip, self.hwaddr, self.uid))
 
     def reload_config(self):
@@ -118,7 +122,7 @@ class RobotDaemon(daemon.Daemon):
             time.sleep(2)
             self.reload_config()
 
-robotd_init = lambda: RobotDaemon(pidfile=config.path.pid_file % get_mac(), 
+robotd_init = lambda: RobotDaemon(pidfile=config.path.pid_file % (get_mac(), get_ip()), 
                          stdout=config.path.stdout, 
                          stderr=config.path.stderr)
 

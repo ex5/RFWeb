@@ -11,7 +11,7 @@ django = Dj()
 class Path():
     def __init__(self):
         self.source_dir = os.path.abspath(os.path.dirname(__file__))
-        self.pid_file = os.path.join(self.source_dir, 'robotd_%s.pid')
+        self.pid_file = os.path.join(self.source_dir, 'robotd_%s_%s.pid')
         self.stdout = "/var/log/messages"
         self.stderr = self.stdout
         self.testlist = os.path.join(self.source_dir, 'example.xml')
