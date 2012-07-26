@@ -14,8 +14,9 @@ from rfweb.rfwebapp.models import Suite, Test, Task, Run, Log
 from uuid import getnode as get_mac
 import datetime
 import syslog
+from django.db.models import Q
 
-WAT_TIME = 10
+WAT_TIME = 20
 
 class Task(object):
     def __init__(self, parent, run_id, on_exit, args):
@@ -57,7 +58,8 @@ def get_ip():
         last_time = time.time()
         while ip.poll() == None:
             if (time.time() - last_time) > WAT_TIME:
-                syslog.syslog("%s, %s: %s" % (__name__, 'Waited long enough'))
+                syslog.syslog("%s: %s" % (__name__, 'Waited long enough'))
+                ip = None
                 break
         if ip.poll() != None:
             ip = ip.stdout.read().split('\n')[0]
@@ -66,34 +68,43 @@ def get_ip():
         syslog.syslog(syslog.LOG_DEBUG, 'Cannot fetch host IP: %s' % e)
     return ip
 
+def get_uid():
+    uid = subprocess.Popen('modprobe ipmi_si && modprobe ipmi_devintf && ipmitool fru | grep "Board Serial" | sed "s/.*: \(.*\)/\\1/"', shell=True, stdout=subprocess.PIPE)
+    try:
+        last_time = time.time()
+        while uid.poll() == None:
+            if (time.time() - last_time) > WAT_TIME:
+                syslog.syslog("%s: %s" % (__name__, 'Waited long enough'))
+                uid = None
+                break
+        if uid.poll() != None:
+            uid = uid.stdout.read().split('\n')[0]
+    except Exception, e:
+        uid = None
+        syslog.syslog(syslog.LOG_DEBUG, 'Cannot fetch host UID: %s' % e)
+    return uid
+
 class RobotDaemon(daemon.Daemon):
     def __init__(self, *argv, **kwargs):
         super(RobotDaemon, self).__init__(*argv, **kwargs)
         syslog.syslog(syslog.LOG_DEBUG, "%s" % config.path)
         self.hwaddr = get_mac()
-        self.uid = subprocess.Popen('modprobe ipmi_si && modprobe ipmi_devintf && ipmitool fru | grep "Board Serial" | sed "s/.*: \(.*\)/\\1/"', shell=True, stdout=subprocess.PIPE)
-        try:
-            last_time = time.time()
-            while self.uid.poll() == None:
-                if (time.time() - last_time) > WAT_TIME:
-                    syslog.syslog("%s, %s: %s" % (__name__, 'Waited long enough'))
-                    break
-            if self.uid.poll() != None:
-                self.uid = self.uid.stdout.read().split('\n')[0]
-        except Exception, e:
-            self.uid = None
-            syslog.syslog(syslog.LOG_DEBUG, 'Cannot fetch host UID: %s' % e)
         self.ip = get_ip()
+        self.uid = get_uid()
         syslog.syslog(syslog.LOG_DEBUG, 'IP: %s, MAC: %s, UID: %s' % (self.ip, self.hwaddr, self.uid))
 
-    def reload_config(self):
+    def fetch(self):
         try:
-            for main_run in Run.objects.filter(hwaddr=None):
+            if not self.uid:
+                self.uid = get_uid()
+            for main_run in Run.objects.filter(Q(hwaddr=self.hwaddr, rerun=True) | Q(hwaddr=None)):
+                syslog.syslog(syslog.LOG_DEBUG, 'main: ' + str(main_run))
                 i = 0
                 task = main_run.task
                 main_run_id = main_run.pk
-                my_runs = Run.objects.filter(hwaddr=self.hwaddr, task=task, rerun=False)
-                if my_runs:
+                my_previous_runs = Run.objects.filter(hwaddr=self.hwaddr, task=task, rerun=False)
+                syslog.syslog(syslog.LOG_DEBUG, 'prev: ' + str(my_previous_runs))
+                if (not main_run.hwaddr and my_previous_runs) or (main_run.hwaddr and my_previous_runs and any(map(lambda prev: prev.id > main_run.id, my_previous_runs))):
                     continue
                 my_run = Run(task_id=main_run.task.pk, hwaddr=self.hwaddr, ip=self.ip, uid=self.uid)
                 my_run.save()
@@ -114,13 +125,13 @@ class RobotDaemon(daemon.Daemon):
             syslog.syslog(syslog.LOG_DEBUG, "Cannot fetch tasks: %s, %s" % (e.message, e.args))
 
     def quit(self):
-        syslog.syslog(syslog.LOG_NOTICE, 'exiting')
+        syslog.syslog(syslog.LOG_NOTICE, 'Exiting')
         self.stop()
 
     def run(self):
         while True:
             time.sleep(2)
-            self.reload_config()
+            self.fetch()
 
 robotd_init = lambda: RobotDaemon(pidfile=config.path.pid_file % (get_mac(), get_ip()), 
                          stdout=config.path.stdout, 
@@ -136,7 +147,7 @@ def main():
         if 'start' == sys.argv[1]:
             robotd.start()
         elif 'stop' == sys.argv[1]:
-            robotd.stop()
+            robotd.quit()
         elif 'restart' == sys.argv[1]:
             robotd.restart()
         elif 'status' == sys.argv[1]:
