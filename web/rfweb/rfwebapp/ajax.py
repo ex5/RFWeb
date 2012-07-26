@@ -6,6 +6,7 @@ from forms import LogViewerForm
 from rfweb.settings import RESULTS_PATH
 import shutil
 import os
+from django.db.models import Q
 
 COLORIZE = {'FAIL': '<font color="red">FAIL</font>',
             'PASS': '<font color="green">PASS</font>',
@@ -58,9 +59,17 @@ def start_tasks(request, selected):
     return dajax.json()
 
 @dajaxice_register
+def rerun_tasks(request, selected):
+    dajax = Dajax()
+    runs = Run.objects.filter(id__in=map(int, selected)).update(rerun=True)
+    dajax.redirect('/results/')
+    return dajax.json()
+
+@dajaxice_register
 def stop_tasks(request, selected):
     dajax = Dajax()
-    runs = Run.objects.filter(task__in=map(int, selected), hwaddr=None).delete()
+    main_runs = Run.objects.filter(task__in=map(int, selected), hwaddr=None).delete()
+    runs = Run.objects.filter(task__in=map(int, selected)).update(rerun=False)
     dajax.redirect('/tasks/')
     return dajax.json()
 
@@ -80,7 +89,12 @@ def delete_runs(request, selected):
         try:
             shutil.rmtree(os.path.join(RESULTS_PATH, run.path_to_results))
         except Exception, e:
-            assert False, 'ERROR: %s' % e
+            print 'ERROR: %s' % e
+    '''
+    runs = Run.objects.filter(id__in=map(int, selected))
+    for run in runs:
+        remaining_runs = Run.objects.filter(task=run.task, hwaddr=))).update(rerun=False)
+    '''
     run = Run.objects.filter(id__in=map(int, selected)).delete()
     dajax.redirect('/results/')
     return dajax.json()

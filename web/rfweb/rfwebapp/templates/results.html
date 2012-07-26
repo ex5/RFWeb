@@ -37,19 +37,19 @@ function toggle_check_all(name, state) {
 <table class="tasks" id="tasks" valign=top>
     <th><input type="checkbox" name="select_all" id="select_all" onclick="toggle_check_all('select', this.checked)" />All</th>
     {% for field in results.object_list.0.get_fields_names %}
-    {% if field == "hwaddr" or field == "viewed"  or field == "rerun" or field == "id" %}
+    {% if field == "hwaddr" or field == "viewed"  or field == "rerun" or field == "id" or field == "status"%}
     {% else %}
     <th>{{ field }}</th>
     {% endif %}
     {% endfor %}
-    <th>View result</th>
-    <th>Download result</th>
+    <th>View</th>
+    <th>Download</th>
     {% for result in results.object_list %}
     <tr bgcolor="#FFFFFF" onMouseOver="this.bgColor='gold';" onMouseOut="this.bgColor='#FFFFFF';">
         {% if result.ip and result.hwaddr %}
         <td><input type="checkbox" name="select" id="{{ result.id }}" /></td>
         {% for field, value in result.get_fields %}
-        {% if field == "hwaddr"  or field == "viewed" or field == "rerun" or field == "id" %}
+        {% if field == "hwaddr"  or field == "viewed" or field == "rerun" or field == "id" or field == "status" %}
         {% else %}
         {% if field == "viewed" %}
         {% if value == "True" %}
@@ -83,16 +83,16 @@ function toggle_check_all(name, state) {
         </td>
         {% endif %}
     {% endfor %}
-    <td>
     {% if result.finish %}
+    <td {% if result.status %} class="pass" {% else %} class="fail" {% endif %}>
     <a href="{{ result.url_to_results }}/report.html">view report</a>
-    {% endif %}
     </td>
-    <td>
+    {% endif %}
     {% if result.finish %}
+    <td {% if result.status %} class="pass" {% else %} class="fail" {% endif %}>
     <a href="/download/{{ result.results_name }}.zip">download .zip</a>
-    {% endif %}
     </td>
+    {% endif %}
     {% endif %}
 </tr>
 {% endfor %}
@@ -112,7 +112,9 @@ function toggle_check_all(name, state) {
         {% endif %}
     </span>
     <div id="wait" style="display: none"><br><img src="{{ MEDIA_URL}}/wait.gif" /></br></div>
-    <div id="buttons" style="display: block"><br><input type="button" value="Delete selected" id="delete" style="display: block"onclick="toggle_visibility('wait'); toggle_visibility('buttons'); Dajaxice.rfweb.rfwebapp.delete_runs(Dajax.process, {'selected': get_checked('select')})" /></br></div>
+    <div id="buttons" style="display: block">
+        <br><input type="button" value="Delete selected" id="delete" style="display: block"onclick="toggle_visibility('wait'); toggle_visibility('buttons'); Dajaxice.rfweb.rfwebapp.delete_runs(Dajax.process, {'selected': get_checked('select')})" />
+        <br><input type="button" value="Restart selected" id="restart" style="display: block"onclick="toggle_visibility('wait'); toggle_visibility('buttons'); Dajaxice.rfweb.rfwebapp.rerun_tasks(Dajax.process, {'selected': get_checked('select')})" /></br></div>
 </div>
 {% else %}
 No results
