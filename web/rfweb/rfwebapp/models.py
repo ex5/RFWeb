@@ -95,14 +95,18 @@ class Task(models.Model):
 class Run(models.Model, object):
     id = models.AutoField(primary_key=True)
     task = models.ForeignKey(Task)
-    start = models.DateTimeField(auto_now_add=True, auto_now=False)
-    finish = models.DateTimeField(null=True)
+    start = models.DateTimeField(auto_now_add=False, auto_now=False)
+    finish = models.DateTimeField(auto_now_add=False, auto_now=False, null=True)
     hwaddr = models.BigIntegerField(null=True) # NULL --- need to be started, Not NULL --- hwaddr
     ip = models.CharField(max_length=15, null=True)
     uid = models.CharField(max_length=50, null=True)
     status = models.NullBooleanField(null=True)
     viewed = models.NullBooleanField(default=False)
     rerun = models.NullBooleanField(default=False)
+
+    def _status_str(self):
+        return str(self.status)
+    sstatus = property(_status_str)
 
     def _get_results_name(self):
         return "%s_%s_%s" % (self.task.name, self.uid and self.uid or self.ip, self.id)
@@ -115,6 +119,15 @@ class Run(models.Model, object):
     def _get_path_to_results(self):
         return os.path.join(RESULTS_PATH, self.results_name)
     path_to_results = property(_get_path_to_results)
+
+    def _path_exists(self):
+        return os.path.exists(self.path_to_results)
+    results_exist = property(_path_exists)
+
+    def _report_exists(self):
+        _path = os.path.join(os.path.join(RESULTS_PATH, self.results_name), 'report.html')
+        return os.path.exists(_path)
+    report_exists = property(_report_exists)
 
     def get_fields_names(self):
         # make a list of fields.

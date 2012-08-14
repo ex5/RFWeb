@@ -5,5 +5,5 @@ from search import search
 from create_task import create_task
 from tasks import tasks
 from log import log
-from results import results, results_zip
+from results import results, results_zip, results_csv, results_md
 

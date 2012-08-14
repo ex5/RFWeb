@@ -15,6 +15,7 @@ from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from contextlib import closing
 from django.core.servers.basehttp import FileWrapper
 from django.http import HttpResponse
+from django.template import loader, Context
 
 class FileWrapperMine(FileWrapper):
     """
@@ -43,6 +44,30 @@ def results(request):
     response = _raw(request)
     return gzip_middleware.process_response(request, response)
     return results
+
+def results_csv(request):
+    def _raw(request):
+        response = HttpResponse(mimetype='text/csv')
+        response['Content-Disposition'] = 'attachment; filename=results.csv'
+        t = loader.get_template('results.csv')
+        runs_all = Run.objects.all().order_by('-id')
+        response.write(t.render(Context({'results': runs_all,})))
+        return response
+    response = _raw(request)
+    return gzip_middleware.process_response(request, response)
+    return results_csv
+
+def results_md(request):
+    def _raw(request):
+        response = HttpResponse(mimetype='text/csv')
+        response['Content-Disposition'] = 'attachment; filename=results.md'
+        t = loader.get_template('results.md')
+        runs_all = Run.objects.all().order_by('-id')
+        response.write(t.render(Context({'results': runs_all,})))
+        return response
+    response = _raw(request)
+    return gzip_middleware.process_response(request, response)
+    return results_md
 
 def results_zip(request, resultsname):
     def _raw(request):

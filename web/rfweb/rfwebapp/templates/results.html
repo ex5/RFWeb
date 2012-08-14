@@ -31,13 +31,13 @@ function toggle_check_all(name, state) {
 }
 </script>
 
-<h2>Results</h2>
+<h2>Results</h2> <a href="/results_csv/">Download CSV</a> <a href="/results_md/">Download MarkDown</a>
 
 {% if results and results.object_list %}
 <table class="tasks" id="tasks" valign=top>
     <th><input type="checkbox" name="select_all" id="select_all" onclick="toggle_check_all('select', this.checked)" />All</th>
     {% for field in results.object_list.0.get_fields_names %}
-    {% if field == "hwaddr" or field == "viewed"  or field == "rerun" or field == "id" or field == "status"%}
+    {% if field == "hwaddr" or field == "viewed"  or field == "rerun" or field == "id" %}
     {% else %}
     <th>{{ field }}</th>
     {% endif %}
@@ -47,9 +47,9 @@ function toggle_check_all(name, state) {
     {% for result in results.object_list %}
     <tr bgcolor="#FFFFFF" onMouseOver="this.bgColor='gold';" onMouseOut="this.bgColor='#FFFFFF';">
         {% if result.ip and result.hwaddr %}
-        <td><input type="checkbox" name="select" id="{{ result.id }}" /></td>
+        <td {% if result.sstatus == "True" %} class="pass" {% else %} {% if result.sstatus == "False" %} class="fail" {% else %} class="unknown" {% endif %} {% endif %}><input type="checkbox" name="select" id="{{ result.id }}" /></td>
         {% for field, value in result.get_fields %}
-        {% if field == "hwaddr"  or field == "viewed" or field == "rerun" or field == "id" or field == "status" %}
+        {% if field == "hwaddr"  or field == "viewed" or field == "rerun" or field == "id" %}
         {% else %}
         {% if field == "viewed" %}
         {% if value == "True" %}
@@ -83,14 +83,14 @@ function toggle_check_all(name, state) {
         </td>
         {% endif %}
     {% endfor %}
-    {% if result.finish %}
-    <td {% if result.status %} class="pass" {% else %} class="fail" {% endif %}>
-    <a href="{{ result.url_to_results }}/report.html">view report</a>
+    <td {% if result.sstatus == "True" %} class="pass" {% else %} {% if result.sstatus == "False" %} class="fail" {% else %} class="unknown" {% endif %} {% endif %}>
+    {% if result.report_exists %}
+    <a href="{{ result.url_to_results }}/report.html" target="_blank">view report</a>
     </td>
     {% endif %}
-    {% if result.finish %}
-    <td {% if result.status %} class="pass" {% else %} class="fail" {% endif %}>
-    <a href="/download/{{ result.results_name }}.zip">download .zip</a>
+    {% if result.results_exist %}
+    <td {% if result.sstatus == "True" %} class="pass" {% else %} {% if result.sstatus == "False" %} class="fail" {% else %} class="unknown" {% endif %} {% endif %}>
+    <a href="/download/{{ result.results_name }}.zip" target="_blank">download .zip</a>
     </td>
     {% endif %}
     {% endif %}

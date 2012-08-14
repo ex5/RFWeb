@@ -16,6 +16,8 @@ DAJAXICE_DEBUG = True
 DAJAXICE_JS_DOCSTRINGS = True
 DAJAXICE_NOTIFY_EXCEPTIONS = True
 
+USE_TZ = True
+#TIME_ZONE = 'Asia/Taipei'
 TIME_ZONE = 'Europe/Moscow'
 ADMINS = (
     ('Anna Sirota', 'anna.sirota@t-platforms.ru'),
@@ -55,7 +57,7 @@ RESULTS_PATH = os.path.join(MEDIA_ROOT, 'results')
 # URL that handles the media served from MEDIA_ROOT. Make sure to use a
 # trailing slash if there is a path component (optional in other cases).
 # Examples: "http://media.lawrence.com", "http://example.com/media/"
-MEDIA_URL = 'http://192.168.100.146:8181/media/'
+MEDIA_URL = 'http://qa-master:8181/media/'
 RESULTS_URL = '/results/'
 
 # URL prefix for admin media -- CSS, JavaScript and images. Make sure to use a
