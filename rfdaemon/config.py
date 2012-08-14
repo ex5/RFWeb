@@ -20,6 +20,7 @@ class Path():
         self.output = os.path.join(django.app_dir, '%s/media/results' % django.app_name)
         self.suits_path = os.path.join(django.app_dir, '%s/media/suits' % django.app_name)
         self.pybot = '/opt/python2.7/bin/pybot'
+        self.time_difference = 4
 
     def __str__(self):
         return '\n'.join(map(lambda x: "%s: %s" % (x, getattr(self, x)), self.__dict__))

@@ -12,9 +12,10 @@ sys.path.append(config.django.app_dir)
 import rfweb.settings
 from rfweb.rfwebapp.models import Suite, Test, Task, Run, Log
 from uuid import getnode as get_mac
-import datetime
 import syslog
 from django.db.models import Q
+from tz import tz
+from datetime import datetime
 
 WAT_TIME = 20
 
@@ -39,7 +40,7 @@ class Task(object):
             on_exit(proc)
             syslog.syslog(syslog.LOG_NOTICE, "Results path is: %s" % args[0][args[0].index('--outputdir') + 1])
             self.my_run.status = (proc.returncode == 0) and True or False
-            self.my_run.finish = datetime.datetime.now()
+            self.my_run.finish = datetime.now(tz(config.path.time_difference))
             self.my_run.save()
             return
         self.thread = threading.Thread(target=run_in_thread, args=(self.on_exit, self.args))
@@ -98,19 +99,19 @@ class RobotDaemon(daemon.Daemon):
             if not self.uid:
                 self.uid = get_uid()
             for main_run in Run.objects.filter(Q(hwaddr=self.hwaddr, rerun=True) | Q(hwaddr=None)):
-                syslog.syslog(syslog.LOG_DEBUG, 'main: ' + str(main_run))
+                #syslog.syslog(syslog.LOG_DEBUG, 'main: ' + str(main_run))
                 i = 0
                 task = main_run.task
                 main_run_id = main_run.pk
                 my_previous_runs = Run.objects.filter(hwaddr=self.hwaddr, task=task, rerun=False)
-                syslog.syslog(syslog.LOG_DEBUG, 'prev: ' + str(my_previous_runs))
+                #syslog.syslog(syslog.LOG_DEBUG, 'prev: ' + str(my_previous_runs))
                 if (not main_run.hwaddr and my_previous_runs) or (main_run.hwaddr and my_previous_runs and any(map(lambda prev: prev.id > main_run.id, my_previous_runs))):
                     continue
-                my_run = Run(task_id=main_run.task.pk, hwaddr=self.hwaddr, ip=self.ip, uid=self.uid)
+                my_run = Run(task_id=main_run.task.pk, hwaddr=self.hwaddr, ip=self.ip, uid=self.uid, start=datetime.now(tz(config.time_difference)))
                 my_run.save()
                 _id = "%s_%04d_%s" % (task.name, my_run.pk, self.ip)
                 _cmd = ['python2.7', config.path.pybot, '--critical', 'critical', '--pythonpath', "%s:%s" % (config.path.listener_path, config.path.suits_path), '--listener',
-                        "%(module)s:%(run_id)s" % {'module': config.path.listener, 'run_id': my_run.pk}]
+                        "%(module)s:%(run_id)s:%(uid)s" % {'module': config.path.listener, 'run_id': my_run.pk, 'uid': self.uid}]
                 _suites = set()
                 for test in task.tests.all():
                     _cmd += ['--test', test.name]
