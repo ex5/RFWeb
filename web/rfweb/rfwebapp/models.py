@@ -104,6 +104,9 @@ class Run(models.Model, object):
     viewed = models.NullBooleanField(default=False)
     rerun = models.NullBooleanField(default=False)
 
+    def hwaddr_hex(self):
+        return hex(self.hwaddr).replace('L','').replace('0x','')
+
     def _status_str(self):
         return str(self.status)
     sstatus = property(_status_str)

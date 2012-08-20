@@ -75,7 +75,11 @@ function toggle_check_all(name, state) {
         {% if field == "task" %}
         <td>{{ result.task.name }}</td>
         {% else %}
+        {% if field == "uid" and not value %}
+        <td>{{ result.hwaddr_hex }}</td>
+        {% else %}
         <td>{{ value }}</td>
+        {% endif %}
         {% endif %}
         {% endif %}
         {% endif %}

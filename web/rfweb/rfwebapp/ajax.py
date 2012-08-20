@@ -7,6 +7,8 @@ from rfweb.settings import RESULTS_PATH
 import shutil
 import os
 from django.db.models import Q
+from datetime import datetime
+import threading
 
 COLORIZE = {'FAIL': '<font color="red">FAIL</font>',
             'PASS': '<font color="green">PASS</font>',
@@ -43,7 +45,7 @@ def create_task(request, name, suite_id, test_ids, comment, run):
     dajax.assign('#preview', 'cols', max(map(len, _xml.split('/'))) + 1)
     dajax.assign('#preview', 'innerText', _xml)
     if run:
-        run = Run(task=task, hwaddr=None)
+        run = Run(start=datetime.now(), task=task, hwaddr=None)
         run.save()
     return dajax.json()
 
@@ -53,7 +55,7 @@ def start_tasks(request, selected):
     main_runs = Run.objects.filter(task__in=map(int, selected), hwaddr=None).delete()
     runs = Run.objects.filter(task__in=map(int, selected)).update(rerun=True)
     for task_id in map(int, selected):
-        new_run = Run(task=Task.objects.get(id=task_id), hwaddr=None)
+        new_run = Run(start=datetime.now(), task=Task.objects.get(id=task_id), hwaddr=None)
         new_run.save()
     dajax.redirect('/tasks/')
     return dajax.json()
@@ -85,17 +87,19 @@ def delete_tasks(request, selected):
 def delete_runs(request, selected):
     dajax = Dajax()
     runs = Run.objects.filter(id__in=map(int, selected))
-    for run in runs:
+    def delete_in_thread(args):
+        run = args
+        path = run.path_to_results
         try:
-            shutil.rmtree(os.path.join(RESULTS_PATH, run.path_to_results))
+            if path:
+                shutil.rmtree(os.path.join(RESULTS_PATH, path))
         except Exception, e:
-            print 'ERROR: %s' % e
-    '''
-    runs = Run.objects.filter(id__in=map(int, selected))
+            print 'ERROR: %s, %s' % (e, args)
+        run.delete()
+        return
     for run in runs:
-        remaining_runs = Run.objects.filter(task=run.task, hwaddr=))).update(rerun=False)
-    '''
-    run = Run.objects.filter(id__in=map(int, selected)).delete()
+        thread = threading.Thread(target=delete_in_thread, args=(run,))
+        thread.start()
     dajax.redirect('/results/')
     return dajax.json()
 

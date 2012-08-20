@@ -51,6 +51,7 @@ class UploadFileForm(forms.Form):
             suite.version = suitedata.version
             suite.path = _tmpfile
             suite.save()
+            missing_keywords = Keyword.objects.filter(suite=suite.id).exclude(name__in=map(lambda x: x.name, suitedata.keywords)).delete()
             for kw in suitedata.keywords:
                 keyword = None
                 try:
@@ -63,6 +64,7 @@ class UploadFileForm(forms.Form):
                     keyword.doc = kw.doc.value
                     keyword.args = ', '.join(map(str, kw.args.value))
                     keyword.save()
+            missing_tests = Test.objects.filter(suite=suite.id).exclude(name__in=map(lambda x: x.name, suitedata.tests)).delete()
             for tc in suitedata.tests:
                 test = None
                 try:
@@ -74,6 +76,7 @@ class UploadFileForm(forms.Form):
                 else:
                     test.doc = tc.doc.value
                     test.save()
+            missing_variables = Variable.objects.filter(suite=suite.id).exclude(name__in=map(lambda x: x.name, suitedata.variables)).delete()
             for vr in suitedata.variables:
                 variable = None
                 comment = len(vr.comment._comment) > 0 and vr.comment._comment[0] or None
