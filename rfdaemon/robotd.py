@@ -70,7 +70,10 @@ def get_ip():
     return ip
 
 def get_uid():
-    uid = subprocess.Popen('modprobe ipmi_si && modprobe ipmi_devintf && ipmitool mc info >/dev/null 2&>1 && ipmitool fru | grep "Board Serial" | sed "s/.*: \(.*\)/\\1/"', shell=True, stdout=subprocess.PIPE)
+    _cmds = 'modprobe ipmi_si;modprobe ipmi_devintf;ipmitool mc info;ipmitool fru | grep "Board Serial" | sed "s/.*: \(.*\)/\\1/"'.split(';')
+    for cmd in _cmds[:-1]:
+        subprocess.call(cmd.split(' '), stdout=open('/dev/null', 'w'))
+    uid = subprocess.Popen(_cmds[-1], shell=True, stdout=subprocess.PIPE)
     try:
         last_time = time.time()
         while uid.poll() == None:
