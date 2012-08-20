@@ -71,6 +71,7 @@ def get_ip():
 
 def get_uid():
     _cmds = 'modprobe ipmi_si;modprobe ipmi_devintf;ipmitool mc info;ipmitool fru | grep "Board Serial" | sed "s/.*: \(.*\)/\\1/"'.split(';')
+    syslog.syslog(syslog.LOG_DEBUG, str(_cmds))
     for cmd in _cmds[:-1]:
         subprocess.call(cmd.split(' '), stdout=open('/dev/null', 'w'))
     uid = subprocess.Popen(_cmds[-1], shell=True, stdout=subprocess.PIPE)

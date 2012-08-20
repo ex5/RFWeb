@@ -4,7 +4,7 @@ import sys
 import os
 import time
 import atexit
-from signal import SIGTERM
+from signal import SIGTERM, SIGKILL
 import syslog
 
 class Daemon(object):
@@ -115,12 +115,19 @@ class Daemon(object):
 
         # Try killing the daemon process	
         try:
+            trials = 0
+            max_kill_trials = 30
             while 1:
                 # suicide dirty workaround TODO
                 if os.getpid() == pid:
                     os.remove(self.pidfile)
-                os.kill(pid, SIGTERM)
-                time.sleep(0.1)
+                if trials > max_kill_trials:
+                    print "Waited long enough, sending SIGKILL"
+                    os.kill(pid, SIGKILL)
+                else:
+                    os.kill(pid, SIGTERM)
+                time.sleep(.2)
+                trials += 1
         except OSError, err:
             err = str(err)
             if err.find("No such process") > 0:
