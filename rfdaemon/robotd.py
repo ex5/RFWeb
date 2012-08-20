@@ -40,7 +40,7 @@ class Task(object):
             on_exit(proc)
             syslog.syslog(syslog.LOG_NOTICE, "Results path is: %s" % args[0][args[0].index('--outputdir') + 1])
             self.my_run.status = (proc.returncode == 0) and True or False
-            self.my_run.finish = datetime.now(tz(config.path.time_difference))
+            self.my_run.finish = datetime.now(tz(config.path.time_difference)).replace(tzinfo=None)
             self.my_run.save()
             return
         self.thread = threading.Thread(target=run_in_thread, args=(self.on_exit, self.args))
@@ -70,7 +70,7 @@ def get_ip():
     return ip
 
 def get_uid():
-    uid = subprocess.Popen('modprobe ipmi_si && modprobe ipmi_devintf && ipmitool fru | grep "Board Serial" | sed "s/.*: \(.*\)/\\1/"', shell=True, stdout=subprocess.PIPE)
+    uid = subprocess.Popen('modprobe ipmi_si && modprobe ipmi_devintf && ipmitool mc info >/dev/null 2&>1 && ipmitool fru | grep "Board Serial" | sed "s/.*: \(.*\)/\\1/"', shell=True, stdout=subprocess.PIPE)
     try:
         last_time = time.time()
         while uid.poll() == None:
@@ -107,7 +107,7 @@ class RobotDaemon(daemon.Daemon):
                 #syslog.syslog(syslog.LOG_DEBUG, 'prev: ' + str(my_previous_runs))
                 if (not main_run.hwaddr and my_previous_runs) or (main_run.hwaddr and my_previous_runs and any(map(lambda prev: prev.id > main_run.id, my_previous_runs))):
                     continue
-                my_run = Run(task_id=main_run.task.pk, hwaddr=self.hwaddr, ip=self.ip, uid=self.uid, start=datetime.now(tz(config.time_difference)))
+                my_run = Run(task_id=main_run.task.pk, hwaddr=self.hwaddr, ip=self.ip, uid=self.uid, start=datetime.now(tz(config.path.time_difference)).replace(tzinfo=None))
                 my_run.save()
                 _id = "%s_%04d_%s" % (task.name, my_run.pk, self.ip)
                 _cmd = ['python2.7', config.path.pybot, '--critical', 'critical', '--pythonpath', "%s:%s" % (config.path.listener_path, config.path.suits_path), '--listener',
