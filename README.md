@@ -3,6 +3,14 @@ RFWeb
 
 Web-app for browsing and scheduling Robot Framework tests, inspired by RFDoc
 
+
+RFDaemon
+=====
+
+RFDaemon is a small daemon which was created to run RobotFramework test suites as they are scheduled by RFWeb.
+It reads RFWeb.RFWebApp settings module and uses the same database configuration to access RFWeb database.
+If RFDaemon and RFWeb are running on different hosts RFWeb settings and settings.RESULTS_PATH/SUITES_PATH should be accessible from both of these hosts (e.g., via NFS).
+
 Requirements
 =====
 
