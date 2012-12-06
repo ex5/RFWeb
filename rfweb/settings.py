@@ -20,7 +20,7 @@ USE_TZ = True
 #TIME_ZONE = 'Asia/Taipei'
 TIME_ZONE = 'Europe/Moscow'
 ADMINS = (
-    ('Anna Sirota', 'anna.sirota@t-platforms.ru'),
+    ('admin', 'admin@example.ru'),
 )
 
 MANAGERS = ADMINS
