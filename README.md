@@ -93,11 +93,26 @@ Assuming MySQL is on the same host:
     mysql> CREATE DATABASE rfweb;
     Query OK, 1 row affected (0.00 sec)
 
-    mysql> GRANT ALL ON rfweb.* TO 'rfweb'@'%' IDENTIFIED BY '123456';
+    mysql> GRANT ALL ON rfweb.* TO rfweb@localhost IDENTIFIED BY '123456';
     Query OK, 0 rows affected (0.00 sec)
 
     mysql> FLUSH PRIVILEGES;
     Query OK, 0 rows affected (0.00 sec)
 
-If you're getting "ERROR 2003 (HY000): Can't connect to MySQL server on 'some-host' (111)", you might need to comment the line 'skip-networking' in your my.cnf.
+    mysql> exit
+    Bye
+
+Now we can sync Django db:
+
+    $ python2.7 manage.py syncdb
+
+If everything worked well Django development server can be started:
+
+    $ python2.7 manage.py runserver
+
+    Development server is running at http://127.0.0.1:8000/
+    Quit the server with CONTROL-C.
+    [07/Dec/2012 01:24:36] "GET / HTTP/1.1" 200 2404
+    [07/Dec/2012 01:24:36] "GET /dajaxice/dajaxice.core.js HTTP/1.1" 200 3624
+
 
