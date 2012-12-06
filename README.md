@@ -84,3 +84,20 @@ Setting up Dajax
 
 Preparing database
 ==
+
+Assuming MySQL is on the same host:
+
+    $ mysql -u root -p
+    Type 'help;' or '\h' for help. Type '\c' to clear the current input statement.
+
+    mysql> CREATE DATABASE rfweb;
+    Query OK, 1 row affected (0.00 sec)
+
+    mysql> GRANT ALL ON rfweb.* TO 'rfweb'@'%' IDENTIFIED BY '123456';
+    Query OK, 0 rows affected (0.00 sec)
+
+    mysql> FLUSH PRIVILEGES;
+    Query OK, 0 rows affected (0.00 sec)
+
+If you're getting "ERROR 2003 (HY000): Can't connect to MySQL server on 'some-host' (111)", you might need to comment the line 'skip-networking' in your my.cnf.
+
